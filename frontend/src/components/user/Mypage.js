@@ -9,7 +9,7 @@ import DataService from "../../data_services";
 import Loading from "../../loading";
 
 const Mypage = () => {
-  const [activeMenu, setActiveMenu] = useState("Profile");
+  const [activeMenu, setActiveMenu] = useState(localStorage.getItem("activeMenu"));
   const [loading, setLoading] = useState(false);
   const [menuStates, setMenuStates] = useState({
     Profile: true,
@@ -37,6 +37,8 @@ const Mypage = () => {
       ...Object.fromEntries(Object.keys(prevStates).map((key) => [key, false])),
       [menu]: true,
     }));
+
+    localStorage.setItem("activeMenu",menu);
     navigate(`${to}`);
   };
 
@@ -87,7 +89,7 @@ const Mypage = () => {
           <div className="w-[8%] h-[70%] fixed left-5 flex flex-col justify-evenly items-center border border-gray-100 border-solid rounded-lg bg-slate-200">
             <SideBar />
           </div>
-          <div className="w-[92%] h-[120%] absolute left-28 flex justify-center">
+          <div className="w-[92%] h-[120%] absolute left-28 top-20 flex justify-center">
             {loading ? <Loading /> : null}
             <Routes>
               <Route path="my-profile" element={<UserProfile />}></Route>

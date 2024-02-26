@@ -22,7 +22,10 @@ export class ProductService {
     }
 
     async getProduct(id:number) : Promise<Product> {
-        const result = await this.prisma.product.findUnique({where:{id}})
+        const result = await this.prisma.product.findUnique({
+            where:{id:Number(id)},
+            include:{images:true}
+        })
         return result
     }
 

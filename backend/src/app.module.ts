@@ -8,12 +8,11 @@ import { ProductModule } from './product/product.module';
 import { StoreuserModule } from './storeuser/storeuser.module';
 import { ImageModule } from './image/image.module';
 import { OrderproductModule } from './orderproduct/orderproduct.module';
-import { EventsModule } from './events/events.module';
 import { ProductImageModule } from './product-image/product-image.module';
 
 @Module({
   imports: [UserModule,ServeStaticModule.forRoot({
     rootPath: join(__dirname,"..",'profile_images')
-  }), StoreModule, OrderModule, ProductModule, StoreuserModule, ImageModule, OrderproductModule, EventsModule, ProductImageModule],
+  }), StoreModule, OrderModule, ProductModule, StoreuserModule, ImageModule, OrderproductModule, ProductImageModule],
 })
 export class AppModule{}

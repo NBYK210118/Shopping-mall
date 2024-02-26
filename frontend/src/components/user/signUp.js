@@ -2,6 +2,7 @@ import { useNavigate } from "react-router-dom";
 import DataService from "../../data_services";
 import { Images } from "../../images_list";
 import { useState } from "react";
+import Loading from "../../loading";
 
 const SignUp = () => {
   const navigate = useNavigate();
@@ -9,6 +10,7 @@ const SignUp = () => {
   const [lastName, setLast] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const handleSubmit = async () => {
     const data = {
@@ -34,6 +36,7 @@ const SignUp = () => {
 
   return (
     <div className="absolute top-16 w-full h-[90%] flex justify-center items-center">
+      {loading ? <Loading/> : null }
       <div
         id="signup_wrapper"
         className="w-[40%] h-[90%] bg-gray-100 flex flex-col items-center justify-center border border-transparent rounded-xl"

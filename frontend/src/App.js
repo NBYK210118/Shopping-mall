@@ -7,6 +7,7 @@ import Mypage from "./components/user/Mypage";
 import { Products } from "./components/products_list";
 import SignUp from "./components/user/signUp";
 import AuthContext, { AuthProvider } from "./auth.context";
+import Loading from "./loading";
 
 function MainHeader() {
   const [isMenuOpen, setMenuOpen] = useState(false);
@@ -203,8 +204,18 @@ function MainHeader() {
 }
 
 function App() {
+  const [loading, setLoading] = useState(false);
+  useEffect(()=>{
+    setLoading(true);
+    const timer = setTimeout(()=>{
+      setLoading(false);
+    },2000)
+    return () => clearTimeout(timer);
+  },[])
+
   return (
     <div className="w-[100vw] h-[100vh] relative flex justify-center" id="main">
+      {loading ? <Loading/> : "" }
       <AuthProvider>
         <MainHeader />
         <Routes>

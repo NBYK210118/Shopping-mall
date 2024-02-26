@@ -1,7 +1,6 @@
 import axios from "axios";
-import { useEffect } from "react";
-import { Navigate, useNavigate } from "react-router-dom";
 import axiosRetry from "axios-retry";
+import { useEffect, useNavigate } from "react";
 
 const http = axios.create({
   baseURL: "http://localhost:3001/",

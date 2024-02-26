@@ -20,9 +20,6 @@ import { StoreuserService } from 'src/storeuser/storeuser.service';
       }
     }),
     PrismaModule,
-    MulterModule.registerAsync({
-      useClass: MulterConfigService
-    }),
   ],
   controllers: [UserController],
   providers: [UserService, StoreuserService,PrismaService, JwtStrategy],

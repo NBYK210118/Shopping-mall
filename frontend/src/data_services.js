@@ -1,11 +1,11 @@
-import { http } from "./http-common";
+import { http } from './http-common';
 
 const signIn = async (form) => {
   try {
-    const data = await http.post("/user/signin", form);
+    const data = await http.post('/user/signin', form);
     return data;
   } catch (error) {
-    console.log("sign in error: ", error);
+    console.log('sign in error: ', error);
     setTimeout(() => {
       window.location.reload();
     }, 3000);
@@ -13,24 +13,24 @@ const signIn = async (form) => {
 };
 
 const signUp = async (form) => {
-  const data = await http.post("/user/signup", form);
+  const data = await http.post('/user/signup', form);
   return data;
 };
 
 const getEmailUser = async (token) => {
-  const data = await http.get("/user", {
+  const data = await http.get('/user', {
     headers: { Authorization: `Bearer ${token}` },
   });
   return data;
 };
 
 const createProfile = async (form) => {
-  const data = await http.post("/user/profile/create", form); // 운동 다녀와서 구현하기
+  const data = await http.post('/user/profile/create', form); // 운동 다녀와서 구현하기
   return data;
 };
 
 const getProfile = async (token) => {
-  const data = await http.get("/user/my-profile", {
+  const data = await http.get('/user/my-profile', {
     headers: { Authorization: `Bearer ${token}` },
   });
   return data;
@@ -38,21 +38,21 @@ const getProfile = async (token) => {
 
 const verifyToken = async (token, navigate) => {
   try {
-    const data = await http.get("/user/verify", {
+    const data = await http.get('/user/verify', {
       headers: { Authorization: `Bearer ${token}` },
     });
 
     return data;
   } catch (error) {
     if (error.response.status === 401) {
-      alert("권한 없음");
-      localStorage.removeItem("accessToken");
-      localStorage.removeItem("user");
-      navigate("/signin");
+      alert('권한 없음');
+      localStorage.removeItem('accessToken');
+      localStorage.removeItem('user');
+      navigate('/signin');
     } else {
-      localStorage.removeItem("accessToken");
-      localStorage.removeItem("user");
-      navigate("/signin");
+      localStorage.removeItem('accessToken');
+      localStorage.removeItem('user');
+      navigate('/signin');
       return Promise.reject(error);
     }
   }
@@ -60,60 +60,73 @@ const verifyToken = async (token, navigate) => {
 
 const updateNickname = async (token, nickname) => {
   try {
-    const data = await http.post("/user/my-profile/nickname", nickname, {
+    const data = await http.post('/user/my-profile/nickname', nickname, {
       headers: { Authorization: `Bearer ${token}` },
     });
     return data;
   } catch (error) {
-    console.log("Failed to update nickname", error);
+    console.log('Failed to update nickname', error);
   }
 };
 
 const uploadProfileImg = async (token, file) => {
   try {
-    const data = await http.post("/user/my-profile/upload", file, {
+    const data = await http.post('/user/my-profile/upload', file, {
       headers: { Authorization: `Bearer ${token}` },
     });
     return data;
   } catch (error) {
     if (error.response?.status === 400) {
-      console.log("Failed to upload Profile image", error);
+      console.log('Failed to upload Profile image', error);
     }
   }
 };
 
 const updateProfile = async (token, form, navigate) => {
   try {
-    const data = await http.post("/user/my-profile/update", form, {
+    const data = await http.post('/user/my-profile/update', form, {
       headers: { Authorization: `Bearer ${token}` },
     });
     return data;
   } catch (error) {
     if (error.response.status === 401) {
-      alert("Unauthroized!");
+      alert('Unauthroized!');
       setTimeout(() => {
-        navigate("/signin");
+        navigate('/signin');
       }, 3000);
     } else {
     }
-    console.log("Failed to update Profile", error);
+    console.log('Failed to update Profile', error);
   }
 };
 
 const addProduct = async (token, form, navigate) => {
   try {
-    const data = await http.post("/user/my-store/add-product", form, {
+    const data = await http.post('/user/my-store/add-product', form, { headers: { Authorization: `Bearer ${token}` } });
+    return data;
+  } catch (error) {
+    if (error.response.status === 401) {
+      alert('Unauthroized!');
+      setTimeout(() => {
+        navigate('/signin');
+      }, 3000);
+    } else {
+      console.error('Failed to add product: ', error);
+    }
+  }
+};
+
+const deleteProduct = async (token, form) => {
+  try {
+    const data = await http.post('/user/my-store/delete-product', form, {
       headers: { Authorization: `Bearer ${token}` },
     });
     return data;
   } catch (error) {
-    if (error.response.status === 401) {
-      alert("Unauthroized!");
-      setTimeout(() => {
-        navigate("/signin");
-      }, 3000);
+    if (error.response.status === 500) {
+      alert('서버에서 로드해오지 못함');
     } else {
-      console.error("Failed to add product: ", error);
+      console.error('Failed to delete product: ', error);
     }
   }
 };
@@ -129,6 +142,7 @@ const DataService = {
   uploadProfileImg,
   updateProfile,
   addProduct,
+  deleteProduct,
 };
 
 export default DataService;

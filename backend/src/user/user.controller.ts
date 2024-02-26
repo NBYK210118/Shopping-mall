@@ -1,4 +1,14 @@
-import { Body, Controller, Delete, Get, Param, Post, Req, Res, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Post,
+  Req,
+  Res,
+  UseGuards,
+} from '@nestjs/common';
 import { UserService } from './user.service';
 import { Image, Profile, User } from '@prisma/client';
 import { signInDto, signUpDto } from './dto/sign.dto';
@@ -8,100 +18,127 @@ import { GetUser } from './get-user.decorator';
 import { ProfileDto } from './dto/profile.dto';
 import AddProductDto from './dto/addProduct.dto';
 
-
 @Controller('user')
 export class UserController {
-    constructor(private userService : UserService) {}
+  constructor(private userService: UserService) {}
 
-    @UseGuards(AuthGuard())
-    @Get()
-    async emailUser(@GetUser() user:User){
-        return this.userService.emailUser(user.email);
+  @UseGuards(AuthGuard())
+  @Get()
+  async emailUser(@GetUser() user: User) {
+    return this.userService.emailUser(user.email);
+  }
+
+  @Get('/all')
+  async getAllUsers(): Promise<User[]> {
+    return this.userService.getAllUsers();
+  }
+
+  @UseGuards(AuthGuard())
+  @Get('/verify')
+  async verifyToken(@Req() req: Request, @Res() res: Response) {
+    try {
+      const authHeader = req.headers.authorization;
+      if (!authHeader || !authHeader.startsWith('Bearer ')) {
+        return res.status(401).json({ error: 'Unauthorized' });
+      }
+
+      const token = authHeader.split(' ')[1];
+      const currentUser = await this.userService.checkingToken(
+        token,
+        'Secret1234',
+      );
+
+      return res.json({ user: currentUser }); // Sending response using res object
+    } catch (error) {
+      console.log('Error', error);
     }
+  }
 
-    @Get('/all')
-    async getAllUsers() : Promise<User[]> {
-        return this.userService.getAllUsers();
-    }
+  @Post('/signup')
+  async signUp(@Body() data: signUpDto): Promise<User> {
+    return this.userService.signUp(data);
+  }
 
-    @UseGuards(AuthGuard())
-    @Get('/verify')
-    async verifyToken(@Req() req:Request, @Res() res:Response){
-        try{
-            const authHeader = req.headers.authorization;
-        if(!authHeader || !authHeader.startsWith('Bearer ')){
-            return res.status(401).json({error:'Unauthorized'})
-        }
+  @Post('/signin')
+  async signIn(
+    @Body() signInDto: signInDto,
+  ): Promise<{ access_token: string }> {
+    return this.userService.signIn(signInDto);
+  }
 
-        const token = authHeader.split(' ')[1];
-        const currentUser = await this.userService.checkingToken(token,'Secret1234');
+  @Delete('/del-user/:id')
+  async deleteUser(@Param('id') id: number): Promise<User> {
+    return this.userService.deleteUser(id);
+  }
 
-        return res.json({ user: currentUser }); // Sending response using res object
-        }catch(error){
-            console.log('Error',error);
-        }
-    }
+  @Delete('/del-all-user')
+  async deleteAllUsers() {
+    return this.userService.deleteAllUsers();
+  }
 
-    @Post('/signup')
-    async signUp(@Body() data:signUpDto) : Promise<User> {
-        return this.userService.signUp(data);
-    }
+  @UseGuards(AuthGuard())
+  @Get('/my-profile')
+  async getProfile(@GetUser() user: User) {
+    return this.userService.getProfile(user);
+  }
 
-    @Post('/signin')
-    async signIn(@Body() signInDto:signInDto) : Promise<{access_token:string}> {
-        return this.userService.signIn(signInDto);
-    }
+  @Get('/my-profile/all')
+  async getAllProfile(): Promise<Profile[]> {
+    return this.userService.getAllProfile();
+  }
 
-    @Delete('/del-user/:id')
-    async deleteUser(@Param('id') id:number) : Promise<User> {
-        return this.userService.deleteUser(id)
-    }
+  @UseGuards(AuthGuard())
+  @Post('/my-profile/nickname')
+  async updateNickname(
+    @GetUser() user: User,
+    @Body('nickname') nickname: string,
+  ): Promise<User> {
+    return this.userService.updateNickname(user, nickname);
+  }
 
-    @Delete('/del-all-user')
-    async deleteAllUsers(){
-        return this.userService.deleteAllUsers();
-    }
+  @UseGuards(AuthGuard())
+  @Post('/my-profile/update')
+  async updateProfile(@GetUser() user: User, @Body() data: ProfileDto) {
+    const result = await this.userService.updateProfile(user, data);
+    return result;
+  }
 
-    @UseGuards(AuthGuard())
-    @Get('/my-profile')
-    async getProfile(@GetUser() user:User) {
-        return this.userService.getProfile(user);
-    }
+  @Post('/my-profile/upload')
+  @UseGuards(AuthGuard())
+  async uploadImage(
+    @Req() req: Request,
+    @Res() res: Response,
+    @GetUser() user: User,
+  ) {
+    const { imageUrl, image_size } = req.body;
+    const result = await this.userService.uploadProfileImage(
+      user,
+      imageUrl,
+      Number(image_size),
+    );
+    return res.status(200).json({ user: result });
+  }
 
-    @Get('/my-profile/all')
-    async getAllProfile() : Promise<Profile[]> {
-        return this.userService.getAllProfile();
-    }
+  @Delete('/my-profile/:id')
+  async deleteProfile(@Param('id') id: number): Promise<Profile> {
+    return this.userService.deleteProfile(Number(id));
+  }
 
-    @UseGuards(AuthGuard())
-    @Post('/my-profile/nickname')
-    async updateNickname(@GetUser() user:User, @Body('nickname') nickname:string) : Promise<User>{
-        return this.userService.updateNickname(user,nickname);
-    }    
+  @UseGuards(AuthGuard())
+  @Post('/my-store/add-product')
+  async addProduct(
+    @GetUser() user: User,
+    @Body() addProductDto: AddProductDto,
+  ) {
+    return this.userService.addProduct(user, addProductDto);
+  }
 
-    @UseGuards(AuthGuard())
-    @Post('/my-profile/update')
-    async updateProfile(@GetUser() user:User, @Body() data:ProfileDto) {
-        const result = await this.userService.updateProfile(user,data);
-        return result
-    }
-
-    @Post('/my-profile/upload')
-    @UseGuards(AuthGuard())
-    async uploadImage(@Req() req:Request, @Res() res:Response, @GetUser() user:User){
-        const {imageUrl, image_size} = req.body;
-        const result = await this.userService.uploadProfileImage(user,imageUrl, Number(image_size));
-        return res.status(200).json({user:result})
-    }
-
-    @Delete('/my-profile/:id')
-    async deleteProfile(@Param('id') id:number) : Promise<Profile>{
-        return this.userService.deleteProfile(Number(id))
-    }
-
-    @UseGuards(AuthGuard())
-    @Post('/my-store/add-product')
-    async addProduct(@GetUser() user:User, @Body() addProductDto:AddProductDto) {
-        return this.userService.addProduct(user,addProductDto)
-    }
+  @UseGuards(AuthGuard())
+  @Post('/my-store/delete-product')
+  async deleteProduct(
+    @GetUser() user: User,
+    @Body('checklist') list: Array<number>,
+  ) {
+    return this.userService.deleteProduct(user, list);
+  }
 }
