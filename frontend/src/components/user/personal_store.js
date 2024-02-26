@@ -37,6 +37,7 @@ export default function PersonalStore() {
   const [activeOption, setActiveOption] = useState(null);
   const [manageProduct, setManageProduct] = useState(false);
   const priceInputRef = useRef();
+  const [selectedProducts, setSelectedProducts] = useState(null);
 
   const handleBeforeButton = () => {
     setActiveOption(null);
@@ -232,6 +233,7 @@ export default function PersonalStore() {
     });
   };
 
+  // 상품 수정하기에서 버튼 클릭시 API 호출
   const handleUpdateProduct = () => {};
 
   const SampleTable = () => {
@@ -270,9 +272,9 @@ export default function PersonalStore() {
         return (
           <div
             className={`w-[90%] h-[25%] flex justify-around items-center border border-solid border-gray-400 
-          rounded-lg hover:bg-gray-300 transition-all duration-300 hover:cursor-pointer 
-          ${selectedList.includes(idx) ? ' bg-blue-500 font-bold' : ''}`}
-            onClick={() => handleSellingListClick(val.id)}
+          rounded-lg hover:bg-blue-400 transition-all duration-300 hover:cursor-pointer 
+          ${selectedList.includes(val.id) ? ' bg-blue-500 font-bold text-white' : ''}`}
+            onClick={(e) => handleSellingListClick(val.id)}
           >
             <div className="w-1/2 flex justify-around">
               <div className="w-[10%]">
@@ -306,20 +308,20 @@ export default function PersonalStore() {
 
   return (
     <div
-      className={`w-full h-full flex items-center border rounded-lg ${
+      className={`w-full h-full flex items-start border rounded-lg ${
         activeOption === '상품 추가하기' ? ' justify-around' : ' justify-center'
       }`}
     >
       <div
         id="mystore_left_content"
-        className={`w-1/2 h-full mr-3 flex flex-col justify-center items-center ${activeOption ? '' : ' hidden'}`}
+        className={`w-1/2 h-full mr-3 flex flex-col items-center ${activeOption ? '' : ' hidden'}`}
       >
         {activeOption === '상품 추가하기' && (
-          <div className="w-full h-full ml-10 flex flex-col justify-center items-center">
-            <div className="w-[85%] h-[80%] mb-5 border border-gray-300 rounded-xl">
+          <div className="w-full h-full p-5 ml-10 flex flex-col items-center">
+            <div className="w-[85%] h-[85%] mb-5 border border-gray-300 rounded-xl">
               {imageUrl && <img src={imageUrl} alt="preview" className="w-full h-full" />}
             </div>
-            <div className="w-full h-[10%] flex flex-row justify-around">
+            <div className="w-full h-[10%] flex justify-around">
               <div className="w-[25%] h-full flex items-end">
                 <div
                   className="w-full h-full flex justify-center items-center border border-transparent rounded-xl text-white bg-blue-500 hover:cursor-pointer hover:bg-blue-600"
@@ -346,11 +348,11 @@ export default function PersonalStore() {
           </div>
         )}
         {activeOption === '상품 수정하기' && (
-          <div className="w-full h-full ml-10 flex flex-col justify-center items-center">
+          <div className="w-full h-full ml-10 flex flex-col items-center">
             <div className="w-[85%] h-[80%] mb-5 border border-gray-300 rounded-xl">
               {imageUrl && <img src={imageUrl} alt="preview" className="w-full h-full" />}
             </div>
-            <div className="w-full h-[10%] flex flex-row justify-around">
+            <div className="w-full h-[10%] flex justify-around">
               <div className="w-[25%] h-full flex items-end">
                 <div
                   className="w-full h-full flex justify-center items-center border border-transparent rounded-xl text-white bg-blue-500 hover:cursor-pointer hover:bg-blue-600"
@@ -379,7 +381,7 @@ export default function PersonalStore() {
       </div>
       <div
         id="mystore_right_content"
-        className={`${activeOption === '상품 추가하기' ? 'w-1/2 ' : 'w-full '} h-full flex flex-col justify-center`}
+        className={`${activeOption === '상품 추가하기' ? 'w-1/2 ' : 'w-full '} h-full flex flex-col`}
       >
         {activeOption === '상품 추가하기' && (
           <>
