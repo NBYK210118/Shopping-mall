@@ -1,0 +1,172 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum OrderType {
+  Buy
+  Sell
+}
+
+enum StoreRoles {
+  Admin
+  inventory
+  support
+  Common
+}
+
+model Image {
+  id           Int            @id @default(autoincrement())
+  imgUrl       String
+  size         Int
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+  Profile      Profile[]
+  products     Product[]
+  ProductImage ProductImage[]
+}
+
+model Profile {
+  id            Int      @id @default(autoincrement())
+  nickname      String   @default("Username")
+  address       String   @default("")
+  user          User     @relation(fields: [userId], references: [id])
+  userId        Int      @unique
+  imageUrl      String?
+  profile_image Image?   @relation(fields: [imageId], references: [id])
+  imageId       Int?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model Order {
+  id           Int            @id @default(autoincrement())
+  user         User?          @relation(fields: [userId], references: [id])
+  userId       Int?
+  products     Product[]
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+  store        Store?         @relation(fields: [storeId], references: [id])
+  storeId      Int?           @unique
+  type         OrderType
+  OrderProduct OrderProduct[]
+}
+
+model Store {
+  id            Int          @id @default(autoincrement())
+  name          String       @unique
+  users         StoreUser[]
+  orders        Order[]
+  selling_list  SellingList?
+  User          User[]
+  sellingListId Int?
+}
+
+model User {
+  id            Int          @id @default(autoincrement())
+  firstName     String
+  lastName      String
+  email         String       @unique
+  password      String
+  orders        Order[]
+  profile       Profile?
+  store         Store?       @relation(fields: [storeId], references: [id])
+  storeId       Int?         @unique
+  wishlist      WishList?
+  wishlistId    Int?         @unique
+  sellinglist   SellingList?
+  sellinglistId Int?         @unique
+  reviews       Review[]
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+  StoreUser     StoreUser[]
+}
+
+model Category {
+  id       Int       @id @default(autoincrement())
+  name     String    @unique
+  products Product[]
+}
+
+model Product {
+  id            Int            @id @default(autoincrement())
+  name          String
+  price         Int
+  description   String
+  manufacturer  String
+  category_name String
+  category      Category       @relation(fields: [categoryId], references: [id])
+  categoryId    Int
+  status        String?
+  orders        Order[]
+  images        Image[]
+  inventory     Int
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  OrderProduct  OrderProduct[]
+  ProductImage  ProductImage[]
+  WishList      WishList?      @relation(fields: [wishListId], references: [id])
+  wishListId    Int?
+  SellingList   SellingList?   @relation(fields: [sellingListId], references: [id])
+  sellingListId Int?
+}
+
+model WishList {
+  id       Int       @id @default(autoincrement())
+  user     User      @relation(fields: [userId], references: [id])
+  userId   Int       @unique
+  products Product[]
+}
+
+model SellingList {
+  id       Int       @id @default(autoincrement())
+  user     User?     @relation(fields: [userId], references: [id])
+  userId   Int?      @unique
+  store    Store?    @relation(fields: [storeId], references: [id])
+  storeId  Int?      @unique
+  products Product[]
+}
+
+model Review {
+  id     Int    @id @default(autoincrement())
+  stars  Int    @default(5)
+  txt    String
+  user   User   @relation(fields: [userId], references: [id])
+  userId Int
+}
+
+model StoreUser {
+  id      Int        @id @default(autoincrement())
+  user    User       @relation(fields: [userId], references: [id])
+  userId  Int
+  store   Store      @relation(fields: [storeId], references: [id])
+  storeId Int
+  role    StoreRoles @unique @default(Common)
+
+  @@unique([userId, storeId])
+}
+
+model ProductImage {
+  product   Product @relation(fields: [productId], references: [id])
+  productId Int
+  image     Image   @relation(fields: [imageId], references: [id])
+  imageId   Int
+
+  @@id([productId, imageId])
+}
+
+model OrderProduct {
+  order     Order   @relation(fields: [orderId], references: [id])
+  orderId   Int
+  product   Product @relation(fields: [productId], references: [id])
+  productId Int
+
+  @@id([orderId, productId])
+}
