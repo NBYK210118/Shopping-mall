@@ -3,7 +3,7 @@ import {
   UnauthorizedException,
   UploadedFile,
 } from '@nestjs/common';
-import { Image, Profile, User } from '@prisma/client';
+import { Image, Product, Profile, User } from '@prisma/client';
 import { PrismaService } from 'src/database/prisma.service';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
@@ -315,7 +315,38 @@ export class UserService {
     return onUser;
   }
 
-  async deleteProduct(user: User, list: Array<number>) {
+  async updateProduct(user:User, id:number, updateProductDto:AddProductDto) : Promise<User> {
+    const {name,price,detail,category,image,image_size,inventory,manufacturer,status} = updateProductDto;
+    const priceWithoutComma = price.replace(/,/g, '');
+    const parsedIntPrice = parseInt(priceWithoutComma, 10);
+    console.log(category);
+    const product_image = await this.prisma.productImage.findFirst({
+      where:{productId:Number(id)}
+    })
+
+    // console.log('found product: ', await this.prisma.product.findFirst({where:{id:Number(id)}}));
+    await this.prisma.product.update({
+      where:{id:Number(id)},
+      data:{
+        name,price:parsedIntPrice,status,description:detail,category_name:category,inventory:Number(inventory),manufacturer,
+        images:{update:{where:{id:product_image.imageId},data:{imgUrl:image, size:Number(image_size)}}}
+      }
+    });
+
+    const onUser = await this.emailUser(user.email);
+    return onUser
+  }
+
+  async getProductsWhileUpdate(checklist:number[]) : Promise<Product[]> {
+    const products = await this.prisma.product.findMany({
+      where:{id:{in:checklist}},
+      include:{images:true}
+    })
+    
+    return products
+  }
+
+  async deleteProduct(user: User, list: number[]) {
     console.log(list);
     await this.prisma.product.deleteMany({
       where: { id: { in: list } },

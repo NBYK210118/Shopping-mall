@@ -10,7 +10,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { UserService } from './user.service';
-import { Image, Profile, User } from '@prisma/client';
+import { Image, Product, Profile, User } from '@prisma/client';
 import { signInDto, signUpDto } from './dto/sign.dto';
 import { AuthGuard } from '@nestjs/passport';
 import { Request, Response } from 'express';
@@ -134,10 +134,27 @@ export class UserController {
   }
 
   @UseGuards(AuthGuard())
+  @Post('/my-store/update-product/:id')
+  async updateProduct(
+    @GetUser() user:User,
+    @Param('id') id:number,
+    @Body() updateProduct:AddProductDto
+  ) : Promise<User> {
+    return this.userService.updateProduct(user,id,updateProduct)
+  }
+
+  @UseGuards(AuthGuard())
+  @Post('/my-store')
+  async getProductsWhileUpdate(@Body('checklist') checklist:string) {
+    const converted_checklist = checklist.split(',').map((val)=>parseInt(val));
+    return this.userService.getProductsWhileUpdate(converted_checklist);
+  }
+
+  @UseGuards(AuthGuard())
   @Post('/my-store/delete-product')
   async deleteProduct(
     @GetUser() user: User,
-    @Body('checklist') list: Array<number>,
+    @Body('checklist') list: number[],
   ) {
     return this.userService.deleteProduct(user, list);
   }

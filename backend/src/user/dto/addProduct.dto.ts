@@ -3,7 +3,6 @@ export default class AddProductDto{
     image_size:number;
     name: string;
     detail:string;
-    description:string;
     price:string;
     status:string;
     manufacturer:string;
