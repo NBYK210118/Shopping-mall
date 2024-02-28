@@ -906,7 +906,8 @@ export default function PersonalStore() {
                       type="submit"
                       className="py-2 px-4 bg-sky-400 text-white rounded-r-md border border-solid hover:bg-sky-600"
                     >
-                      <img src={Images.Search} alt="" />
+                      {/* <img src={Images.Search} alt="" /> */}
+                      <span class="material-symbols-outlined">search</span>
                     </button>
                   </form>
                 </div>
@@ -914,7 +915,7 @@ export default function PersonalStore() {
 
               <div className="w-full h-full flex flex-col justify-center">
                 {/*슬라이드쇼*/}
-                <div className="w-full h-[35%] p-3 flex justify-between items-center">
+                <div className="w-full h-[35%] p-5 flex justify-between items-center">
                   <div className="w-[10%] flex justify-center">
                     <button id="prevBtn" className="ml-5 p-3 opacity-[0.6]" onClick={toPrev}>
                       &#10094;
@@ -985,7 +986,11 @@ export default function PersonalStore() {
                       </div>
                     </>
                   ) : (
-                    <div className={`w-[60%] ml-5 flex items-center ${clickedCategory ? ' justify-around' : ''}`}>
+                    <div
+                      className={`w-[60%] h-full ml-5 flex items-center ${
+                        clickedCategory ? ' justify-around' : ' justify-center'
+                      }`}
+                    >
                       {clickedCategory && (
                         <div className="text-sm">
                           <span>
@@ -997,8 +1002,8 @@ export default function PersonalStore() {
                       <div
                         onClick={() => setManageProduct(!manageProduct)}
                         className={`${
-                          clickedCategory ? 'w-[25%] -ml-4 ' : 'w-full '
-                        } h-full flex justify-center items-center border border-transparent rounded-lg bg-green-600 hover:cursor-pointer hover:bg-green-700`}
+                          clickedCategory ? 'w-1/4 -ml-6 ' : 'w-1/4 '
+                        } h-2/3 flex justify-center items-center border border-transparent rounded-lg bg-green-600 hover:cursor-pointer hover:bg-green-700`}
                       >
                         <span className="text-white text-xl text-nowrap font-semibold">상품 관리</span>
                       </div>

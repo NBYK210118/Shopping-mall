@@ -9,7 +9,7 @@ import DataService from '../../data_services';
 import Loading from '../../loading';
 
 const Mypage = () => {
-  const [activeMenu, setActiveMenu] = useState(localStorage.getItem('activeMenu') || 'Profile');
+  const [activeMenu, setActiveMenu] = useState(localStorage.getItem('activeMenu'));
   const [loading, setLoading] = useState(false);
   const [menuStates, setMenuStates] = useState({
     Profile: true,
@@ -24,9 +24,8 @@ const Mypage = () => {
 
   useEffect(() => {
     const storedMenueStates = JSON.parse(localStorage.getItem('menuStates'));
-    if (storedMenueStates) {
-      setMenuStates(storedMenueStates);
-    }
+    storedMenueStates[activeMenu] = true;
+    setMenuStates(storedMenueStates);
   }, []);
 
   const items = [

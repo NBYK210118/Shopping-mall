@@ -1,43 +1,58 @@
-import { Images } from "../../images_list";
+import { useEffect, useState } from 'react';
+import { Images } from '../../images_list';
 
 export const Clothes = () => {
-  return (
-    <>
-      <div
-        id="products_row_1"
-        className="w-full h-[49%] flex flex-row justify-evenly items-center"
-      >
-        <div
-          id="product_1"
-          className="w-[15%] h-full flex flex-col justify-end hover:bg-gray-100"
-        >
-          <div className="h-[80%] p-5 hover:cursor-pointer hover:scale-[1.02] hover:duration-200">
+  const [isFilledHeart, setFilledHeart] = useState(false);
+
+  useEffect(() => {
+    // 해당 카테고리의 상품 정보 전체 불러와서 useState로 데이터 관리하기
+  }, []);
+
+  const Item = () => {
+    const Result = () => {
+      return (
+        <div id="product_1" className="w-[15%] h-full flex flex-col items-center">
+          <div className="h-[80%] p-3 hover:bg-gray-100 hover:cursor-pointer hover:scale-[1.02] hover:duration-200">
             <img src={Images.Bluejean} alt="청바지" className="h-full" />
           </div>
-
-          <div className="h-[20%] flex flex-col ml-2 pl-5">
-            <div>
-              <span>상품명: 청바지</span>
+          <div className="w-full h-[20%] -mt-2 flex justify-center">
+            <div
+              className="w-1/4 h-full flex flex-col justify-center items-center"
+              onClick={() => setFilledHeart(!isFilledHeart)}
+            >
+              <img src={`${isFilledHeart ? Images.filled_heart : Images.heart}`} alt="" className="w-[25px] h-[25px]" />
             </div>
-            <div>
-              <span>가격: 30,000원</span>
+            <div className="w-1/2 h-full -m1-2 flex flex-col">
+              <div>
+                <span>청바지</span>
+              </div>
+              <div>
+                <span>30,000원</span>
+              </div>
             </div>
           </div>
         </div>
-        <div className="w-[15%] h-[100%] border border-solid border-black"></div>
-        <div className="w-[15%] h-[100%] border border-solid border-black"></div>
-        <div className="w-[15%] h-[100%] border border-solid border-black"></div>
-        <div className="w-[15%] h-[100%] border border-solid border-black"></div>
+      );
+    };
+    return <Result />;
+  };
+  return (
+    <>
+      <div id="products_row_1" className="w-full h-[25%] flex justify-center items-center">
+        <Item />
+        <Item />
+        <Item />
+        <Item />
+        <Item />
+        <Item />
       </div>
-      <div
-        id="products_row_1"
-        className="w-[100%] h-[50%] border border-solid border-black flex justify-evenly items-center"
-      >
-        <div className="w-[15%] h-[100%] border border-solid border-black"></div>
-        <div className="w-[15%] h-[100%] border border-solid border-black"></div>
-        <div className="w-[15%] h-[100%] border border-solid border-black"></div>
-        <div className="w-[15%] h-[100%] border border-solid border-black"></div>
-        <div className="w-[15%] h-[100%] border border-solid border-black"></div>
+      <div id="products_row_2" className="w-full h-[25%] flex justify-center items-center">
+        <Item />
+        <Item />
+        <Item />
+        <Item />
+        <Item />
+        <Item />
       </div>
     </>
   );
