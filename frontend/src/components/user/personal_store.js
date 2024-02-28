@@ -948,11 +948,7 @@ export default function PersonalStore() {
                     </div>
                   )}
                 </div>
-                <div
-                  className={`w-full h-[10%] flex items-center ${
-                    manageProduct ? ' justify-around' : ' justify-center'
-                  }`}
-                >
+                <div className={`w-full h-[10%] flex items-center ${clickedCategory ? '' : 'justify-center'}`}>
                   {manageProduct ? (
                     <>
                       <div className="w-full h-1/3 flex justify-center items-end">
@@ -989,11 +985,23 @@ export default function PersonalStore() {
                       </div>
                     </>
                   ) : (
-                    <div
-                      onClick={() => setManageProduct(!manageProduct)}
-                      className="w-[15%] h-2/3 flex justify-center items-center border border-transparent rounded-lg bg-green-600 hover:cursor-pointer hover:bg-green-700"
-                    >
-                      <span className="text-white text-xl text-nowrap font-semibold">상품 관리</span>
+                    <div className={`w-[60%] ml-5 flex items-center ${clickedCategory ? ' justify-around' : ''}`}>
+                      {clickedCategory && (
+                        <div className="text-sm">
+                          <span>
+                            카테고리 <b>&lt;{clickedCategory}&gt;</b>에서 판매 중인 상품 <b>{categoryItems.length}</b>
+                            개를 찾았습니다
+                          </span>
+                        </div>
+                      )}
+                      <div
+                        onClick={() => setManageProduct(!manageProduct)}
+                        className={`${
+                          clickedCategory ? 'w-[25%] -ml-4 ' : 'w-full '
+                        } h-full flex justify-center items-center border border-transparent rounded-lg bg-green-600 hover:cursor-pointer hover:bg-green-700`}
+                      >
+                        <span className="text-white text-xl text-nowrap font-semibold">상품 관리</span>
+                      </div>
                     </div>
                   )}
                 </div>

@@ -85,13 +85,13 @@ const Mypage = () => {
   }, [token]);
 
   return (
-    <div className="w-[1296px] h-[650px] flex justify-center">
+    <div className="w-[1296px] h-[760px] flex justify-center">
       <div className="w-[95%] h-full flex justify-center items-center relative">
         <div id="mypage_content" className="w-[90%] h-[90%] flex absolute top-24">
           <div className="w-[8%] h-[70%] fixed left-5 flex flex-col justify-evenly items-center border border-gray-100 border-solid rounded-lg bg-slate-200">
             <SideBar />
           </div>
-          <div className="w-full h-full absolute left-20 top-16 flex justify-center">
+          <div className="w-full h-full absolute left-20 top-8 flex justify-center">
             {loading ? <Loading /> : null}
             <Routes>
               <Route path="my-profile" element={<UserProfile />}></Route>
