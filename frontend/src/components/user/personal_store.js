@@ -1,27 +1,29 @@
-import { useNavigate } from "react-router-dom";
-import AuthContext from "../../auth.context";
-import { Images } from "../../images_list";
-import { useContext, useEffect, useRef, useState } from "react";
-import DataService from "../../data_services";
-import ProductApi from "../products/product_api";
+import { useNavigate } from 'react-router-dom';
+import AuthContext from '../../auth.context';
+import { Images } from '../../images_list';
+import { useContext, useEffect, useRef, useState } from 'react';
+import DataService from '../../data_services';
+import ProductApi from '../products/product_api';
 
 export default function PersonalStore() {
   const { token, user, setUser } = useContext(AuthContext); // AuthProvider 로 부터 제공받는 변수들
   const navigate = useNavigate();
   const [productSize, setProductSize] = useState(0);
-  const [productName, setProductName] = useState("");
-  const [productDetail, setProductDetail] = useState("");
-  const [productSecDetail, setProductSecDetail] = useState("");
-  const [productThirdDetail, setProductThirdDetail] = useState("");
-  const [productPrice, setProductPrice] = useState("");
-  const [productMaker, setProductMaker] = useState("");
-  const [categoryInput, setCategoryInput] = useState("");
-  const [inventory, setInventory] = useState("");
-  const [statusInput, setStatusInput] = useState("판매");
-  const [sellistIndex, setSellistIndex] = useState("");
+  const [productName, setProductName] = useState('');
+  const [productDetail, setProductDetail] = useState('');
+  const [productSecDetail, setProductSecDetail] = useState('');
+  const [productThirdDetail, setProductThirdDetail] = useState('');
+  const [productPrice, setProductPrice] = useState('');
+  const [productMaker, setProductMaker] = useState('');
+  const [categoryInput, setCategoryInput] = useState('');
+  const [inventory, setInventory] = useState('');
+  const [statusInput, setStatusInput] = useState('판매');
+  const [sellistIndex, setSellistIndex] = useState('');
   const [selectedList, setSelectedList] = useState([]);
   const [productsList, setProductsList] = useState([]);
   const [currentProduct, setCurrentProduct] = useState({});
+  const [categoryItems, setCategoryItems] = useState([]);
+  const [clickedCategory, setClickedCategory] = useState('');
   const [currentpage, setCurrentpage] = useState({
     first: true,
     second: false,
@@ -29,9 +31,9 @@ export default function PersonalStore() {
     fourth: false,
   });
   const [currentClick, setCurrentClick] = useState({
-    "상품 추가하기": false,
-    "상품 수정하기": false,
-    "상품 제거하기": false,
+    '상품 추가하기': false,
+    '상품 수정하기': false,
+    '상품 제거하기': false,
   });
   const [currentFile, setCurrentFile] = useState(null);
   const [imageUrl, setImageUrl] = useState(null);
@@ -39,7 +41,8 @@ export default function PersonalStore() {
   const [activeOption, setActiveOption] = useState(null);
   const [manageProduct, setManageProduct] = useState(false);
   const priceInputRef = useRef();
-  const [selectedProducts, setSelectedProducts] = useState(null);
+
+  console.log('categoryItems.length: ', categoryItems.length);
 
   // 이전 버튼 클릭 시 activeOption 비워주기
   const handleBeforeButton = () => {
@@ -68,17 +71,14 @@ export default function PersonalStore() {
     console.log(selectedList);
   }, [selectedList]);
 
-  //슬라이드 쇼의 카테고리를 클릭하면 해당 유저의 판매 물품들 중 클릭한 카테고리에 해당하는 상품들만 출력돼야함
-  const handleCategoryClick = (category) => {};
-
   // 가격 사이사이에 Comma 를 붙여주는 코드
   const handlePriceComma = (e) => {
     let price = e.target.value;
-    price = Number(price.replaceAll(",", ""));
+    price = Number(price.replaceAll(',', ''));
     if (isNaN(price)) {
       priceInputRef.current.value = 0;
     } else {
-      const formatValue = price.toLocaleString("ko-KR");
+      const formatValue = price.toLocaleString('ko-KR');
       priceInputRef.current.value = formatValue;
       setProductPrice(formatValue);
     }
@@ -96,37 +96,37 @@ export default function PersonalStore() {
 
   useEffect(() => {
     if (currentProduct) {
-      if (currentProduct["images"] && currentProduct["name"]) {
-        setImageUrl(currentProduct["images"][0]["imgUrl"]);
-        setProductName(currentProduct["name"]);
-        setProductDetail(currentProduct["description"]);
-        setProductPrice(currentProduct["price"]);
-        setProductMaker(currentProduct["manufacturer"]);
-        setCategoryInput(currentProduct["category_names"]);
-        setStatusInput(currentProduct["status"]);
-        setInventory(currentProduct["inventory"]);
+      if (currentProduct['images'] && currentProduct['name']) {
+        setImageUrl(currentProduct['images'][0]['imgUrl']);
+        setProductName(currentProduct['name']);
+        setProductDetail(currentProduct['description']);
+        setProductPrice(currentProduct['price']);
+        setProductMaker(currentProduct['manufacturer']);
+        setCategoryInput(currentProduct['category_names']);
+        setStatusInput(currentProduct['status']);
+        setInventory(currentProduct['inventory']);
       }
     } else {
-      setImageUrl("");
-      setProductName("");
-      setProductDetail("");
-      setProductPrice("");
-      setProductMaker("");
-      setCategoryInput("");
-      setStatusInput("");
+      setImageUrl('');
+      setProductName('');
+      setProductDetail('');
+      setProductPrice('');
+      setProductMaker('');
+      setCategoryInput('');
+      setStatusInput('');
       setInventory(0);
     }
   }, [currentProduct]);
 
   const handleCancelSelling = () => {
     // 선택된 상품들에 대해 삭제할 것인지 물어보기
-    const isChecking = window.confirm("정말로 삭제하시겠습니까?");
+    const isChecking = window.confirm('정말로 삭제하시겠습니까?');
     // 예 라고 대답했을 때, API 를 통해 선택된 상품번호들 서버로 보내기
     if (isChecking) {
       const formData = new FormData();
-      formData.append("checklist", selectedList);
+      formData.append('checklist', selectedList);
       DataService.deleteProduct(token, formData).then((response) => {
-        localStorage.setItem("user", JSON.stringify(response.data));
+        localStorage.setItem('user', JSON.stringify(response.data));
         setUser(response.data);
         setSelectedList((prevState) => {
           return [];
@@ -140,61 +140,56 @@ export default function PersonalStore() {
     if (sellistIndex) {
       setActiveOption(e.currentTarget.firstChild.textContent);
       ProductApi.findProduct(token, sellistIndex, navigate).then((response) => {
-        console.log("will be updated product: ", response.data);
-        localStorage.setItem("product", JSON.stringify(response.data));
-        setImageUrl(response.data["images"][0]["imgUrl"]);
-        setProductName(response.data["name"]);
-        setProductDetail(response.data["description"]);
-        setProductPrice(response.data["price"]);
-        setProductMaker(response.data["manufacturer"]);
-        setCategoryInput(response.data["category_names"]);
-        setStatusInput(response.data["status"]);
-        setInventory(response.data["inventory"]);
+        console.log('will be updated product: ', response.data);
+        localStorage.setItem('product', JSON.stringify(response.data));
+        setImageUrl(response.data['images'][0]['imgUrl']);
+        setProductName(response.data['name']);
+        setProductDetail(response.data['description']);
+        setProductPrice(response.data['price']);
+        setProductMaker(response.data['manufacturer']);
+        setCategoryInput(response.data['category_names']);
+        setStatusInput(response.data['status']);
+        setInventory(response.data['inventory']);
         setCurrentProduct(response.data);
       });
-      console.log("after findProduct: ", selectedList);
+      console.log('after findProduct: ', selectedList);
       getProductsWhileUpdate();
     } else {
-      alert("상품을 선택해주세요");
+      alert('상품을 선택해주세요');
     }
   };
 
   // 상품 수정하기에서 Submit 버튼 클릭시 API 호출
   const handleUpdateProduct = () => {
     const formData = new FormData();
-    formData.append("image", imageUrl);
-    formData.append("image_size", productSize);
-    formData.append("name", productName);
-    formData.append(
-      "detail",
-      `${productDetail} ${productSecDetail} ${productThirdDetail}`
-    );
-    formData.append("price", productPrice);
-    formData.append("manufacturer", productMaker);
-    formData.append("category", categoryInput);
-    formData.append("inventory", inventory);
-    formData.append("status", statusInput);
+    formData.append('image', imageUrl);
+    formData.append('image_size', productSize);
+    formData.append('name', productName);
+    formData.append('detail', `${productDetail} ${productSecDetail} ${productThirdDetail}`);
+    formData.append('price', productPrice);
+    formData.append('manufacturer', productMaker);
+    formData.append('category', categoryInput);
+    formData.append('inventory', inventory);
+    formData.append('status', statusInput);
 
     for (let key of formData.entries()) {
       console.log(`key[0]: ${key[0]}, key[1]: ${key[1]}`);
     }
 
     try {
-      DataService.updateProduct(token, formData, sellistIndex, navigate).then(
-        (response) => {
-          console.log(response.status);
-          if (response.data) {
-            setUser(response.data);
-            localStorage.setItem("user", JSON.stringify(response.data));
-            alert("상품 정보가 성공적으로 업데이트 되었습니다");
-            navigate("");
-          } else {
-            alert("상품 정보 업데이트 실패!");
-          }
+      DataService.updateProduct(token, formData, sellistIndex, navigate).then((response) => {
+        console.log(response.status);
+        if (response.data) {
+          setUser(response.data);
+          localStorage.setItem('user', JSON.stringify(response.data));
+          alert('상품 정보가 성공적으로 업데이트 되었습니다');
+          navigate('');
+        } else {
+          alert('상품 정보 업데이트 실패!');
         }
-      );
+      });
     } catch (error) {
-      console.log("Error: ", error);
+      console.log('Error: ', error);
     }
   };
 
@@ -213,16 +208,16 @@ export default function PersonalStore() {
 
   const SlideShow = () => {
     const category_images = [
-      { image: Images.chair, txt: "가구" },
-      { image: Images.watermelon, txt: "식품" },
-      { image: Images.macbook, txt: "전자제품" },
-      { image: Images.Bluejean, txt: "의류" },
+      { image: Images.chair, txt: '가구' },
+      { image: Images.watermelon, txt: '식품' },
+      { image: Images.macbook, txt: '전자제품' },
+      { image: Images.Bluejean, txt: '의류' },
     ];
 
     const result = category_images.map((val, idx) => (
       <div
         id="item_box"
-        className="w-[25%] flex flex-col items-center hover:cursor-pointer hover:scale-[1.05] hover:font-semibold transition-all duration-300"
+        className="w-[25%] font-semibold flex flex-col items-center hover:cursor-pointer hover:scale-[1.05] hover:font-bold transition-all duration-300"
         onClick={() => handleCategoryClick(val.txt)}
       >
         <img src={val.image} alt="" className="w-[150px] h-[150px]" />
@@ -234,32 +229,24 @@ export default function PersonalStore() {
       <>
         {currentpage.first && (
           <div className="w-[75%] h-full flex justify-center items-center">
-            <div className="w-full h-full flex flex-row justify-around items-center">
-              {result}
-            </div>
+            <div className="w-full h-full flex flex-row justify-around items-center">{result}</div>
           </div>
         )}
         {currentpage.second && (
           <div className="w-[80%] h-full">
-            <div className="w-full h-full flex flex-row justify-around items-center">
-              {result}
-            </div>
+            <div className="w-full h-full flex flex-row justify-around items-center">{result}</div>
             <span>2</span>
           </div>
         )}
         {currentpage.third && (
           <div className="w-[80%] h-full">
-            <div className="w-full h-full flex flex-row justify-around items-center">
-              {result}
-            </div>
+            <div className="w-full h-full flex flex-row justify-around items-center">{result}</div>
             <span>3</span>
           </div>
         )}
         {currentpage.fourth && (
           <div className="w-[80%] h-full">
-            <div className="w-full h-full flex flex-row justify-around items-center">
-              {result}
-            </div>
+            <div className="w-full h-full flex flex-row justify-around items-center">{result}</div>
             <span>4</span>
           </div>
         )}
@@ -301,13 +288,13 @@ export default function PersonalStore() {
 
   const getProductsWhileUpdate = () => {
     if (selectedList) {
-      console.log("selectedList: ", selectedList);
+      console.log('selectedList: ', selectedList);
       const formData = new FormData();
-      formData.append("checklist", selectedList);
+      formData.append('checklist', selectedList);
 
       DataService.getProductsWhileUpdate(token, formData).then((response) => {
         setProductsList(response.data);
-        localStorage.setItem("products", JSON.stringify(response.data));
+        localStorage.setItem('products', JSON.stringify(response.data));
         console.log(response.data);
       });
     }
@@ -315,24 +302,21 @@ export default function PersonalStore() {
 
   const handleAddProduct = () => {
     const formData = new FormData();
-    formData.append("image", imageUrl);
-    formData.append("image_size", productSize);
-    formData.append("name", productName);
-    formData.append(
-      "detail",
-      `${productDetail} ${productSecDetail} ${productThirdDetail}`
-    );
-    formData.append("price", productPrice);
-    formData.append("manufacturer", productMaker);
-    formData.append("category", categoryInput);
-    formData.append("inventory", inventory);
-    formData.append("status", statusInput);
+    formData.append('image', imageUrl);
+    formData.append('image_size', productSize);
+    formData.append('name', productName);
+    formData.append('detail', `${productDetail} ${productSecDetail} ${productThirdDetail}`);
+    formData.append('price', productPrice);
+    formData.append('manufacturer', productMaker);
+    formData.append('category', categoryInput);
+    formData.append('inventory', inventory);
+    formData.append('status', statusInput);
 
     DataService.addProduct(token, formData, navigate).then((response) => {
       if (response.data) {
-        localStorage.setItem("user", JSON.stringify(response.data));
+        localStorage.setItem('user', JSON.stringify(response.data));
         setUser(response.data);
-        alert("성공적으로 등록되었습니다!");
+        alert('성공적으로 등록되었습니다!');
       }
     });
   };
@@ -340,73 +324,75 @@ export default function PersonalStore() {
   const SampleTable = () => {
     return (
       <>
-        <div className="w-[90%] flex items-center justify-around">
+        <div className="w-[90%] p-2 flex items-center justify-around border-x border-y rounded-lg">
           <div className="w-[5%]">
             <span className="font-bold text-nowrap">상품번호/상태</span>
           </div>
-          <div className="w-[65%] flex justify-around">
+          <div className="w-[65%] ml-5 flex justify-around">
             <span className="font-bold">상품명</span>
             <span className="font-bold">가격</span>
             <span className="font-bold">카테고리</span>
             <span className="font-bold text-nowrap">제조사/원산지</span>
           </div>
-          <div className="w-[25%]">
-            <span className="font-bold">상세설명</span>
+          <div className="w-[25%] flex items-center justify-between font-bold">
+            <span className="">상세설명</span>
+            <span
+              onClick={() => setClickedCategory('')}
+              className="p-2 rounded-lg bg-yellow-500 text-white hover:cursor-pointer hover:bg-gray-200"
+            >
+              전체 상품 보기
+            </span>
           </div>
         </div>
       </>
     );
   };
 
-  const UsersOnSale = () => {
-    let Result = null;
+  //슬라이드 쇼의 카테고리를 클릭하면 해당 유저의 판매 물품들 중 클릭한 카테고리에 해당하는 상품들만 출력돼야함
+  const handleCategoryClick = (category) => {
+    ProductApi.categoriesItem(token, category, navigate).then((response) => {
+      console.log('클릭한 카테고리에 해당하는 상품들: ', response.data);
+      setCategoryItems(response.data);
+      setClickedCategory(category);
+    });
+  };
 
-    if (user["sellinglist"]) {
-      Result = user["sellinglist"]["products"].map((val, idx) => {
+  const UsersOnSale = () => {
+    let Result;
+
+    if (user.sellinglist) {
+      Result = user.sellinglist?.products.map((val, idx) => {
         return (
           <div
-            className={`w-[90%] h-[25%] flex justify-around items-center border border-solid border-gray-400 
+            className={`w-[90%] h-[25%] p-2 flex justify-around items-center border border-solid border-gray-300 
           rounded-lg hover:bg-blue-400 transition-all duration-300 hover:cursor-pointer 
-          ${
-            selectedList.includes(val.id)
-              ? " bg-blue-500 font-bold text-white"
-              : ""
-          }`}
+          ${selectedList.includes(val.id) ? ' bg-blue-500 font-bold text-white' : ''}`}
             onClick={(e) => handleSellingListClick(val.id)}
           >
             <div className="w-full flex items-center justify-around">
               <div className="w-[5%] ml-3 flex justify-center">
                 <span className="font-bold text-nowrap">
-                  {val.id ? val.id : "번호 없음"}-
-                  {val.status ? val.status : "None"}
+                  {val.id ? val.id : '번호 없음'}-{val.status ? val.status : 'None'}
                 </span>
               </div>
               <div className="w-[65%] flex justify-around -ml-10">
                 <div className="w-1/4 ml-3 flex justify-center">
-                  <span className="font-bold">
-                    {val.name ? val.name : "None"}
-                  </span>
+                  <span className="font-bold">{val.name ? val.name : 'None'}</span>
                 </div>
                 <div className="w-1/4 -ml-7 flex justify-center">
-                  <span className="font-bold">
-                    {val.price ? val.price.toLocaleString("ko-kr") : "None"}
-                  </span>
+                  <span className="font-bold">{val.price ? val.price.toLocaleString('ko-kr') : 'None'}원</span>
                 </div>
                 <div className="w-1/4 -ml-5 flex justify-center">
-                  <span className="font-bold">
-                    {val.category_name ? val.category_name : "None"}
-                  </span>
+                  <span className="font-bold">{val.category_name ? val.category_name : 'None'}</span>
                 </div>
                 <div className="w-1/4 flex justify-center">
-                  <span className="font-bold text-nowrap">
-                    {val.manufacturer ? val.manufacturer : "None"}
-                  </span>
+                  <span className="font-bold text-nowrap">{val.manufacturer ? val.manufacturer : 'None'}</span>
                 </div>
               </div>
               <div className="w-[25%]">
                 <div className="w-full flex items-center">
                   <span className="inline-block font-bold text-ellipsis overflow-hidden whitespace-nowrap">
-                    {val.description ? val.description : "None"}
+                    {val.description ? val.description : 'None'}
                   </span>
                 </div>
               </div>
@@ -414,6 +400,57 @@ export default function PersonalStore() {
           </div>
         );
       });
+
+      return Result;
+    } else {
+      return null;
+    }
+  };
+
+  const CategoriesOnSale = () => {
+    let Result;
+
+    if (categoryItems) {
+      Result = categoryItems.map((val, idx) => {
+        return (
+          <div
+            className={`w-[90%] h-[25%] p-3 flex justify-around items-center border border-solid border-gray-300 
+          rounded-lg hover:bg-blue-400 transition-all duration-300 hover:cursor-pointer 
+          ${selectedList.includes(val.id) ? ' bg-blue-500 font-bold text-white' : ''}`}
+            onClick={(e) => handleSellingListClick(val.id)}
+          >
+            <div className="w-full flex items-center justify-around">
+              <div className="w-[5%] ml-3 flex justify-center">
+                <span className="font-bold text-nowrap">
+                  {val.id ? val.id : '번호 없음'}-{val.status ? val.status : 'None'}
+                </span>
+              </div>
+              <div className="w-[65%] flex justify-around -ml-10">
+                <div className="w-1/4 ml-3 flex justify-center">
+                  <span className="font-bold">{val.name ? val.name : 'None'}</span>
+                </div>
+                <div className="w-1/4 -ml-7 flex justify-center">
+                  <span className="font-bold">{val.price ? val.price.toLocaleString('ko-kr') : 'None'}</span>
+                </div>
+                <div className="w-1/4 -ml-5 flex justify-center">
+                  <span className="font-bold">{val.category_name ? val.category_name : 'None'}</span>
+                </div>
+                <div className="w-1/4 flex justify-center">
+                  <span className="font-bold text-nowrap">{val.manufacturer ? val.manufacturer : 'None'}</span>
+                </div>
+              </div>
+              <div className="w-[25%]">
+                <div className="w-full flex items-center">
+                  <span className="inline-block font-bold text-ellipsis overflow-hidden whitespace-nowrap">
+                    {val.description ? val.description : 'None'}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+      });
+
       return Result;
     } else {
       return null;
@@ -426,36 +463,25 @@ export default function PersonalStore() {
         id="selected_items"
         className={`w-full h-[25%] p-3 flex flex-col justify-center border rounded-lg 
         hover:cursor-pointer hover:scale-[1.02] transition-all duration-300
-        ${currentProduct.name === val.name ? " bg-gray-300" : ""}`}
+        ${currentProduct?.name === val.name ? ' bg-gray-300' : ''}`}
         onClick={() => setCurrentProduct(val)}
       >
-        <div
-          id="selected_item_1"
-          className="w-full h-full flex justify-center items-center"
-        >
+        <div id="selected_item_1" className="w-full h-full flex justify-center items-center">
           <div className="w-1/2 h-full flex items-center">
-            <img
-              src={val["images"][0]["imgUrl"]}
-              alt="product_img"
-              className="w-full h-full"
-            />
+            <img src={val['images'][0]['imgUrl']} alt="product_img" className="w-full h-full" />
           </div>
           <div className="w-1/2 h-full ml-3 flex flex-col justify-around items-center">
             <div
               id="product_name"
               className="w-full inline-block text-sm text-ellipsis overflow-hidden whitespace-nowrap text-blue-500 hover:underline"
             >
-              <span className="font-semibold">
-                {val.name ? val.name : "None"}
-              </span>
+              <span className="font-semibold">{val.name ? val.name : 'None'}</span>
             </div>
             <div
               id="product_description"
               className="w-full inline-block text-sm text-ellipsis overflow-hidden whitespace-nowrap text-blue-500 hover:underline"
             >
-              <span className="">
-                {val.description ? val.description : "None"}
-              </span>
+              <span className="">{val.description ? val.description : 'None'}</span>
             </div>
           </div>
         </div>
@@ -469,21 +495,17 @@ export default function PersonalStore() {
     <>
       <div
         className={`w-full h-full flex items-center border border-gray-300 rounded-lg ${
-          activeOption === "상품 추가하기" ? " justify-around" : ""
-        } ${activeOption === "상품 수정하기" ? " justify-center" : ""}`}
+          activeOption === '상품 추가하기' ? ' justify-around' : ''
+        } ${activeOption === '상품 수정하기' ? ' justify-center' : ''}`}
       >
         <div
           id="mystore_left_content"
-          className={`w-1/2 h-[90%] mr-3 flex flex-col items-center ${
-            activeOption ? "" : " hidden"
-          }`}
+          className={`w-1/2 h-[90%] mr-3 flex flex-col items-center ${activeOption ? '' : ' hidden'}`}
         >
-          {activeOption === "상품 추가하기" && (
+          {activeOption === '상품 추가하기' && (
             <div className="w-full h-full p-5 ml-10 flex flex-col items-center">
               <div className="w-[85%] h-[85%] mb-5 border border-gray-300 rounded-xl">
-                {imageUrl && (
-                  <img src={imageUrl} alt="preview" className="w-full h-full" />
-                )}
+                {imageUrl && <img src={imageUrl} alt="preview" className="w-full h-full" />}
               </div>
               <div className="w-full h-[10%] flex justify-around">
                 <div className="w-[25%] h-full flex items-end">
@@ -494,7 +516,7 @@ export default function PersonalStore() {
                     <input
                       type="file"
                       ref={fileInputRef}
-                      style={{ display: "none" }}
+                      style={{ display: 'none' }}
                       onChange={(e) => handleFileChange(e)}
                     />
                     <span className="text-[1.2rem] font-bold">Upload</span>
@@ -511,12 +533,10 @@ export default function PersonalStore() {
               </div>
             </div>
           )}
-          {activeOption === "상품 수정하기" && (
+          {activeOption === '상품 수정하기' && (
             <div className="w-full h-full ml-10 flex flex-col items-center">
               <div className="w-[85%] h-[80%] mb-5 border border-gray-300 rounded-xl">
-                {imageUrl && (
-                  <img src={imageUrl} alt="preview" className="w-full h-full" />
-                )}
+                {imageUrl && <img src={imageUrl} alt="preview" className="w-full h-full" />}
               </div>
               <div className="w-full h-[10%] flex justify-around">
                 <div className="w-[35%] h-full flex items-end">
@@ -527,7 +547,7 @@ export default function PersonalStore() {
                     <input
                       type="file"
                       ref={fileInputRef}
-                      style={{ display: "none" }}
+                      style={{ display: 'none' }}
                       onChange={(e) => handleFileChange(e)}
                     />
                     <span className="text-[1.2rem] font-bold">Upload</span>
@@ -547,11 +567,9 @@ export default function PersonalStore() {
         </div>
         <div
           id="mystore_right_content"
-          className={`${
-            activeOption === "상품 추가하기" ? "w-1/2 " : "w-full "
-          } h-full flex flex-col`}
+          className={`${activeOption === '상품 추가하기' ? 'w-1/2 ' : 'w-full '} h-full flex flex-col`}
         >
-          {activeOption === "상품 추가하기" && (
+          {activeOption === '상품 추가하기' && (
             <>
               <div className="w-[80%] h-[85%] ml-3 flex flex-col justify-center items-center">
                 <div className="w-full mb-3 flex justify-around">
@@ -624,10 +642,7 @@ export default function PersonalStore() {
                 </div>
                 <div className="w-full mb-3 flex justify-around">
                   <div className="w-[15%]">
-                    <label
-                      htmlFor=""
-                      className="w-[10%] font-semibold text-nowrap"
-                    >
+                    <label htmlFor="" className="w-[10%] font-semibold text-nowrap">
                       제조사/원산지
                     </label>
                   </div>
@@ -644,10 +659,7 @@ export default function PersonalStore() {
                 </div>
                 <div className="w-full mb-3 flex justify-around">
                   <div className="w-[15%]">
-                    <label
-                      htmlFor=""
-                      className="w-[10%] font-semibold text-nowrap"
-                    >
+                    <label htmlFor="" className="w-[10%] font-semibold text-nowrap">
                       카테고리
                     </label>
                   </div>
@@ -658,21 +670,18 @@ export default function PersonalStore() {
                       className="w-[50%] pl-2 text-center border border-gray-400"
                       onChange={(e) => setCategoryInput(e.target.value)}
                     >
-                      <option value="Rent">Rent</option>
-                      <option value="Trip">Trip</option>
-                      <option value="Fashion">Fashion</option>
-                      <option value="Furniture">Furniture</option>
-                      <option value="Foods">Foods</option>
-                      <option value="Electronics">Electronics</option>
+                      <option value="렌트">렌트</option>
+                      <option value="여행">여행</option>
+                      <option value="의류">의류</option>
+                      <option value="가구">가구</option>
+                      <option value="식품">식품</option>
+                      <option value="전자제품">전자제품</option>
                     </select>
                   </div>
                 </div>
                 <div className="w-full mb-3 flex justify-around">
                   <div className="w-[15%]">
-                    <label
-                      htmlFor=""
-                      className="w-[10%] font-semibold text-nowrap"
-                    >
+                    <label htmlFor="" className="w-[10%] font-semibold text-nowrap">
                       재고 수량
                     </label>
                   </div>
@@ -688,10 +697,7 @@ export default function PersonalStore() {
                 </div>
                 <div className="w-full mb-3 flex justify-around">
                   <div className="w-[15%]">
-                    <label
-                      htmlFor=""
-                      className="w-[10%] font-semibold text-nowrap"
-                    >
+                    <label htmlFor="" className="w-[10%] font-semibold text-nowrap">
                       판매 여부
                     </label>
                   </div>
@@ -715,14 +721,12 @@ export default function PersonalStore() {
                   className="w-[25%] h-full flex justify-center items-center border border-transparent rounded-lg bg-sky-500 hover:bg-sky-600 hover:cursor-pointer"
                   onClick={() => handleAddProduct()}
                 >
-                  <span className="text-white font-bold text-[1.2rem]">
-                    Submit
-                  </span>
+                  <span className="text-white font-bold text-[1.2rem]">Submit</span>
                 </div>
               </div>
             </>
           )}
-          {activeOption === "상품 수정하기" && (
+          {activeOption === '상품 수정하기' && (
             <>
               <div className="w-[80%] h-[85%] ml-3 flex flex-col justify-center items-center">
                 <div className="w-full mb-3 flex justify-around">
@@ -800,10 +804,7 @@ export default function PersonalStore() {
                 </div>
                 <div className="w-full mb-3 flex justify-around">
                   <div className="w-[15%]">
-                    <label
-                      htmlFor=""
-                      className="w-[10%] font-semibold text-nowrap"
-                    >
+                    <label htmlFor="" className="w-[10%] font-semibold text-nowrap">
                       제조사/원산지
                     </label>
                   </div>
@@ -820,10 +821,7 @@ export default function PersonalStore() {
                 </div>
                 <div className="w-full mb-3 flex justify-around">
                   <div className="w-[15%]">
-                    <label
-                      htmlFor=""
-                      className="w-[10%] font-semibold text-nowrap"
-                    >
+                    <label htmlFor="" className="w-[10%] font-semibold text-nowrap">
                       카테고리
                     </label>
                   </div>
@@ -846,10 +844,7 @@ export default function PersonalStore() {
                 </div>
                 <div className="w-full mb-3 flex justify-around">
                   <div className="w-[15%]">
-                    <label
-                      htmlFor=""
-                      className="w-[10%] font-semibold text-nowrap"
-                    >
+                    <label htmlFor="" className="w-[10%] font-semibold text-nowrap">
                       재고 수량
                     </label>
                   </div>
@@ -866,10 +861,7 @@ export default function PersonalStore() {
                 </div>
                 <div className="w-full mb-3 flex justify-around">
                   <div className="w-[15%]">
-                    <label
-                      htmlFor=""
-                      className="w-[10%] font-semibold text-nowrap"
-                    >
+                    <label htmlFor="" className="w-[10%] font-semibold text-nowrap">
                       판매 여부
                     </label>
                   </div>
@@ -894,9 +886,7 @@ export default function PersonalStore() {
                   className="w-[25%] h-full flex justify-center items-center border border-transparent rounded-lg bg-sky-500 hover:bg-sky-600 hover:cursor-pointer"
                   onClick={() => handleUpdateProduct()}
                 >
-                  <span className="text-white font-bold text-[1.2rem]">
-                    Submit
-                  </span>
+                  <span className="text-white font-bold text-[1.2rem]">Submit</span>
                 </div>
               </div>
             </>
@@ -905,10 +895,7 @@ export default function PersonalStore() {
             <>
               {/*등록한 상품들 검색 상자*/}
               <div className="w-full h-[10%] flex justify-center items-center border border-transparent rounded-lg">
-                <div
-                  id="search-box"
-                  className="w-[80%] flex justify-center items-center pl-10"
-                >
+                <div id="search-box" className="w-[80%] flex justify-center items-center pl-10">
                   <form method="get" className="w-[100%] flex justify-center">
                     <input
                       type="text"
@@ -925,37 +912,28 @@ export default function PersonalStore() {
                 </div>
               </div>
 
-              <div className="w-full h-[90%] flex flex-col justify-center">
+              <div className="w-full h-full flex flex-col justify-center">
                 {/*슬라이드쇼*/}
-                <div className="w-full h-[45%] p-3 flex justify-between items-center">
+                <div className="w-full h-[35%] p-3 flex justify-between items-center">
                   <div className="w-[10%] flex justify-center">
-                    <button
-                      id="prevBtn"
-                      className="ml-5 p-3 opacity-[0.6]"
-                      onClick={toPrev}
-                    >
+                    <button id="prevBtn" className="ml-5 p-3 opacity-[0.6]" onClick={toPrev}>
                       &#10094;
                     </button>
                   </div>
 
                   <SlideShow />
                   <div className="w-[10%]">
-                    <button
-                      id="nextBtn"
-                      className="mr-5 p-3 opacity-[0.6]"
-                      onClick={toNext}
-                    >
+                    <button id="nextBtn" className="mr-5 p-3 opacity-[0.6]" onClick={toNext}>
                       &#10095;
                     </button>
                   </div>
                 </div>
                 {/*등록된 물품 리스트*/}
-                <div className="w-full h-[30%] flex flex-col justify-center items-center">
-                  {user["sellinglist"] &&
-                  user["sellinglist"]["products"].length > 0 ? (
+                <div className="w-full h-[55%] flex flex-col justify-center items-center transition-all duration-300">
+                  {user['sellinglist'] && user['sellinglist']['products'].length > 0 ? (
                     <>
                       <SampleTable />
-                      <UsersOnSale />
+                      {clickedCategory ? <CategoriesOnSale /> : <UsersOnSale />}
                     </>
                   ) : (
                     <div className="w-full h-full flex flex-col justify-end items-center">
@@ -971,20 +949,18 @@ export default function PersonalStore() {
                   )}
                 </div>
                 <div
-                  className={`w-full h-[15%] flex items-end${
-                    manageProduct ? " justify-around" : " justify-center"
+                  className={`w-full h-[10%] flex items-center ${
+                    manageProduct ? ' justify-around' : ' justify-center'
                   }`}
                 >
                   {manageProduct ? (
                     <>
                       <div className="w-full h-1/3 flex justify-center items-end">
                         <div
-                          onClick={() => handleButtons("상품 추가하기")}
+                          onClick={() => handleButtons('상품 추가하기')}
                           className="w-[60%] h-[30%] p-5 flex justify-center items-center border border-transparent rounded-lg bg-green-600 hover:cursor-pointer hover:bg-green-700"
                         >
-                          <span className="text-white text-nowrap font-semibold">
-                            상품 추가하기
-                          </span>
+                          <span className="text-white text-nowrap font-semibold">상품 추가하기</span>
                         </div>
                       </div>
                       <div className="w-full h-1/3 flex justify-center items-end">
@@ -992,9 +968,7 @@ export default function PersonalStore() {
                           onClick={(e) => handleUpdatebtn(e)}
                           className="w-[60%] h-[30%] p-5 flex justify-center items-center border border-transparent rounded-lg bg-blue-500 hover:cursor-pointer hover:bg-blue-600 transition-all duration-300"
                         >
-                          <span className="text-white font-semibold">
-                            상품 수정하기
-                          </span>
+                          <span className="text-white font-semibold">상품 수정하기</span>
                         </div>
                       </div>
                       <div className="w-full h-1/3 flex justify-center items-end">
@@ -1002,9 +976,7 @@ export default function PersonalStore() {
                           onClick={() => handleCancelSelling()}
                           className="w-[60%] h-[30%] p-5 flex justify-center items-center border border-transparent rounded-lg bg-red-500 hover:cursor-pointer hover:bg-red-600"
                         >
-                          <span className="text-white font-semibold">
-                            상품 판매취소
-                          </span>
+                          <span className="text-white font-semibold">상품 판매취소</span>
                         </div>
                       </div>
                       <div className="w-full h-1/3 flex justify-center items-end">
@@ -1012,20 +984,16 @@ export default function PersonalStore() {
                           onClick={() => setManageProduct(!manageProduct)}
                           className="w-[60%] h-[30%] p-5 flex justify-center items-center border border-transparent rounded-lg bg-yellow-500 hover:cursor-pointer hover:bg-yellow-600"
                         >
-                          <span className="text-white font-semibold">
-                            이전으로
-                          </span>
+                          <span className="text-white font-semibold">이전으로</span>
                         </div>
                       </div>
                     </>
                   ) : (
                     <div
                       onClick={() => setManageProduct(!manageProduct)}
-                      className="w-[20%] h-2/3 flex justify-center items-center border border-transparent rounded-lg bg-green-600 hover:cursor-pointer hover:bg-green-700"
+                      className="w-[15%] h-2/3 flex justify-center items-center border border-transparent rounded-lg bg-green-600 hover:cursor-pointer hover:bg-green-700"
                     >
-                      <span className="p-5 text-white text-xl text-nowrap font-semibold">
-                        상품 관리
-                      </span>
+                      <span className="text-white text-xl text-nowrap font-semibold">상품 관리</span>
                     </div>
                   )}
                 </div>
@@ -1034,10 +1002,10 @@ export default function PersonalStore() {
           )}
         </div>
       </div>
-      {activeOption === "상품 수정하기" && (
+      {activeOption === '상품 수정하기' && (
         <div
           className={`w-1/3 h-full flex flex-col justify-around items-center border border-gray-300 rounded-lg 
-      ${activeOption === "상품 수정하기" ? " justify-center" : ""}`}
+      ${activeOption === '상품 수정하기' ? ' justify-center' : ''}`}
         >
           <SelectedProductsList />
         </div>

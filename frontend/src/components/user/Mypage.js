@@ -1,36 +1,40 @@
-import { useContext, useState, useEffect } from "react";
-import { Route, Routes, useNavigate } from "react-router-dom";
-import UserProfile from "./profile";
-import PersonalStore from "./personal_store";
-import UserWishlist from "./user_wishlist";
-import UserSettings from "./user_settings";
-import AuthContext from "../../auth.context";
-import DataService from "../../data_services";
-import Loading from "../../loading";
+import { useContext, useState, useEffect } from 'react';
+import { Route, Routes, useNavigate, useParams } from 'react-router-dom';
+import UserProfile from './profile';
+import PersonalStore from './personal_store';
+import UserWishlist from './user_wishlist';
+import UserSettings from './user_settings';
+import AuthContext from '../../auth.context';
+import DataService from '../../data_services';
+import Loading from '../../loading';
 
 const Mypage = () => {
-  const [activeMenu, setActiveMenu] = useState(
-    localStorage.getItem("activeMenu")
-  );
+  const [activeMenu, setActiveMenu] = useState(localStorage.getItem('activeMenu') || 'Profile');
   const [loading, setLoading] = useState(false);
   const [menuStates, setMenuStates] = useState({
     Profile: true,
-    "My Store": false,
+    'My Store': false,
     WishList: false,
     Settings: false,
   });
-
   const { user, setUser } = useContext(AuthContext);
   const { token } = useContext(AuthContext);
 
   const navigate = useNavigate();
 
+  useEffect(() => {
+    const storedMenueStates = JSON.parse(localStorage.getItem('menuStates'));
+    if (storedMenueStates) {
+      setMenuStates(storedMenueStates);
+    }
+  }, []);
+
   const items = [
-    { txt: "Profile", to: "my-profile" },
-    { txt: "My Store", to: "my-store" },
-    { txt: "WishList", to: "wishlist" },
-    { txt: "My Orders", to: "my-orders" },
-    { txt: "Settings", to: "settings" },
+    { txt: 'Profile', to: 'my-profile' },
+    { txt: 'My Store', to: 'my-store' },
+    { txt: 'WishList', to: 'wishlist' },
+    { txt: 'My Orders', to: 'my-orders' },
+    { txt: 'Settings', to: 'settings' },
   ];
 
   const handleActive = (menu, to) => {
@@ -40,7 +44,8 @@ const Mypage = () => {
       [menu]: true,
     }));
 
-    localStorage.setItem("activeMenu", menu);
+    localStorage.setItem('menuStates', JSON.stringify(menuStates));
+    localStorage.setItem('activeMenu', menu);
     navigate(`${to}`);
   };
 
@@ -49,9 +54,7 @@ const Mypage = () => {
       <div
         key={idx}
         className={`w-[80%] h-[10%] text-white text-center border border-solid rounded-xl flex justify-center items-center hover:cursor-pointer shadow-lg ${
-          menuStates[item.txt]
-            ? " bg-blue-500 font-bold"
-            : " bg-gray-500 font-semibold hover:bg-gray-400"
+          menuStates[item.txt] ? ' bg-blue-500 font-bold' : ' bg-gray-500 font-semibold hover:bg-gray-400'
         }`}
         onClick={() => handleActive(item.txt, item.to)}
       >
@@ -66,32 +69,29 @@ const Mypage = () => {
       try {
         setLoading(true);
         if (response.status === 200) {
-          console.log("isVerified: ", response.data["user"]);
-          localStorage.removeItem("user");
-          setUser(response.data["user"]);
-          localStorage.setItem("user", JSON.stringify(response.data["user"]));
+          console.log('isVerified: ', response.data['user']);
+          localStorage.removeItem('user');
+          setUser(response.data['user']);
+          localStorage.setItem('user', JSON.stringify(response.data['user']));
           setLoading(false);
         }
       } catch (error) {
         console.log(error);
-        localStorage.removeItem("accessToken");
-        localStorage.removeItem("user");
-        navigate("/signin");
+        localStorage.removeItem('accessToken');
+        localStorage.removeItem('user');
+        navigate('/signin');
       }
     });
   }, [token]);
 
   return (
-    <div className="w-[1296px] h-[560px] flex justify-center">
+    <div className="w-[1296px] h-[650px] flex justify-center">
       <div className="w-[95%] h-full flex justify-center items-center relative">
-        <div
-          id="mypage_content"
-          className="w-[90%] h-[90%] flex absolute top-24"
-        >
+        <div id="mypage_content" className="w-[90%] h-[90%] flex absolute top-24">
           <div className="w-[8%] h-[70%] fixed left-5 flex flex-col justify-evenly items-center border border-gray-100 border-solid rounded-lg bg-slate-200">
             <SideBar />
           </div>
-          <div className="w-full h-full absolute left-20 top-4 flex justify-center">
+          <div className="w-full h-full absolute left-20 top-16 flex justify-center">
             {loading ? <Loading /> : null}
             <Routes>
               <Route path="my-profile" element={<UserProfile />}></Route>

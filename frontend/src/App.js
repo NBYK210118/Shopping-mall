@@ -1,13 +1,13 @@
-import React, { useContext, useEffect, useState } from "react";
-import { Images } from "./images_list";
-import { NavLink, Route, Routes, useNavigate } from "react-router-dom";
-import SignIn from "./components/signIn";
-import MainContent from "./components/main_content";
-import Mypage from "./components/user/Mypage";
-import { Products } from "./components/products_list";
-import SignUp from "./components/user/signUp";
-import AuthContext, { AuthProvider } from "./auth.context";
-import Loading from "./loading";
+import React, { useContext, useEffect, useState } from 'react';
+import { Images } from './images_list';
+import { NavLink, Route, Routes, useNavigate } from 'react-router-dom';
+import SignIn from './components/signIn';
+import MainContent from './components/main_content';
+import Mypage from './components/user/Mypage';
+import { Products } from './components/products_list';
+import SignUp from './components/user/signUp';
+import AuthContext, { AuthProvider } from './auth.context';
+import Loading from './loading';
 
 function MainHeader() {
   const [isMenuOpen, setMenuOpen] = useState(false);
@@ -15,7 +15,7 @@ function MainHeader() {
   const navigate = useNavigate();
 
   const goHome = () => {
-    navigate("/");
+    navigate('/');
   };
 
   const toggleMenu = (e) => {
@@ -39,37 +39,35 @@ function MainHeader() {
 
   const handleLogout = () => {
     try {
-      localStorage.removeItem("accessToken");
-      localStorage.removeItem("user");
-      navigate("/home");
+      localStorage.removeItem('accessToken');
+      localStorage.removeItem('user');
+      localStorage.removeItem('products');
+      localStorage.removeItem('product');
+      localStorage.removeItem('activeMenu');
+      navigate('/home');
       window.location.reload();
     } catch (error) {
-      navigate("/home");
+      navigate('/home');
     }
   };
 
   useEffect(() => {
-    document.addEventListener("click", closeMenu);
+    document.addEventListener('click', closeMenu);
 
     return () => {
-      document.removeEventListener("click", closeMenu);
+      document.removeEventListener('click', closeMenu);
     };
   }, []);
 
   const menus = () => {
     const result = [
-      { to: "/home", text: "Home" },
-      { to: "/support", text: "Support" },
+      { to: '/home', text: 'Home' },
+      { to: '/support', text: 'Support' },
     ];
 
     const links = result.map((val, idx) => (
       <div className="border border-transparent rounded-full block p-4 hover:bg-sky-300">
-        <NavLink
-          key={idx}
-          to={val.to}
-          onClick={closeMenu}
-          className="text-nowrap text-base text-white font-semibold"
-        >
+        <NavLink key={idx} to={val.to} onClick={closeMenu} className="text-nowrap text-base text-white font-semibold">
           {val.text}
         </NavLink>
       </div>
@@ -80,39 +78,28 @@ function MainHeader() {
 
   return (
     <>
-      <div
-        id="main_header"
-        className="w-[100%] h-[70px] fixed z-30 flex justify-between items-center bg-sky-400 mb-7"
-      >
-        <div
-          id="main_header_menus"
-          className="w-[20%] flex flex-row justify-between p-4"
-        >
+      <div id="main_header" className="w-[100%] h-[70px] fixed z-30 flex justify-between items-center bg-sky-400 mb-7">
+        <div id="main_header_menus" className="w-[20%] flex flex-row justify-between p-4">
           <div className="w-[30%] flex flex-row items-center justify-center ">
             <button
-              className="menu p-2 focus:outline-none flex items-center ml-4 border border-transparent rounded-full hover:bg-sky-300"
+              className={`menu p-2 focus:outline-none flex items-center ml-4 border border-transparent rounded-full hover:bg-sky-300 ${
+                isMenuOpen ? ' hidden' : ''
+              }`}
               onClick={handleIconClick}
             >
               <svg
-                className={`w-8 h-8 text-white ${isMenuOpen ? " hidden" : ""}`}
+                className={`w-8 h-8 text-white ${isMenuOpen ? ' hidden' : ''}`}
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
               >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M4 6h16M4 12h16m-7 6h7"
-                />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16m-7 6h7" />
               </svg>
             </button>
           </div>
           <div
-            className={` w-[40%] h-[100%] flex flex-row justify-around items-center ${
-              isMenuOpen ? "" : " hidden"
-            }`}
+            className={`w-[40%] h-[100%] flex flex-row justify-around items-center ${isMenuOpen ? '' : ' hidden'}`}
             onClick={handleMenuClick}
           >
             {menus()}
@@ -141,27 +128,13 @@ function MainHeader() {
               </>
             ) : (
               <>
-                <div
-                  className="border border-transparent rounded-full flex p-4 hover:bg-sky-300"
-                  onClick={closeMenu}
-                >
-                  <NavLink
-                    key="3"
-                    to="/signin"
-                    className="text-nowrap text-base text-white font-semibold"
-                  >
+                <div className="border border-transparent rounded-full flex p-4 hover:bg-sky-300" onClick={closeMenu}>
+                  <NavLink key="3" to="/signin" className="text-nowrap text-base text-white font-semibold">
                     Sign in
                   </NavLink>
                 </div>
-                <div
-                  className="border border-transparent rounded-full flex p-4 hover:bg-sky-300"
-                  onClick={closeMenu}
-                >
-                  <NavLink
-                    key="4"
-                    to="/signup"
-                    className="text-nowrap text-base text-white font-semibold"
-                  >
+                <div className="border border-transparent rounded-full flex p-4 hover:bg-sky-300" onClick={closeMenu}>
+                  <NavLink key="4" to="/signup" className="text-nowrap text-base text-white font-semibold">
                     Sign Up
                   </NavLink>
                 </div>
@@ -169,10 +142,7 @@ function MainHeader() {
             )}
           </div>
         </div>
-        <div
-          id="search-box"
-          className="w-[30%] flex justify-center items-center -ml-52"
-        >
+        <div id="search-box" className="w-[30%] flex justify-center items-center -ml-52">
           <form method="get" className="w-[100%] flex justify-center ">
             <input
               type="text"
@@ -205,17 +175,18 @@ function MainHeader() {
 
 function App() {
   const [loading, setLoading] = useState(false);
-  useEffect(()=>{
+
+  useEffect(() => {
     setLoading(true);
-    const timer = setTimeout(()=>{
+    const timer = setTimeout(() => {
       setLoading(false);
-    },2000)
+    }, 2000);
     return () => clearTimeout(timer);
-  },[])
+  }, []);
 
   return (
     <div className="w-[100vw] h-[100vh] relative flex justify-center" id="main">
-      {loading ? <Loading/> : "" }
+      {loading ? <Loading /> : ''}
       <AuthProvider>
         <MainHeader />
         <Routes>
