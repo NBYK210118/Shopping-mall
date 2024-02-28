@@ -66,7 +66,7 @@ function MainHeader() {
     ];
 
     const links = result.map((val, idx) => (
-      <div className="border border-transparent rounded-full block p-4 hover:bg-sky-300">
+      <div className="border border-transparent rounded-full block p-3 hover:bg-sky-300">
         <NavLink key={idx} to={val.to} onClick={closeMenu} className="text-nowrap text-base text-white font-semibold">
           {val.text}
         </NavLink>
@@ -78,9 +78,9 @@ function MainHeader() {
 
   return (
     <>
-      <div id="main_header" className="w-[100%] h-[70px] fixed z-30 flex justify-between items-center bg-sky-400 mb-7">
-        <div id="main_header_menus" className="w-[20%] flex flex-row justify-between p-4">
-          <div className="w-[30%] flex flex-row items-center justify-center ">
+      <div id="main_header" className="w-full h-[70px] fixed top-0 z-20 flex justify-between items-center bg-sky-400">
+        <div id="main_header_menus" className="w-[20%] flex justify-between">
+          <div className="w-[30%] flex items-center justify-center ">
             <button
               className={`menu p-2 focus:outline-none flex items-center ml-4 border border-transparent rounded-full hover:bg-sky-300 ${
                 isMenuOpen ? ' hidden' : ''
@@ -99,7 +99,7 @@ function MainHeader() {
             </button>
           </div>
           <div
-            className={`w-[40%] h-[100%] flex flex-row justify-around items-center ${isMenuOpen ? '' : ' hidden'}`}
+            className={`h-full flex justify-around items-center ${isMenuOpen ? '' : ' hidden'}`}
             onClick={handleMenuClick}
           >
             {menus()}
@@ -142,12 +142,18 @@ function MainHeader() {
             )}
           </div>
         </div>
-        <div id="search-box" className="w-[30%] flex justify-center items-center -ml-52">
-          <form method="get" className="w-[100%] flex justify-center ">
+        {/* 헤더 검색 상자 */}
+        <div id="search-box" className="w-[30%] hidden justify-center items-center -ml-52 max-md:flex">
+          <form method="get" className="flex justify-center bg-white rounded-lg p-3 active:bg-black">
+            <span>&#128269;</span>
+          </form>
+        </div>
+        <div id="search-box" className="w-[30%] flex justify-center items-center -ml-52 max-md:hidden">
+          <form method="get" className="w-full flex justify-center ">
             <input
               type="text"
               placeholder="What are you looking for?"
-              className="py-2 px-4 rounded-l-md focus:outline-none w-[70%] placeholder:pl-1 focus:w-[100%] transition-[all] duration-700"
+              className="py-2 px-4 rounded-l-md focus:outline-none w-[70%] placeholder:pl-1 focus:w-full transition-[all] duration-700"
             />
             <button
               type="submit"
@@ -157,16 +163,21 @@ function MainHeader() {
             </button>
           </form>
         </div>
+
+        {/* 로고 */}
         <div
-          className="w-[100px] h-[100%] flex justify-center items-center pr-5 mr-10"
+          className="w-[120px] h-full flex justify-center items-center pr-5 bg-black/50 hover:cursor-pointer max-md:hidden"
           id="main_header_logo"
           onClick={() => goHome()}
         >
-          <img
-            src={Images.logo}
-            alt=""
-            className="border border-transparent rounded-xl w-[100%] hover:cursor-pointer"
-          />
+          <span className="text-white text-3xl font-bold font-serif tracking-widest">CAVE</span>
+        </div>
+        <div
+          className="w-[100px] h-full hidden justify-center items-center pr-5 mr-10 max-md:flex"
+          id="main_header_logo"
+          onClick={() => goHome()}
+        >
+          <img src={Images.logo} alt="" className="border border-transparent rounded-xl w-full hover:cursor-pointer" />
         </div>
       </div>
     </>
@@ -185,18 +196,20 @@ function App() {
   }, []);
 
   return (
-    <div className="w-[100vw] h-[100vh] relative flex justify-center" id="main">
+    <div className="w-[100vw] h-[100vh] overflow-hidden" id="main">
       {loading ? <Loading /> : ''}
       <AuthProvider>
         <MainHeader />
-        <Routes>
-          <Route exact path="/" element={<MainContent />}></Route>
-          <Route exact path="/home" element={<MainContent />}></Route>
-          <Route exact path="/user/*" element={<Mypage />}></Route>
-          <Route exact path="/signin" element={<SignIn />}></Route>
-          <Route exact path="/signup" element={<SignUp />}></Route>
-          <Route exact path="/products/*" element={<Products />}></Route>
-        </Routes>
+        <div className="w-full flex justify-center items-center mt-24">
+          <Routes>
+            <Route exact path="/" element={<MainContent />}></Route>
+            <Route exact path="/home" element={<MainContent />}></Route>
+            <Route exact path="/user/*" element={<Mypage />}></Route>
+            <Route exact path="/signin" element={<SignIn />}></Route>
+            <Route exact path="/signup" element={<SignUp />}></Route>
+            <Route exact path="/products/*" element={<Products />}></Route>
+          </Routes>
+        </div>
       </AuthProvider>
     </div>
   );

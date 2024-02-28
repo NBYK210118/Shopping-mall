@@ -1,6 +1,6 @@
-import { useContext } from "react";
-import { useNavigate } from "react-router-dom";
-import AuthContext from "../auth.context";
+import { useContext } from 'react';
+import { useNavigate } from 'react-router-dom';
+import AuthContext from '../auth.context';
 
 export default function MainContent() {
   const navigate = useNavigate();
@@ -12,10 +12,10 @@ export default function MainContent() {
 
   const Categories = () => {
     const items_dict = [
-      { txt: "의류", category: "clothes" },
-      { txt: "전자제품", category: "electronics" },
-      { txt: "식품", category: "foods" },
-      { txt: "가구", category: "furniture" },
+      { txt: '의류', category: 'clothes' },
+      { txt: '전자제품', category: 'electronics' },
+      { txt: '식품', category: 'foods' },
+      { txt: '가구', category: 'furniture' },
     ];
 
     return items_dict.map((ctg, idx) => {
@@ -23,7 +23,7 @@ export default function MainContent() {
         <div
           key={idx}
           onClick={() => handleCategoryClick(ctg.category)}
-          className="w-[22%] h-[100%] border border-solid border-black rounded-lg flex justify-center items-center hover:cursor-pointer hover:bg-sky-100"
+          className="w-[24%] h-full border border-solid border-black rounded-lg flex justify-center items-center hover:cursor-pointer hover:bg-sky-100 max-lg:w-[100px] max-lg:h-[100px] max-lg:flex-col"
         >
           <span className="">{ctg.txt}</span>
         </div>
@@ -33,28 +33,19 @@ export default function MainContent() {
 
   const Containers = () => {
     return (
-      <div className="w-full h-[85%] flex justify-center">
-        <div className="w-full h-full ml-5 mr-5 flex flex-row justify-center items-center border border-solid border-black rounded-md bg-gray-50"></div>
+      <div className="w-[96%] h-[85%] flex justify-center">
+        <div className="w-full h-full flex justify-center items-center border border-solid border-black rounded-md bg-gray-50"></div>
       </div>
     );
   };
 
   return (
     <>
-      <div
-        id="main_content_1"
-        className="w-[90%] h-full flex flex-col justify-center mb-5 absolute top-24"
-      >
-        <div
-          id="1_first_content"
-          className="w-full h-full flex justify-around items-center bg-gray-300"
-        >
+      <div id="main_content_1" className="w-[75vw] h-[65vh] flex flex-col justify-center bg-gray-300">
+        <div id="1_first_content" className="w-full h-full flex justify-around items-center ">
           <Categories />
         </div>
-        <div
-          id="2_second_content"
-          className="w-full h-full flex justify-center items-center bg-gray-300"
-        >
+        <div id="2_second_content" className="w-full h-full flex justify-center items-center">
           <Containers />
         </div>
       </div>

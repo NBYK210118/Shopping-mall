@@ -105,11 +105,11 @@ export default function UserProfile(props) {
 
   return (
     <>
-      <div className="flex flex-row items-center w-full h-full">
+      <div className="flex items-center w-full h-full">
         <div className="w-[50%] h-full flex flex-col justify-center">
           <div
             id="profile_img_nickname"
-            className="h-[30%] border border-transparent rounded-lg flex flex-row justify-evenly items-center bg-gray-200"
+            className="h-[30%] border border-transparent rounded-lg flex justify-evenly items-center bg-gray-200"
           >
             <div id="profile_image" className={`w-[40%] flex justify-center mr-3 ${imageUrl ? ' hidden' : ''}`}>
               <span className="material-symbols-outlined text-[150px] opacity-55">account_circle</span>
@@ -153,7 +153,7 @@ export default function UserProfile(props) {
                 </div>
               </div>
               <div className={`w-[80%] ${editClick ? 'visible' : 'hidden'}`}>
-                <form onSubmit={(e) => e.preventDefault()} className="w-full flex flex-row justify-around">
+                <form onSubmit={(e) => e.preventDefault()} className="w-full flex  justify-around">
                   <div className="w-[60%] mr-2">
                     <input
                       type="text"
@@ -185,7 +185,7 @@ export default function UserProfile(props) {
             <div className="w-[80%] h-full mt-10 flex justify-around items-around">
               {/* 유저 정보 라벨링/입력 받기 */}
               <div id="labels_col" className="w-full h-[85%] flex flex-col justify-around">
-                <div className="w-full h-[10%] flex flex-row justify-center">
+                <div className="w-full h-[10%] flex  justify-center">
                   <div className="w-[30%] mr-5 flex justify-center items-center">
                     <label htmlFor="firstName" className="flex justify-center items-center font-bold text-xl">
                       First Name
@@ -200,7 +200,7 @@ export default function UserProfile(props) {
                   </div>
                 </div>
 
-                <div className="w-full h-[10%] flex flex-row justify-center">
+                <div className="w-full h-[10%] flex  justify-center">
                   <div className="w-[30%] mr-5 flex justify-center items-center">
                     <label htmlFor="lastName" className="flex justify-center items-center font-bold text-xl">
                       Last Name
@@ -215,7 +215,7 @@ export default function UserProfile(props) {
                   </div>
                 </div>
 
-                <div className="w-full h-[10%] flex flex-row justify-center">
+                <div className="w-full h-[10%] flex  justify-center">
                   <div className="w-[30%] mr-5 flex justify-center items-center">
                     <label htmlFor="email" className="flex justify-center items-center font-bold text-xl">
                       Email
@@ -230,7 +230,7 @@ export default function UserProfile(props) {
                   </div>
                 </div>
 
-                <div className="w-full h-[10%] flex flex-row justify-center">
+                <div className="w-full h-[10%] flex  justify-center">
                   <div className="w-[30%] mr-5 flex justify-center items-center">
                     <label htmlFor="store" className="font-bold text-xl">
                       Store
@@ -293,7 +293,7 @@ export default function UserProfile(props) {
         </div>
         <div
           id="right_content"
-          className="w-[50%] h-full flex flex-row justify-center items-center border border-transparent rounded-lg shadow-lg"
+          className="w-[50%] h-full flex  justify-center items-center border border-transparent rounded-lg shadow-lg"
         >
           <img src={Images.logo} alt="" />
         </div>

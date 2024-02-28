@@ -229,24 +229,24 @@ export default function PersonalStore() {
       <>
         {currentpage.first && (
           <div className="w-[75%] h-full flex justify-center items-center">
-            <div className="w-full h-full flex flex-row justify-around items-center">{result}</div>
+            <div className="w-full h-full flex justify-around items-center">{result}</div>
           </div>
         )}
         {currentpage.second && (
           <div className="w-[80%] h-full">
-            <div className="w-full h-full flex flex-row justify-around items-center">{result}</div>
+            <div className="w-full h-full flex justify-around items-center">{result}</div>
             <span>2</span>
           </div>
         )}
         {currentpage.third && (
           <div className="w-[80%] h-full">
-            <div className="w-full h-full flex flex-row justify-around items-center">{result}</div>
+            <div className="w-full h-full flex justify-around items-center">{result}</div>
             <span>3</span>
           </div>
         )}
         {currentpage.fourth && (
           <div className="w-[80%] h-full">
-            <div className="w-full h-full flex flex-row justify-around items-center">{result}</div>
+            <div className="w-full h-full flex justify-around items-center">{result}</div>
             <span>4</span>
           </div>
         )}
@@ -628,7 +628,7 @@ export default function PersonalStore() {
                       가격
                     </label>
                   </div>
-                  <div className="w-[70%] flex flex-row">
+                  <div className="w-[70%] flex">
                     <input
                       type="text"
                       name="product_name"
@@ -789,7 +789,7 @@ export default function PersonalStore() {
                       가격
                     </label>
                   </div>
-                  <div className="w-[70%] flex flex-row">
+                  <div className="w-[70%] flex ">
                     <input
                       type="text"
                       name="product_name"
