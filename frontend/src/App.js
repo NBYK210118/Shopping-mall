@@ -95,7 +95,7 @@ function MainHeader() {
   return (
     <div
       id="main_header"
-      className="w-full h-[70px] fixed top-0 z-20 flex justify-between items-center bg-sky-400 mw-md:flex mw-md:justify-between"
+      className="w-full h-[70px] fixed top-0 z-20 flex justify-between items-center bg-sky-400"
     >
       {/*헤더 메뉴 버튼*/}
       <div id="main_header_menus" className="w-[20%] flex justify-between">
@@ -185,12 +185,14 @@ function MainHeader() {
       {/* 헤더 검색 상자 */}
       <div
         id="search-box"
-        className={`hidden p-2 rounded-full justify-center items-center mw-md:inline-flex hover:cursor-pointer hover:bg-slate-100 mw-md:-ml-20 mw-md:${
-          openSearchBox ? "hidden" : ""
-        }`}
-        onClick={(e) => handleSearchBox(e)}
+        className={`hidden p-2 rounded-full justify-center items-center bg-slate-200 mw-md:flex mw-md:-ml-20 mw-md: hover:cursor-pointer hover:bg-slate-100 `}
       >
-        <span>&#128269;</span>
+        <div>
+          <input type="text" name="searching" className="focus:outline-none" />
+        </div>
+        <div>
+          <span>&#128269;</span>
+        </div>
       </div>
 
       <div
