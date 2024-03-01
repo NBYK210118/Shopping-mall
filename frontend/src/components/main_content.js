@@ -52,11 +52,11 @@ export default function MainContent() {
           className="w-1/2 h-[21%] mw-md:w-[50%] mw-md:h-[58.4%] flex flex-col justify-around"
         >
           <div className="w-full h-1/2 border border-solid border-black">
-            <div className=""></div>
+            <img src="" alt="" />
             <span>관심있는 상품들</span>
           </div>
           <div className="w-full h-1/2 border border-solid border-black">
-            <div className=""></div>
+            <img src="" alt="" />
             <span>WatchedList</span>
           </div>
         </div>
