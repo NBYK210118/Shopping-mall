@@ -46,14 +46,21 @@ export default function MainContent() {
 
   return (
     <>
-      <div id="main_content" className="w-[90vw] h-[100vh] flex justify-between bg-gray-400">
+      <div id="main_content" className="w-[90vw] h-[90vh] flex justify-between bg-gray-400">
         <div
           id="main_content_left_content"
-          className="w-1/2 h-[21%] mw-md:w-[50%] mw-md:h-1/2 flex border border-solid border-black"
+          className="w-1/2 h-[21%] mw-md:w-[50%] mw-md:h-[58.4%] flex flex-col justify-around"
         >
-          이전에 살펴보셨던 상품들
+          <div className="w-full h-1/2 border border-solid border-black">
+            <div className=""></div>
+            <span>관심있는 상품들</span>
+          </div>
+          <div className="w-full h-1/2 border border-solid border-black">
+            <div className=""></div>
+            <span>WatchedList</span>
+          </div>
         </div>
-        <div id="main_content_right_content" className="mw-md:w-[50%] h-1/2 flex flex-wrap justify-end">
+        <div id="main_content_right_content" className="mw-md:w-1/2 h-1/2 mw-md:h-[60%] flex flex-wrap justify-end">
           <Categories />
           <Categories />
         </div>

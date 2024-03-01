@@ -68,8 +68,13 @@ function MainHeader() {
     ];
 
     const links = result.map((val, idx) => (
-      <div className="border border-transparent rounded-full p-3 hover:bg-sky-300">
-        <NavLink key={idx} to={val.to} onClick={closeMenu} className="text-nowrap text-base text-white font-semibold">
+      <div className="rounded-full block p-3 hover:bg-sky-300 transition-all duration-400">
+        <NavLink
+          key={idx}
+          to={val.to}
+          onClick={closeMenu}
+          className="text-nowrap text-base text-white mw-md:text-black font-semibold"
+        >
           {val.text}
         </NavLink>
       </div>
@@ -85,16 +90,14 @@ function MainHeader() {
   return (
     <div id="main_header" className="w-full h-[70px] fixed top-0 z-20 flex justify-between items-center bg-sky-400">
       {/*헤더 메뉴 버튼*/}
-      <div id="main_header_menus" className="mw-md:ml-5 miw-md:w-[150px] h-full flex justify-between">
+      <div id="main_header_menus" className="mw-md:ml-5 mw-md:relative miw-md:w-[150px] h-full flex justify-between">
         <div className="w-[10%] hidden items-center justify-center mw-md:flex">
           <button
-            className={`p-2 focus:outline-none flex items-center ml-4 border border-transparent rounded-full hover:bg-sky-300 hover:cursor-pointer transition-all duration-400 ${
-              isMenuOpen ? ' hidden' : ''
-            }`}
+            className={`p-2 focus:outline-none flex items-center ml-4 border border-transparent rounded-full hover:bg-sky-300 hover:cursor-pointer transition-all duration-400`}
             onClick={handleIconClick}
           >
             <svg
-              className={`w-8 h-8 text-white ${isMenuOpen ? ' hidden' : ''}`}
+              className={`w-8 h-8 text-white`}
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
               viewBox="0 0 24 24"
@@ -105,7 +108,11 @@ function MainHeader() {
           </button>
         </div>
         <div
-          className={`h-full justify-around items-center ml-5 miw-md:flex ${isMenuOpen ? '' : ' hidden'}`}
+          className={`miw-md:w-[40vh] h-full mw-md:h-[30vh] transition-all duration-300 justify-around items-center ml-5 mw-md:z-99 mw-md:${
+            isMenuOpen
+              ? 'flex mw-md:flex-col mw-md:absolute mw-md:-left-10 mw-md:top-[4.4rem] mw-md:border-t-0 mw-md:rounded-r-lg mw-md:bg-slate-300'
+              : 'hidden '
+          } mw-md:flex-col miw-md:flex ${isMenuOpen ? '' : ' hidden'}`}
           onClick={handleMenuClick}
         >
           {menus()}
@@ -116,7 +123,7 @@ function MainHeader() {
                   key="2"
                   to="/user/my-profile"
                   onClick={closeMenu}
-                  className="text-nowrap text-base text-white font-semibold"
+                  className="text-nowrap text-base text-white mw-md:text-black font-semibold"
                 >
                   My Cave
                 </NavLink>
@@ -126,7 +133,7 @@ function MainHeader() {
                   key="3"
                   to="/home"
                   onClick={handleLogout}
-                  className="text-nowrap text-base text-white font-semibold"
+                  className="text-nowrap text-base text-white mw-md:text-black font-semibold"
                 >
                   Logout
                 </NavLink>
@@ -138,7 +145,11 @@ function MainHeader() {
                 className="border border-transparent rounded-full flex p-4 hover:bg-sky-300 hover:cursor-pointer transition-all duration-500"
                 onClick={closeMenu}
               >
-                <NavLink key="3" to="/signin" className="text-nowrap text-base text-white font-semibold">
+                <NavLink
+                  key="3"
+                  to="/signin"
+                  className="text-nowrap text-base text-white mw-md:text-black font-semibold"
+                >
                   Sign in
                 </NavLink>
               </div>
@@ -146,7 +157,11 @@ function MainHeader() {
                 className="border border-transparent rounded-full flex p-4 hover:bg-sky-300 hover:cursor-pointer transition-all duration-500"
                 onClick={closeMenu}
               >
-                <NavLink key="4" to="/signup" className="text-nowrap text-base text-white font-semibold">
+                <NavLink
+                  key="4"
+                  to="/signup"
+                  className="text-nowrap text-base text-white mw-md:text-black font-semibold"
+                >
                   Sign Up
                 </NavLink>
               </div>
@@ -199,7 +214,7 @@ function App() {
   }, []);
 
   return (
-    <div className="w-[100vw] h-[100vh] overflow-hidden" id="main">
+    <div className="w-[100vw] h-[90vh] overflow-hidden" id="main">
       {loading ? <Loading /> : ''}
       <AuthProvider>
         <MainHeader />
