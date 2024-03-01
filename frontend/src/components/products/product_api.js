@@ -20,7 +20,7 @@ const findProduct = async (token, id, navigate) => {
 
 const categoriesItem = async (token, category, navigate) => {
   try {
-    const data = await http.get(`/product/${category}`, {
+    const data = await http.post(`/product/${category}`, {
       headers: { Authorization: `Bearer ${token}` },
     });
     return data;

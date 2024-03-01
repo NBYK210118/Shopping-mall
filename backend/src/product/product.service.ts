@@ -44,7 +44,6 @@ export class ProductService {
         AND: { category_name: category },
       },
     });
-    console.log(result);
     return result;
   }
 

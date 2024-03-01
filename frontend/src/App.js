@@ -88,7 +88,10 @@ function MainHeader() {
   }, [openSearchBox]);
 
   return (
-    <div id="main_header" className="w-full h-[70px] fixed top-0 z-20 flex justify-between items-center bg-sky-400">
+    <div
+      id="main_header"
+      className="w-full h-[70px] fixed top-0 z-20 flex justify-between items-center bg-gradient-to-r from-sky-500 to-indigo-500"
+    >
       {/*헤더 메뉴 버튼*/}
       <div id="main_header_menus" className="mw-md:ml-5 mw-md:relative miw-md:w-[150px] h-full flex justify-between">
         <div className="w-[10%] hidden items-center justify-center mw-md:flex">
@@ -177,7 +180,7 @@ function MainHeader() {
             placeholder="Enter keywords"
             className="w-1/2 mw-md:w-4/5 mw-md:focus:w-full h-[40px] rounded-l-md pl-2 focus:w-[70%] focus:outline-none placeholder:pl-1 transition-all duration-500"
           />
-          <span className="miw-md:flex miw-md:items-center mw-md:hidden bg-sky-400 text-white rounded-r-lg border border-solid hover:bg-sky-600 hover:cursor-pointer">
+          <span className="w-[10%] miw-md:flex miw-md:items-center miw-md:justify-center mw-md:hidden bg-gradient-to-r from-blue-600 text-white rounded-r-lg border border-solid hover:bg-blue-600 hover:cursor-pointer">
             Search
           </span>
           <span className="hidden rounded-r-lg mw-md:flex mw-md:bg-gray-400 mw-md:items-center hover:cursor-pointer">
@@ -214,11 +217,11 @@ function App() {
   }, []);
 
   return (
-    <div className="w-[100vw] h-[90vh] overflow-hidden" id="main">
+    <div className="w-[100vw] h-[100vh] overflow-hidden" id="main">
       {loading ? <Loading /> : ''}
       <AuthProvider>
         <MainHeader />
-        <div className="w-full h-full flex justify-center items-center mt-28">
+        <div className="w-full h-full flex justify-center items-center mt-12">
           <Routes>
             <Route exact path="/" element={<MainContent />}></Route>
             <Route exact path="/home" element={<MainContent />}></Route>

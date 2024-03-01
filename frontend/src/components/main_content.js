@@ -28,7 +28,7 @@ export default function MainContent() {
           <div
             key={idx}
             onClick={() => handleCategoryClick(ctg.category)}
-            className="w-[80px] h-[80px] miw-md:w-[200px] miw-md:h-[200px] miw-md:mr-2 box-border border border-solid border-black flex flex-col"
+            className="w-[80px] h-[80px] miw-md:w-[160px] miw-md:h-[160px] miw-md:mr-2 box-border border border-solid border-black flex flex-col"
           >
             <div className="h-[80%] flex justify-center items-center border border-solid border-black hover:cursor-pointer hover:bg-sky-100 transition-all duration-300 hover:scale-[1.03]">
               {ctg.icon}
@@ -46,25 +46,40 @@ export default function MainContent() {
 
   return (
     <>
-      <div id="main_content" className="w-[90vw] h-[90vh] flex justify-between bg-gray-400">
-        <div
-          id="main_content_left_content"
-          className="w-1/2 h-[21%] mw-md:w-[50%] mw-md:h-[58.4%] flex flex-col justify-around"
-        >
-          <div className="w-full h-1/2 border border-solid border-black">
-            <img src="" alt="" />
-            <span>관심있는 상품들</span>
+      {/*로그인한 사용자에게만 보여지는 화면 */}
+      {token ? (
+        <div id="main_content" className="w-[95vw] h-[90vh] flex justify-between bg-gray-400">
+          <div
+            id="main_content_left_content"
+            className="w-1/2 h-full mw-md:w-[50%] mw-md:h-[58.4%] flex flex-col justify-around"
+          >
+            <div className="w-[90%] h-1/3 border border-solid border-black">
+              <img src="" alt="" />
+              <span>내 찜 목록</span>
+            </div>
+            <div className="w-[90%] h-1/3 border border-solid border-black">
+              <img src="" alt="" />
+              <span>WatchedList</span>
+            </div>
+            <div className="w-[90%] h-1/3 border border-solid border-black">
+              <img src="" alt="" />
+              <span>WatchedList</span>
+            </div>
           </div>
-          <div className="w-full h-1/2 border border-solid border-black">
-            <img src="" alt="" />
-            <span>WatchedList</span>
+          <div
+            id="main_content_right_content"
+            className="w-1/2 h-1/2 mw-md:w-1/2 mw-md:h-[60%] flex flex-wrap justify-end"
+          >
+            <Categories />
+            <Categories />
+            <Categories />
           </div>
         </div>
-        <div id="main_content_right_content" className="mw-md:w-1/2 h-1/2 mw-md:h-[60%] flex flex-wrap justify-end">
-          <Categories />
-          <Categories />
+      ) : (
+        <div id="main_content" className="w-[70vw] h-[95vh] flex justify-between bg-gray-400">
+          {/*Guest 사용자에게만 보여지는 화면 */}
         </div>
-      </div>
+      )}
     </>
   );
 }

@@ -3,7 +3,6 @@ import { Images } from '../../images_list';
 import AuthContext from '../../auth.context';
 import DataService from '../../data_services';
 import { useNavigate } from 'react-router-dom';
-import Loading from '../../loading';
 
 export default function UserProfile(props) {
   const { token } = useContext(AuthContext);
@@ -105,14 +104,19 @@ export default function UserProfile(props) {
 
   return (
     <>
-      <div className="flex items-center w-full h-full">
-        <div className="w-[50%] h-full flex flex-col justify-center">
+      <div className="flex items-center w-full h-full mw-md:w-[100vw] mw-md:h-[100vh]">
+        <div
+          id="left_content"
+          className="w-[50%] h-full mw-md:w-full mw-md:h-[60%] flex flex-col justify-center mw-md:bg-"
+        >
           <div
             id="profile_img_nickname"
             className="h-[30%] border border-transparent rounded-lg flex justify-evenly items-center bg-gray-200"
           >
             <div id="profile_image" className={`w-[40%] flex justify-center mr-3 ${imageUrl ? ' hidden' : ''}`}>
-              <span className="material-symbols-outlined text-[150px] opacity-55">account_circle</span>
+              <span className="material-symbols-outlined text-[150px] mw-md:text-[80px] opacity-55">
+                account_circle
+              </span>
             </div>
             <div className={`w-[55%] h-[120%] flex justify-center items-center mr-3 ${imageUrl ? '' : ' hidden'}`}>
               <img
@@ -123,7 +127,7 @@ export default function UserProfile(props) {
             </div>
             <div className="w-[60%] h-[80%] flex flex-col justify-around items-center">
               <div
-                className={`w-[45%] h-1/3 flex justify-center items-center bg-green-500 rounded-xl hover:cursor-pointer hover:bg-green-600`}
+                className={`w-[45%] h-1/3 mw-md:w-2/3 mw-md:h-[50px] flex justify-center items-center bg-green-500 rounded-xl hover:cursor-pointer hover:bg-green-600`}
                 onClick={() => handleSelectFile()}
               >
                 <input
@@ -134,17 +138,19 @@ export default function UserProfile(props) {
                   ref={fileInputRef}
                   onChange={(e) => handleProfileImage(e)}
                 />
-                <span className="text-white font-bold">Change Image</span>
+                <span className="text-white text-center font-bold text-lg text-[0.9rem] mw-md:text-[0.7rem] ">
+                  프로필 바꾸기
+                </span>
               </div>
-              <div className={`w-[80%] flex justify-center ${editClick ? 'hidden' : 'visible'}`}>
+              <div className={`w-[80%] flex miw-md:justify-center ${editClick ? 'hidden' : 'visible'}`}>
                 <div id="user_nickname" className="flex justify-center items-center mr-3">
-                  <span className={`font-bold ml-3 text-xl ${editClick ? ' hidden' : ''}`}>
+                  <span className={`font-bold ml-3 text-xl mw-md:text-[0.75rem] ${editClick ? ' hidden' : ''}`}>
                     {user['profile']['nickname']}
                   </span>
                 </div>
                 <div id="edit_img" className="flex justify-between" onClick={() => handleClick()}>
                   <span
-                    class={`material-symbols-outlined p-2 border-transparent rounded-lg hover:cursor-pointer text-white/85 bg-sky-500 ${
+                    class={`material-symbols-outlined p-2 mw-md:-ml-1 mw-md:p-1 mw-md:text-sm mw-md:flex mw-md:items-center border-transparent rounded-lg hover:cursor-pointer text-white/85 bg-sky-500 ${
                       editClick ? ' hidden' : ''
                     } hover:bg-sky-600`}
                   >
@@ -180,78 +186,89 @@ export default function UserProfile(props) {
           </div>
           <div
             id="left_content"
-            className="h-[70%] flex justify-center border border-transparent rounded-lg bg-gray-100 shadow-lg"
+            className="h-[70%] -mt-2 flex justify-center border border-transparent rounded-lg bg-gray-100 shadow-lg"
           >
             <div className="w-[80%] h-full mt-10 flex justify-around items-around">
               {/* 유저 정보 라벨링/입력 받기 */}
               <div id="labels_col" className="w-full h-[85%] flex flex-col justify-around">
                 <div className="w-full h-[10%] flex  justify-center">
                   <div className="w-[30%] mr-5 flex justify-center items-center">
-                    <label htmlFor="firstName" className="flex justify-center items-center font-bold text-xl">
+                    <label
+                      htmlFor="firstName"
+                      className="flex justify-center items-center font-bold text-xl mw-md:text-[0.8rem] mw-md:text-nowrap"
+                    >
                       First Name
                     </label>
                   </div>
-                  <div className="w-[70%] mt-1">
+                  <div className="w-[70%]">
                     {userInfo ? (
                       <input type="text" value={firstName} onChange={(e) => setFirstName(e.target.value)} />
                     ) : (
-                      <span className="text-lg">{user['firstName']}</span>
+                      <span className="text-lg mw-md:text-[0.8rem] mw-md:text-nowrap">{user['firstName']}</span>
                     )}
                   </div>
                 </div>
 
                 <div className="w-full h-[10%] flex  justify-center">
                   <div className="w-[30%] mr-5 flex justify-center items-center">
-                    <label htmlFor="lastName" className="flex justify-center items-center font-bold text-xl">
+                    <label
+                      htmlFor="lastName"
+                      className="flex justify-center items-center font-bold text-xl mw-md:text-[0.8rem] mw-md:text-nowrap"
+                    >
                       Last Name
                     </label>
                   </div>
-                  <div className="w-[70%] mt-1">
+                  <div className="w-[70%]">
                     {userInfo ? (
                       <input type="text" value={lastName} onChange={(e) => setLastName(e.target.value)} />
                     ) : (
-                      <span className="text-lg">{user['lastName']}</span>
+                      <span className="text-lg mw-md:text-[0.8rem] mw-md:text-nowrap">{user['lastName']}</span>
                     )}
                   </div>
                 </div>
 
                 <div className="w-full h-[10%] flex  justify-center">
                   <div className="w-[30%] mr-5 flex justify-center items-center">
-                    <label htmlFor="email" className="flex justify-center items-center font-bold text-xl">
+                    <label
+                      htmlFor="email"
+                      className="flex justify-center items-center font-bold text-xl mw-md:text-[0.8rem] mw-md:text-nowrap"
+                    >
                       Email
                     </label>
                   </div>
-                  <div className="w-[70%] mt-1">
+                  <div className="w-[70%]">
                     {userInfo ? (
                       <input type="text" value={email} onChange={(e) => setEmail(e.target.value)} />
                     ) : (
-                      <span className="text-lg">{user['email']}</span>
+                      <span className="text-lg mw-md:text-[0.8rem] mw-md:text-nowrap">{user['email']}</span>
                     )}
                   </div>
                 </div>
 
                 <div className="w-full h-[10%] flex  justify-center">
                   <div className="w-[30%] mr-5 flex justify-center items-center">
-                    <label htmlFor="store" className="font-bold text-xl">
+                    <label htmlFor="store" className="font-bold text-xl mw-md:text-[0.8rem] mw-md:text-nowrap">
                       Store
                     </label>
                   </div>
-                  <div className="w-[70%] mt-1">
+                  <div className="w-[70%]">
                     {userInfo ? (
                       <input type="text" value={store} onChange={(e) => setStore(e.target.value)} />
                     ) : (
-                      <span className="text-lg">{user['store'] ? user['store']['name'] : 'None'}</span>
+                      <span className="text-lg mw-md:text-[0.8rem] mw-md:text-nowrap">
+                        {user['store'] ? user['store']['name'] : 'None'}
+                      </span>
                     )}
                   </div>
                 </div>
 
                 <div className="w-full h-[10%] flex justify-center">
                   <div className="w-[30%] mr-5 flex justify-center items-center">
-                    <label htmlFor="address" className="font-bold text-xl">
+                    <label htmlFor="address" className="font-bold text-xl mw-md:text-[0.8rem] mw-md:text-nowrap">
                       Address
                     </label>
                   </div>
-                  <div className="w-[70%] mt-1">
+                  <div className="w-[70%]">
                     {userInfo ? (
                       <input
                         type="text"
@@ -260,7 +277,11 @@ export default function UserProfile(props) {
                         onChange={(e) => setAddress(e.target.value)}
                       />
                     ) : (
-                      <span className={`${user['profile']['address'].length > 20 ? 'text-[15px]' : 'text-[18px]'}`}>
+                      <span
+                        className={`mw-md:text-[0.8rem] mw-md:text-nowrap ${
+                          user['profile']['address'].length > 20 ? 'text-[15px]' : 'text-[18px]'
+                        }`}
+                      >
                         {user['profile']['address'] ? user['profile']['address'] : 'None'}
                       </span>
                     )}
@@ -281,7 +302,7 @@ export default function UserProfile(props) {
                       className="w-[30%] h-full mr-5 p-2 flex justify-center items-center border border-transparent rounded-lg bg-sky-500 hover:bg-sky-600 hover:cursor-pointer"
                       onClick={() => setUserInfo(!userInfo)}
                     >
-                      <span className="text-xl text-white text-center font-bold hover:bg-sky-600 hover:cursor-pointer">
+                      <span className="text-lg mw-md:text-sm text-white text-center font-bold hover:bg-sky-600 hover:cursor-pointer">
                         Edit
                       </span>
                     </div>
@@ -293,7 +314,7 @@ export default function UserProfile(props) {
         </div>
         <div
           id="right_content"
-          className="w-[50%] h-full flex  justify-center items-center border border-transparent rounded-lg shadow-lg"
+          className="w-[50%] h-full mw-md:w-1/2 mw-md:h-1/2 mw-md:hidden flex justify-center items-center border border-transparent rounded-lg shadow-lg"
         >
           <img src={Images.logo} alt="" />
         </div>

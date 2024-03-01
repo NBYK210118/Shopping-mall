@@ -315,35 +315,60 @@ export class UserService {
     return onUser;
   }
 
-  async updateProduct(user:User, id:number, updateProductDto:AddProductDto) : Promise<User> {
-    const {name,price,detail,category,image,image_size,inventory,manufacturer,status} = updateProductDto;
+  async updateProduct(
+    user: User,
+    id: number,
+    updateProductDto: AddProductDto,
+  ): Promise<User> {
+    const {
+      name,
+      price,
+      detail,
+      category,
+      image,
+      image_size,
+      inventory,
+      manufacturer,
+      status,
+    } = updateProductDto;
     const priceWithoutComma = price.replace(/,/g, '');
     const parsedIntPrice = parseInt(priceWithoutComma, 10);
     console.log(category);
     const product_image = await this.prisma.productImage.findFirst({
-      where:{productId:Number(id)}
-    })
+      where: { productId: Number(id) },
+    });
 
     // console.log('found product: ', await this.prisma.product.findFirst({where:{id:Number(id)}}));
     await this.prisma.product.update({
-      where:{id:Number(id)},
-      data:{
-        name,price:parsedIntPrice,status,description:detail,category_name:category,inventory:Number(inventory),manufacturer,
-        images:{update:{where:{id:product_image.imageId},data:{imgUrl:image, size:Number(image_size)}}}
-      }
+      where: { id: Number(id) },
+      data: {
+        name,
+        price: parsedIntPrice,
+        status,
+        description: detail,
+        category_name: category,
+        inventory: Number(inventory),
+        manufacturer,
+        images: {
+          update: {
+            where: { id: product_image.imageId },
+            data: { imgUrl: image, size: Number(image_size) },
+          },
+        },
+      },
     });
 
     const onUser = await this.emailUser(user.email);
-    return onUser
+    return onUser;
   }
 
-  async getProductsWhileUpdate(checklist:number[]) : Promise<Product[]> {
+  async getProductsWhileUpdate(checklist: number[]): Promise<Product[]> {
     const products = await this.prisma.product.findMany({
-      where:{id:{in:checklist}},
-      include:{images:true}
-    })
-    
-    return products
+      where: { id: { in: checklist } },
+      include: { images: true },
+    });
+
+    return products;
   }
 
   async deleteProduct(user: User, list: number[]) {

@@ -9,17 +9,17 @@ export class ProductController {
   constructor(private productService: ProductService) {}
 
   @UseGuards(AuthGuard())
-  @Get('/:category')
+  @Get(':id')
+  async getProduct(@Param('id') id: number): Promise<Product> {
+    return this.productService.getProduct(id);
+  }
+
+  @UseGuards(AuthGuard())
+  @Post('/:category')
   async getCategoryItems(
     @GetUser() user: User,
     @Param('category') category: string,
   ) {
     return this.productService.getCategoryItems(user, category);
-  }
-
-  @UseGuards(AuthGuard())
-  @Get(':id')
-  async getProduct(@Param('id') id: number): Promise<Product> {
-    return this.productService.getProduct(id);
   }
 }
