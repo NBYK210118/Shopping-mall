@@ -68,7 +68,7 @@ function MainHeader() {
     ];
 
     const links = result.map((val, idx) => (
-      <div className="border border-transparent rounded-full block p-3 hover:bg-sky-300">
+      <div className="border border-transparent rounded-full p-3 hover:bg-sky-300">
         <NavLink key={idx} to={val.to} onClick={closeMenu} className="text-nowrap text-base text-white font-semibold">
           {val.text}
         </NavLink>
@@ -78,11 +78,6 @@ function MainHeader() {
     return links;
   };
 
-  const handleSearchBox = (e) => {
-    e.stopPropagation();
-    setOpenSearchBox(!openSearchBox);
-  };
-
   useEffect(() => {
     console.log('OpenSearchBox: ', openSearchBox);
   }, [openSearchBox]);
@@ -90,10 +85,10 @@ function MainHeader() {
   return (
     <div id="main_header" className="w-full h-[70px] fixed top-0 z-20 flex justify-between items-center bg-sky-400">
       {/*헤더 메뉴 버튼*/}
-      <div id="main_header_menus" className="mw-md:ml-5 miw-md:w-[100px] h-full flex justify-between">
+      <div id="main_header_menus" className="mw-md:ml-5 miw-md:w-[150px] h-full flex justify-between">
         <div className="w-[10%] hidden items-center justify-center mw-md:flex">
           <button
-            className={`menu p-2 focus:outline-none flex items-center ml-4 border border-transparent rounded-full hover:bg-sky-300 ${
+            className={`p-2 focus:outline-none flex items-center ml-4 border border-transparent rounded-full hover:bg-sky-300 hover:cursor-pointer transition-all duration-400 ${
               isMenuOpen ? ' hidden' : ''
             }`}
             onClick={handleIconClick}
@@ -116,7 +111,7 @@ function MainHeader() {
           {menus()}
           {token ? (
             <>
-              <div className="border border-transparent rounded-full flex p-4 hover:bg-sky-300">
+              <div className="border border-transparent rounded-full flex p-4 hover:bg-sky-300 hover:cursor-pointer transition-all duration-400">
                 <NavLink
                   key="2"
                   to="/user/my-profile"
@@ -126,7 +121,7 @@ function MainHeader() {
                   My Cave
                 </NavLink>
               </div>
-              <div className="border border-transparent rounded-full flex p-4 hover:bg-sky-300">
+              <div className="border border-transparent rounded-full flex p-4 hover:bg-sky-300 hover:cursor-pointer transition-all duration-400">
                 <NavLink
                   key="3"
                   to="/home"
@@ -139,12 +134,18 @@ function MainHeader() {
             </>
           ) : (
             <>
-              <div className="border border-transparent rounded-full flex p-4 hover:bg-sky-300" onClick={closeMenu}>
+              <div
+                className="border border-transparent rounded-full flex p-4 hover:bg-sky-300 hover:cursor-pointer transition-all duration-500"
+                onClick={closeMenu}
+              >
                 <NavLink key="3" to="/signin" className="text-nowrap text-base text-white font-semibold">
                   Sign in
                 </NavLink>
               </div>
-              <div className="border border-transparent rounded-full flex p-4 hover:bg-sky-300" onClick={closeMenu}>
+              <div
+                className="border border-transparent rounded-full flex p-4 hover:bg-sky-300 hover:cursor-pointer transition-all duration-500"
+                onClick={closeMenu}
+              >
                 <NavLink key="4" to="/signup" className="text-nowrap text-base text-white font-semibold">
                   Sign Up
                 </NavLink>
@@ -154,7 +155,7 @@ function MainHeader() {
         </div>
       </div>
       {/* 헤더 검색 상자 */}
-      <div id="search-box" className={`w-1/2 mw-md:3/4 h-full flex justify-center items-center`}>
+      <div id="search-box" className={`w-1/2 h-full mw-md:3/4 mw-md:-ml-9 flex justify-center items-center`}>
         <div className="w-full flex justify-center">
           <input
             type="text"
@@ -171,8 +172,16 @@ function MainHeader() {
       </div>
 
       {/* 로고 */}
-      <div className="h-[85%] ml-5 flex justify-center items-center" id="main_header_logo" onClick={() => goHome()}>
-        <img src={Images.logo} alt="" className="h-2/3 border border-transparent rounded-xl hover:cursor-pointer" />
+      <div
+        className="h-[85%] mw-md:[150px] mw-md:mr-4 miw-md:w-[200px] miw-md:h-full flex items-center"
+        id="main_header_logo"
+        onClick={() => goHome()}
+      >
+        <img
+          src={Images.logo}
+          alt=""
+          className="w-1/2 h-3/4 mw-md:w-full mw-md:h-2/3 border border-transparent rounded-xl hover:cursor-pointer"
+        />
       </div>
     </div>
   );
@@ -194,7 +203,7 @@ function App() {
       {loading ? <Loading /> : ''}
       <AuthProvider>
         <MainHeader />
-        <div className="w-full flex justify-center items-center mt-24">
+        <div className="w-full h-full flex justify-center items-center mt-28">
           <Routes>
             <Route exact path="/" element={<MainContent />}></Route>
             <Route exact path="/home" element={<MainContent />}></Route>

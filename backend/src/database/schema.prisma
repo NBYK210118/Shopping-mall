@@ -33,6 +33,14 @@ model Image {
   ProductImage ProductImage[]
 }
 
+model ViewedProduct{
+  id Int @id @default(autoincrement())
+  viewedAt DateTime @default(now())
+  user User @relation(fields: [userId], references: [id])
+  products Product[]
+  userId Int @unique
+}
+
 model Profile {
   id            Int      @id @default(autoincrement())
   nickname      String   @default("Username")
@@ -83,10 +91,13 @@ model User {
   wishlistId    Int?         @unique
   sellinglist   SellingList?
   sellinglistId Int?         @unique
+  product Product? @relation(fields: [productId], references: [id])
+  productId Int?
   reviews       Review[]
   createdAt     DateTime     @default(now())
   updatedAt     DateTime     @updatedAt
   StoreUser     StoreUser[]
+  viewedProducts ViewedProduct[]
 }
 
 model Category {
@@ -107,6 +118,8 @@ model Product {
   status        String?
   orders        Order[]
   images        Image[]
+  likedBy User[]
+  reviews Review[]
   inventory     Int
   createdAt     DateTime       @default(now())
   updatedAt     DateTime       @updatedAt
@@ -116,6 +129,8 @@ model Product {
   wishListId    Int?
   SellingList   SellingList?   @relation(fields: [sellingListId], references: [id])
   sellingListId Int?
+  viewedProduct ViewedProduct? @relation(fields:[viewedProductId], references: [id])
+  viewedProductId Int?
 }
 
 model WishList {
@@ -140,6 +155,8 @@ model Review {
   txt    String
   user   User   @relation(fields: [userId], references: [id])
   userId Int
+  product Product @relation(fields: [productId], references: [id])
+  productId Int
 }
 
 model StoreUser {
