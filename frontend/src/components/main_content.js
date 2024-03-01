@@ -23,30 +23,27 @@ export default function MainContent() {
         <div
           key={idx}
           onClick={() => handleCategoryClick(ctg.category)}
-          className="w-[24%] h-full border border-solid border-black rounded-lg flex justify-center items-center hover:cursor-pointer hover:bg-sky-100 max-lg:w-[100px] max-lg:h-[100px] max-lg:flex-col"
+          className="w-[24%] h-full border border-solid border-black flex flex-col hover:cursor-pointer hover:bg-sky-100"
         >
-          <span className="">{ctg.txt}</span>
+          <div className="h-[80%] border border-solid border-black"></div>
+          <div className="h-[10%] flex justify-center items-center">
+            <span className="">{ctg.txt}</span>
+          </div>
         </div>
       );
     });
   };
 
-  const Containers = () => {
-    return (
-      <div className="w-[96%] h-[85%] flex justify-center">
-        <div className="w-full h-full flex justify-center items-center border border-solid border-black rounded-md bg-gray-50"></div>
-      </div>
-    );
-  };
-
   return (
     <>
-      <div id="main_content_1" className="w-[75vw] h-[65vh] flex flex-col justify-center bg-gray-300">
-        <div id="1_first_content" className="w-full h-full flex justify-around items-center ">
-          <Categories />
-        </div>
-        <div id="2_second_content" className="w-full h-full flex justify-center items-center">
-          <Containers />
+      <div id="main_content_1" className="w-[45vw] h-[50vh] flex flex-col justify-center">
+        <div className="w-full h-[70%] flex flex-col justify-around">
+          <div id="1_first_content" className="w-full h-[90%] flex justify-around items-center ">
+            <Categories />
+          </div>
+          <div id="2_second_content" className="w-full h-[90%] flex justify-around items-center">
+            <Categories />
+          </div>
         </div>
       </div>
     </>
