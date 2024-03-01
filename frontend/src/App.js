@@ -1,13 +1,13 @@
-import React, { useContext, useEffect, useState } from 'react';
-import { Images } from './images_list';
-import { NavLink, Route, Routes, useNavigate } from 'react-router-dom';
-import SignIn from './components/signIn';
-import MainContent from './components/main_content';
-import Mypage from './components/user/Mypage';
-import { Products } from './components/products_list';
-import SignUp from './components/user/signUp';
-import AuthContext, { AuthProvider } from './auth.context';
-import Loading from './loading';
+import React, { useContext, useEffect, useState } from "react";
+import { Images } from "./images_list";
+import { NavLink, Route, Routes, useNavigate } from "react-router-dom";
+import SignIn from "./components/signIn";
+import MainContent from "./components/main_content";
+import Mypage from "./components/user/Mypage";
+import { Products } from "./components/products_list";
+import SignUp from "./components/user/signUp";
+import AuthContext, { AuthProvider } from "./auth.context";
+import Loading from "./loading";
 
 function MainHeader() {
   const [isMenuOpen, setMenuOpen] = useState(false);
@@ -16,7 +16,7 @@ function MainHeader() {
   const [openSearchBox, setOpenSearchBox] = useState(false);
 
   const goHome = () => {
-    navigate('/');
+    navigate("/");
   };
 
   const toggleMenu = (e) => {
@@ -41,30 +41,30 @@ function MainHeader() {
 
   const handleLogout = () => {
     try {
-      localStorage.removeItem('accessToken');
-      localStorage.removeItem('user');
-      localStorage.removeItem('products');
-      localStorage.removeItem('product');
-      localStorage.removeItem('activeMenu');
-      navigate('/home');
+      localStorage.removeItem("accessToken");
+      localStorage.removeItem("user");
+      localStorage.removeItem("products");
+      localStorage.removeItem("product");
+      localStorage.removeItem("activeMenu");
+      navigate("/home");
       window.location.reload();
     } catch (error) {
-      navigate('/home');
+      navigate("/home");
     }
   };
 
   useEffect(() => {
-    document.addEventListener('click', closeMenu);
+    document.addEventListener("click", closeMenu);
 
     return () => {
-      document.removeEventListener('click', closeMenu);
+      document.removeEventListener("click", closeMenu);
     };
   }, []);
 
   const menus = () => {
     const result = [
-      { to: '/home', text: 'Home' },
-      { to: '/support', text: 'Support' },
+      { to: "/home", text: "Home" },
+      { to: "/support", text: "Support" },
     ];
 
     const links = result.map((val, idx) => (
@@ -84,7 +84,7 @@ function MainHeader() {
   };
 
   useEffect(() => {
-    console.log('OpenSearchBox: ', openSearchBox);
+    console.log("OpenSearchBox: ", openSearchBox);
   }, [openSearchBox]);
 
   return (
@@ -93,7 +93,10 @@ function MainHeader() {
       className="w-full h-[70px] fixed top-0 z-20 flex justify-between items-center bg-gradient-to-r from-sky-500 to-indigo-500"
     >
       {/*헤더 메뉴 버튼*/}
-      <div id="main_header_menus" className="mw-md:ml-5 mw-md:relative miw-md:w-[150px] h-full flex justify-between">
+      <div
+        id="main_header_menus"
+        className="mw-md:ml-5 mw-md:relative miw-md:w-[150px] h-full flex justify-between"
+      >
         <div className="w-[10%] hidden items-center justify-center mw-md:flex">
           <button
             className={`p-2 focus:outline-none flex items-center ml-4 border border-transparent rounded-full hover:bg-sky-300 hover:cursor-pointer transition-all duration-400`}
@@ -106,16 +109,21 @@ function MainHeader() {
               viewBox="0 0 24 24"
               stroke="currentColor"
             >
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16m-7 6h7" />
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M4 6h16M4 12h16m-7 6h7"
+              />
             </svg>
           </button>
         </div>
         <div
           className={`miw-md:w-[40vh] h-full mw-md:h-[30vh] transition-all duration-300 justify-around items-center ml-5 mw-md:z-99 mw-md:${
             isMenuOpen
-              ? 'flex mw-md:flex-col mw-md:absolute mw-md:-left-10 mw-md:top-[4.4rem] mw-md:border-t-0 mw-md:rounded-r-lg mw-md:bg-slate-300'
-              : 'hidden '
-          } mw-md:flex-col miw-md:flex ${isMenuOpen ? '' : ' hidden'}`}
+              ? "flex mw-md:flex-col mw-md:absolute mw-md:-left-10 mw-md:top-[4.4rem] mw-md:border-t-0 mw-md:rounded-r-lg mw-md:bg-slate-300"
+              : "hidden "
+          } mw-md:flex-col miw-md:flex ${isMenuOpen ? "" : " hidden"}`}
           onClick={handleMenuClick}
         >
           {menus()}
@@ -173,7 +181,10 @@ function MainHeader() {
         </div>
       </div>
       {/* 헤더 검색 상자 */}
-      <div id="search-box" className={`w-1/2 h-full mw-md:3/4 mw-md:-ml-9 flex justify-center items-center`}>
+      <div
+        id="search-box"
+        className={`w-1/2 h-full mw-md:3/4 mw-md:-ml-9 flex justify-center items-center`}
+      >
         <div className="w-full flex justify-center">
           <input
             type="text"
@@ -217,11 +228,11 @@ function App() {
   }, []);
 
   return (
-    <div className="w-[100vw] h-[100vh] overflow-hidden" id="main">
-      {loading ? <Loading /> : ''}
+    <div className="w-[100vw] h-[100vh] overflow-x-hidden" id="main">
+      {loading ? <Loading /> : ""}
       <AuthProvider>
         <MainHeader />
-        <div className="w-full h-full flex justify-center items-center mt-12">
+        <div className="w-full h-full flex justify-center items-center mt-24">
           <Routes>
             <Route exact path="/" element={<MainContent />}></Route>
             <Route exact path="/home" element={<MainContent />}></Route>
