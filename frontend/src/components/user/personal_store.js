@@ -42,8 +42,6 @@ export default function PersonalStore() {
   const [manageProduct, setManageProduct] = useState(false);
   const priceInputRef = useRef();
 
-  console.log('categoryItems.length: ', categoryItems.length);
-
   // 이전 버튼 클릭 시 activeOption 비워주기
   const handleBeforeButton = () => {
     setActiveOption(null);

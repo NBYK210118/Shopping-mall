@@ -85,23 +85,6 @@ export default function UserProfile(props) {
     setUserInfo(!userInfo);
   };
 
-  useEffect(() => {
-    DataService.verifyToken(token, navigate).then((response) => {
-      try {
-        if (response.status === 200) {
-          console.log('isVerified: ', response.data['user']);
-          localStorage.removeItem('user');
-          setUser(response.data['user']);
-          localStorage.setItem('user', JSON.stringify(response.data['user']));
-        }
-      } catch (error) {
-        console.log(error);
-        localStorage.removeItem('accessToken');
-        localStorage.removeItem('user');
-      }
-    });
-  }, [token]);
-
   return (
     <>
       <div className="flex items-center w-full h-full mw-md:w-[100vw] mw-md:h-[100vh]">

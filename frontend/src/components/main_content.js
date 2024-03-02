@@ -1,83 +1,326 @@
-import { useContext } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import AuthContext from '../auth.context';
+import { Images } from '../images_list';
+import { Swiper, SwiperSlide } from 'swiper/react';
+import 'swiper/css/pagination';
+import 'swiper/css/navigation';
+import 'swiper/css';
+import { Navigation } from 'swiper/modules';
 
 export default function MainContent() {
   const navigate = useNavigate();
   const { token } = useContext(AuthContext);
+  const [showMessage, setShowMessage] = useState(true);
+  const [slideOut, setSlideOut] = useState(false);
 
-  const handleCategoryClick = (category) => {
-    navigate(`/products/${category}`);
+  // 첫 로드 때 환영합니다 메시지 띄워주기
+  useEffect(() => {
+    // Show the message by sliding it up after the component mounts
+    const slideUpTimeout = setTimeout(() => {
+      setShowMessage(true);
+      setSlideOut(true);
+    }, 100); // Start almost immediately after mount
+
+    // Slide down the message after 4 seconds
+    const slideDownTimeout = setTimeout(() => {
+      setSlideOut(false);
+    }, 3100); // 4 seconds for viewing + 0.1s after slide up
+
+    // Clean up the timers on component unmount
+    return () => {
+      clearTimeout(slideUpTimeout);
+      clearTimeout(slideDownTimeout);
+    };
+  }, []);
+
+  const categories = [
+    { txt: '의류', category: 'clothes', icon: 'checkroom' },
+    { txt: '전자제품', category: 'electronics', icon: 'laptop_mac' },
+    { txt: '식품', category: 'foods', icon: 'restaurant' },
+    { txt: '가구', category: 'furniture', icon: 'chair' },
+    { txt: '스포츠', category: 'sports', icon: 'fitness_center' },
+    { txt: '게임', category: 'games', icon: 'sports_esports' },
+    { txt: '도서', category: 'books', icon: 'book' },
+    { txt: '장난감', category: 'toys', icon: 'toys' },
+  ];
+
+  const CategoryItem = ({ category, txt, icon }) => {
+    const navigate = useNavigate();
+
+    return (
+      <div
+        onClick={() => navigate(`/products/${category}`)}
+        className="flex flex-col items-center justify-center w-24 h-24 mw-md:w-16 mw-md:h-16 p-2 m-2 border border-solid border-black rounded-lg cursor-pointer hover:bg-sky-100 transition-all duration-300 hover:scale-105"
+      >
+        <span className="material-symbols-outlined text-7xl mw-md:text-3xl">{icon}</span>
+        <span className="mt-2 text-sm mw-md:text-[0.7rem] mw-md:text-nowrap">{txt}</span>
+      </div>
+    );
   };
 
   const Categories = () => {
-    const items_dict = [
-      { txt: '의류', category: 'clothes', icon: <span class="material-symbols-outlined text-7xl">checkroom</span> },
-      {
-        txt: '전자제품',
-        category: 'electronics',
-        icon: <span class="material-symbols-outlined text-7xl">laptop_mac</span>,
-      },
-      { txt: '식품', category: 'foods', icon: <span class="material-symbols-outlined text-7xl">restaurant</span> },
-      { txt: '가구', category: 'furniture', icon: <span class="material-symbols-outlined text-7xl">chair</span> },
+    return (
+      <div className="-ml-10 flex flex-wrap justify-center mw-md:ml-0">
+        {categories.map((ctg, idx) => (
+          <CategoryItem key={idx} {...ctg} className="w-1/4" />
+        ))}
+      </div>
+    );
+  };
+
+  const Cards = () => {
+    return (
+      <Swiper
+        className="max-w-[1024px] mw-md:max-w-[266px]"
+        spaceBetween={10}
+        slidesPerView={2}
+        modules={[Navigation]}
+        navigation={true}
+        breakpoints={{
+          640: {
+            slidesPerView: 2,
+            spaceBetween: 20,
+          },
+          768: {
+            slidesPerView: 2,
+            spaceBetween: 30,
+          },
+          1024: {
+            slidesPerView: 4,
+            spaceBetween: 40,
+          },
+        }}
+      >
+        {[...Array(5)].map((_, index) => (
+          <SwiperSlide key={index}>
+            <div className="p-2 flex flex-col justify-between">
+              {' '}
+              <div className="bg-white rounded-lg shadow overflow-hidden hover:-translate-y-1 transition-transform duration-200">
+                <img src={Images.Bluejean} alt={`Item ${index + 1}`} className="w-full max-h-[125px] object-cover" />
+                <div className="p-1 text-md">
+                  {' '}
+                  <h3>Item Title {index + 1}</h3>
+                  <p className="text-xs text-gray-600">Item Description or Price</p>
+                </div>
+              </div>
+            </div>
+          </SwiperSlide>
+        ))}
+      </Swiper>
+    );
+  };
+
+  const Sales = () => {
+    return (
+      <Swiper
+        className="max-w-[1024px] mw-md:max-w-[266px]"
+        spaceBetween={10}
+        slidesPerView={2}
+        modules={[Navigation]}
+        navigation={true}
+        breakpoints={{
+          640: {
+            slidesPerView: 2,
+            spaceBetween: 20,
+          },
+          768: {
+            slidesPerView: 2,
+            spaceBetween: 30,
+          },
+          1024: {
+            slidesPerView: 4,
+            spaceBetween: 40,
+          },
+        }}
+      >
+        {[...Array(5)].map((_, index) => (
+          <SwiperSlide key={index}>
+            <div className="p-2 flex flex-col justify-between">
+              {' '}
+              <div className="bg-white rounded-lg shadow overflow-hidden hover:-translate-y-1 transition-transform duration-200">
+                <img src={Images.chair} alt={`Item ${index + 1}`} className="w-full max-h-[125px] object-cover" />
+                <div className="p-1 text-md">
+                  {' '}
+                  <h3>Item Title {index + 1}</h3>
+                  <p className="text-xs text-gray-600">Item Description or Price</p>
+                </div>
+              </div>
+            </div>
+          </SwiperSlide>
+        ))}
+      </Swiper>
+    );
+  };
+
+  const WatchList = () => {
+    const watchListItems = [
+      { id: 1, title: 'Watch Item', description: 'Description', image: Images.macbook, price: 'price' },
+      { id: 2, title: 'Watch Item', description: 'Description', image: Images.macbook, price: 'price' },
+      { id: 3, title: 'Watch Item', description: 'Description', image: Images.macbook, price: 'price' },
+      { id: 4, title: 'Watch Item', description: 'Description', image: Images.macbook, price: 'price' },
+      { id: 5, title: 'Watch Item', description: 'Description', image: Images.macbook, price: 'price' },
     ];
 
-    const Result = () => {
-      return items_dict.map((ctg, idx) => {
-        return (
-          <div
-            key={idx}
-            onClick={() => handleCategoryClick(ctg.category)}
-            className="w-[80px] h-[80px] miw-md:w-[160px] miw-md:h-[160px] miw-md:mr-2 box-border border border-solid border-black flex flex-col"
-          >
-            <div className="h-[80%] flex justify-center items-center border border-solid border-black hover:cursor-pointer hover:bg-sky-100 transition-all duration-300 hover:scale-[1.03]">
-              {ctg.icon}
+    return (
+      <Swiper
+        className="max-w-[1024px] mw-md:max-w-[256px]"
+        spaceBetween={10}
+        slidesPerView={2}
+        modules={[Navigation]} // Add the Navigation module here
+        navigation={true} // Enable navigation arrows
+        breakpoints={{
+          640: {
+            slidesPerView: 2,
+            spaceBetween: 20,
+          },
+          768: {
+            slidesPerView: 2,
+            spaceBetween: 30,
+          },
+          1024: {
+            slidesPerView: 4,
+            spaceBetween: 40,
+          },
+        }}
+      >
+        {watchListItems.map((item, index) => (
+          <SwiperSlide key={index}>
+            <div className="p-2 flex flex-col justify-between">
+              {' '}
+              {/* Reduced padding */}
+              <div className="bg-white rounded-lg shadow overflow-hidden hover:-translate-y-1 transition-transform duration-200">
+                <img
+                  src={item.image}
+                  alt={`Item ${index + 1}`}
+                  className="w-full max-h-[125px] object-cover" // Half of 250px
+                />
+                <div className="p-1 text-md">
+                  {' '}
+                  {/* Adjusted padding and text size */}
+                  <h3>
+                    {item.title} {index + 1}
+                  </h3>
+                  <p className="text-xs text-gray-600">
+                    {item.price} {item.description}
+                  </p>
+                </div>
+              </div>
             </div>
-            <div className="h-[20%] flex justify-center items-center">
-              <span className="">{ctg.txt}</span>
-            </div>
-          </div>
-        );
-      });
-    };
-
-    return <Result />;
+          </SwiperSlide>
+        ))}
+      </Swiper>
+    );
   };
 
   return (
     <>
-      {/*로그인한 사용자에게만 보여지는 화면 */}
       {token ? (
-        <div id="main_content" className="w-[95vw] h-[90vh] flex justify-between bg-gray-400">
-          <div
-            id="main_content_left_content"
-            className="w-1/2 h-full mw-md:w-[50%] mw-md:h-[58.4%] flex flex-col justify-around"
-          >
-            <div className="w-[90%] h-1/3 border border-solid border-black">
-              <img src="" alt="" />
-              <span>내 찜 목록</span>
+        <>
+          {showMessage && (
+            <div
+              className={`fixed -bottom-24 mx-auto w-full p-4 z-50 bg-gradient-to-tr bg-cyan-500 text-white text-center transition-all duration-1000 ${
+                slideOut ? '-translate-y-full' : 'translate-y-10'
+              }`}
+              style={{ transitionProperty: 'transform', transitionDuration: '1000ms' }}
+            >
+              <h2 className="text-2xl font-semibold">Welcome! [User' name]!</h2>
+              <p>Check out what's new since your last visit.</p>
             </div>
-            <div className="w-[90%] h-1/3 border border-solid border-black">
-              <img src="" alt="" />
-              <span>WatchedList</span>
+          )}
+
+          <div className="w-full h-full flex flex-wrap justify-between p-4 overflow-y-scroll">
+            <div
+              id="main_left_content"
+              className="w-[35%] h-auto flex flex-col justify-center items-center max-w-[512px] mx-auto"
+            >
+              {/* Recommended Products */}
+              <div className="mt-5 mb-6 mw-md:mb-2 mw-md:mr-0 p-4">
+                <h3 className="text-xl font-semibold mb-3 mw-md:text-sm">Recommended for You</h3>
+                <div className="grid grid-cols-1 miw-md:grid-cols-2 miw-lg:grid-cols-3 miw-xl:grid-cols-4 gap-4">
+                  {[...Array(4)].map((_, index) => (
+                    <div key={index} className="flex flex-col items-center">
+                      <img src="https://via.placeholder.com/150" alt={`Product ${index + 1}`} className="mb-2" />
+                      <p className="mw-md:text-sm">Product Name {index + 1}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Sales and Promotions */}
+              <div className="mb-2 p-4">
+                <h3 className="text-xl font-semibold mb-3 text-center mw-md:text-lg">On Sale Now</h3>
+                <div className="grid grid-cols-1 miw-md:grid-cols-2 miw-lg:grid-cols-3 miw-xl:grid-cols-4 gap-4">
+                  {[...Array(4)].map((_, index) => (
+                    <div key={index} className="flex flex-col items-center">
+                      <img src="https://via.placeholder.com/150" alt={`Product ${index + 1}`} className="mb-2" />
+                      <p className="mw-md:text-sm">Product Name {index + 1}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Advertising Space */}
+              <div className="ml-5 mb-2 mr-5 p-4">
+                <h3 className="text-xl font-semibold mb-3 mw-md:text-lg mw-md:text-nowrap">Featured Ads</h3>
+                <div className="grid grid-cols-4 gap-4">
+                  {[...Array(4)].map((_, index) => (
+                    <div className="flex flex-col items-center">
+                      <img src="https://via.placeholder.com/150" alt="Ad" className="mb-2" />
+                      <p className="mw-md:text-sm">Ad Description</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* User Activity*/}
+              <div className="mb-6 p-4">
+                <h3 className="text-xl font-semibold mb-3 mw-md:text-lg mw-md:text-nowrap">Recent Activity</h3>
+                <div className="grid grid-cols-4 gap-4">
+                  {[...Array(4)].map((_, index) => (
+                    <div className="flex flex-col items-center">
+                      <img src="https://via.placeholder.com/150" alt="Activity" className="mb-2" />
+                      <p className="mw-md:text-sm">Activity Description</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
             </div>
-            <div className="w-[90%] h-1/3 border border-solid border-black">
-              <img src="" alt="" />
-              <span>WatchedList</span>
+            <div id="main_right_content" className="w-1/2 h-auto max-w-[1024px] mt-5 mx-auto mw-md:justify-evenly">
+              {/* Categories */}
+              <div className="flex flex-col justify-around max-w-[1024px] mt-5 mx-auto mw-md:justify-evenly">
+                <h1 className="font-bold text-xl mw-md:text-sm">카테고리</h1>
+                <Categories />
+              </div>
+              {/* Sales */}
+              <div className="flex flex-col justify-around max-w-[1024px] mt-5 mx-auto mw-md:justify-evenly">
+                <h1 className="font-bold text-xl mw-md:text-sm">판매 중인 상품</h1>
+                <Sales />
+              </div>
+              {/* Favorites */}
+              <div className="flex flex-col justify-around max-w-[1024px] mt-5 mx-auto mw-md:justify-evenly">
+                <h1 className="font-bold text-xl mw-md:text-sm">좋아요 리스트</h1>
+                <Cards />
+              </div>
+              {/* WatchList */}
+              <div className="flex flex-col justify-around max-w-[1024px] mt-5 mx-auto mw-md:justify-evenly">
+                <h1 className="font-bold text-xl mw-md:text-sm">내가 본 상품들</h1>
+                <WatchList />
+              </div>
+              {/* Advertisement Banner */}
+              <div className="flex justify-center items-center mt-5 mx-auto mw-md:justify-evenly w-full h-48 bg-gray-300">
+                <img src="https://via.placeholder.com/1024x192" alt="Advertisement" className="max-w-full h-auto" />
+              </div>
+              {/* Advertisement Banner */}
+              <div className="flex justify-center items-center mt-5 mx-auto mw-md:justify-evenly w-full h-48 bg-gray-300">
+                <img src="https://via.placeholder.com/1024x192" alt="Advertisement" className="max-w-full h-auto" />
+              </div>
             </div>
           </div>
-          <div
-            id="main_content_right_content"
-            className="w-1/2 h-1/2 mw-md:w-1/2 mw-md:h-[60%] flex flex-wrap justify-end"
-          >
-            <Categories />
-            <Categories />
-            <Categories />
-          </div>
-        </div>
+        </>
       ) : (
-        <div id="main_content" className="w-[70vw] h-[95vh] flex justify-between bg-gray-400">
-          {/*Guest 사용자에게만 보여지는 화면 */}
+        <div className="w-full h-full flex justify-center bg-gray-400 p-4">
+          {/* Guest 사용자에게 보여지는 화면도 만들어줘*/}
         </div>
       )}
     </>

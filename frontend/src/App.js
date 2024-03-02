@@ -8,12 +8,14 @@ import { Products } from './components/products_list';
 import SignUp from './components/user/signUp';
 import AuthContext, { AuthProvider } from './auth.context';
 import Loading from './loading';
+import DataService from './data_services';
 
 function MainHeader() {
   const [isMenuOpen, setMenuOpen] = useState(false);
   const { token } = useContext(AuthContext);
   const navigate = useNavigate();
   const [openSearchBox, setOpenSearchBox] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
 
   const goHome = () => {
     navigate('/');
@@ -68,13 +70,8 @@ function MainHeader() {
     ];
 
     const links = result.map((val, idx) => (
-      <div className="rounded-full block p-3 hover:bg-sky-300 transition-all duration-400">
-        <NavLink
-          key={idx}
-          to={val.to}
-          onClick={closeMenu}
-          className="text-nowrap text-base text-white mw-md:text-black font-semibold"
-        >
+      <div key={idx} className="rounded-lg block p-3 hover:bg-sky-300 transition-all duration-300">
+        <NavLink to={val.to} onClick={closeMenu} className="block text-base font-semibold text-white hover:bg-sky-300">
           {val.text}
         </NavLink>
       </div>
@@ -84,13 +81,31 @@ function MainHeader() {
   };
 
   useEffect(() => {
+    const handleScroll = () => {
+      if (window.scrollY > 70) {
+        setIsScrolled(true);
+      } else {
+        setIsScrolled(false);
+      }
+    };
+
+    // Add scroll event listener when component mounts
+    window.addEventListener('scroll', handleScroll);
+
+    // Clean up event listener when component unmounts
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  useEffect(() => {
     console.log('OpenSearchBox: ', openSearchBox);
   }, [openSearchBox]);
 
   return (
     <div
       id="main_header"
-      className="w-full h-[70px] fixed top-0 z-20 flex justify-between items-center bg-gradient-to-r from-sky-500 to-indigo-500"
+      className={`w-full h-[70px] fixed top-0 z-10 flex justify-between items-center bg-gradient-to-r from-sky-500 to-indigo-500 ${
+        isScrolled ? 'bg-opacity-80' : 'bg-opacity-100'
+      }`}
     >
       {/*헤더 메뉴 버튼*/}
       <div id="main_header_menus" className="mw-md:ml-5 mw-md:relative miw-md:w-[150px] h-full flex justify-between">
@@ -111,11 +126,11 @@ function MainHeader() {
           </button>
         </div>
         <div
-          className={`miw-md:w-[40vh] h-full mw-md:h-[30vh] transition-all duration-300 justify-around items-center ml-5 mw-md:z-99 mw-md:${
+          className={`flex miw-md:w-[40vh] mw-md:h-[50vh] transition-all duration-300 justify-around items-center ml-5 mw-md:z-50 mw-md:${
             isMenuOpen
-              ? 'flex mw-md:flex-col mw-md:absolute mw-md:-left-10 mw-md:top-[4.4rem] mw-md:border-t-0 mw-md:rounded-r-lg mw-md:bg-slate-300'
-              : 'hidden '
-          } mw-md:flex-col miw-md:flex ${isMenuOpen ? '' : ' hidden'}`}
+              ? 'mw-md:flex-col mw-md:absolute mw-md:-left-10 mw-md:top-[70px] mw-md:bg-white mw-md:shadow-lg mw-md:rounded-lg mw-md:opacity-65 mw-md:hover:opacity-100'
+              : 'hidden'
+          }`}
           onClick={handleMenuClick}
         >
           {menus()}
@@ -207,6 +222,7 @@ function MainHeader() {
 
 function App() {
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     setLoading(true);
@@ -217,11 +233,11 @@ function App() {
   }, []);
 
   return (
-    <div className="w-[100vw] h-[100vh] overflow-hidden" id="main">
-      {loading ? <Loading /> : ''}
-      <AuthProvider>
+    <AuthProvider>
+      <div className={`w-[100vw] h-[100vh] overflow-hidden`} id="main">
+        {loading && <Loading />}
         <MainHeader />
-        <div className="w-full h-full flex justify-center items-center mt-12">
+        <div className="w-full h-full flex justify-center items-center mt-12 bg-white/55">
           <Routes>
             <Route exact path="/" element={<MainContent />}></Route>
             <Route exact path="/home" element={<MainContent />}></Route>
@@ -231,8 +247,8 @@ function App() {
             <Route exact path="/products/*" element={<Products />}></Route>
           </Routes>
         </div>
-      </AuthProvider>
-    </div>
+      </div>
+    </AuthProvider>
   );
 }
 
