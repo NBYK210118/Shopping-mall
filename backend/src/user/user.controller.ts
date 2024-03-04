@@ -146,7 +146,6 @@ export class UserController {
   @UseGuards(AuthGuard())
   @Post('/my-store')
   async getProductsWhileUpdate(@Body('checklist') checklist: string) {
-    console.log(checklist);
     const converted_checklist = checklist
       .split(',')
       .map((val) => parseInt(val));

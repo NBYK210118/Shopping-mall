@@ -7,9 +7,12 @@ export class Product implements Prisma.ProductCreateInput {
   manufacturer: string;
   category: Prisma.CategoryCreateNestedOneWithoutProductsInput;
   category_name: string;
+  likedBy?: Prisma.UserCreateNestedManyWithoutProductInput;
+  reviews?: Prisma.ReviewCreateNestedManyWithoutProductInput;
   status?: string;
   SellingList?: Prisma.SellingListCreateNestedOneWithoutProductsInput;
   WishList?: Prisma.WishListCreateNestedOneWithoutProductsInput;
+  viewedProduct?: Prisma.ViewedProductCreateNestedOneWithoutProductsInput;
   inventory: number;
   images?: Prisma.ImageCreateNestedManyWithoutProductsInput;
   ProductImage?: Prisma.ProductImageCreateNestedManyWithoutProductInput;

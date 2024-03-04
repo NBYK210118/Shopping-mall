@@ -12,7 +12,6 @@ export class ProductController {
   async getAllProducts(
     @Param('category') category: string,
   ): Promise<Product[]> {
-    console.log(category);
     return this.productService.getAllProducts(category);
   }
 

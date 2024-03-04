@@ -11,11 +11,8 @@ export function Products() {
   const [isFilledHeart, setFilledHeart] = useState(false);
   const { token, user, setUser, category, setCategory, setLoading } = useContext(AuthContext);
   const [currentProducts, setCurrentProducts] = useState([]);
+  const [manageProductsLikes, setManageProductsLikes] = useState({});
   const navigate = useNavigate();
-
-  const toggleHeart = () => {
-    setFilledHeart(!isFilledHeart);
-  };
 
   useEffect(() => {
     const storedCategory = localStorage.getItem('category');
@@ -32,7 +29,24 @@ export function Products() {
 
   useEffect(() => {
     console.log(currentProducts);
+    setManageProductsLikes(
+      currentProducts.reduce((acc, product) => {
+        acc[product.id] = false;
+        return acc;
+      }, {})
+    );
   }, [currentProducts]);
+
+  useEffect(() => {
+    console.log('manageProductsLikes: ', manageProductsLikes);
+  }, [manageProductsLikes]);
+
+  const toggleHeart = (productId) => {
+    setManageProductsLikes({
+      ...manageProductsLikes,
+      [productId]: !manageProductsLikes[productId],
+    });
+  };
 
   const Items = () => {
     if (currentProducts) {
@@ -48,9 +62,9 @@ export function Products() {
             <p className="text-sm md:text-xs mb-2">{val.price.toLocaleString('ko-kr')}원</p>
             <div className="w-full flex justfiy-between items-center space-x-12">
               <FontAwesomeIcon
-                icon={isFilledHeart ? faHeart : faHeartRegular} // isFilledHeart 상태에 따라 아이콘을 변경하는 로직 추가 필요
-                className="w-[20%] text-red-500 cursor-pointer hover:scale-[1.1] transition-all duration-300"
-                onClick={() => toggleHeart()}
+                icon={manageProductsLikes[val.id] ? faHeart : faHeartRegular} // isFilledHeart 상태에 따라 아이콘을 변경하는 로직 추가 필요
+                className="w-[20%] text-red-500 text-2xl cursor-pointer hover:scale-[1.1] transition-all duration-300"
+                onClick={() => toggleHeart(val.id)}
               />
               <div className="w-[80%] flex">
                 <button className="font-semibold buy-btn text-xs py-1 px-2 bg-blue-500 text-white rounded hover:bg-blue-600">
