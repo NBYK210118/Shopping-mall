@@ -42,7 +42,7 @@ export class UserService {
     const user = await this.prisma.user.findFirst({
       where: { email },
       include: {
-        sellinglist: { include: { products: true, store: true, user: true } },
+        sellinglist: { include: { products: true, store: true } },
         profile: true,
         orders: true,
         store: true,

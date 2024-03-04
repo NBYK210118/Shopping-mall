@@ -22,4 +22,10 @@ export class ProductController {
   ) {
     return this.productService.getCategoryItems(user, category);
   }
+
+  @UseGuards(AuthGuard())
+  @Post('onsales')
+  async getAllProducts(@Body('category') category:string) : Promise<Product[]>{
+    return this.productService.getAllProducts(category)
+  }
 }

@@ -9,10 +9,11 @@ import { StoreuserModule } from './storeuser/storeuser.module';
 import { ImageModule } from './image/image.module';
 import { OrderproductModule } from './orderproduct/orderproduct.module';
 import { ProductImageModule } from './product-image/product-image.module';
+import { CategoryModule } from './category/category.module';
 
 @Module({
   imports: [UserModule,ServeStaticModule.forRoot({
     rootPath: join(__dirname,"..",'profile_images')
-  }), StoreModule, OrderModule, ProductModule, StoreuserModule, ImageModule, OrderproductModule, ProductImageModule],
+  }), StoreModule, OrderModule, ProductModule, StoreuserModule, ImageModule, OrderproductModule, ProductImageModule, CategoryModule],
 })
 export class AppModule{}

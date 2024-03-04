@@ -9,7 +9,6 @@ export class Product implements Prisma.ProductCreateInput {
   category_name: string;
   status?: string;
   SellingList?: Prisma.SellingListCreateNestedOneWithoutProductsInput;
-
   WishList?: Prisma.WishListCreateNestedOneWithoutProductsInput;
   inventory: number;
   images?: Prisma.ImageCreateNestedManyWithoutProductsInput;

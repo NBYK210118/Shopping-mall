@@ -47,6 +47,17 @@ export class ProductService {
     return result;
   }
 
+  async getAllProducts(
+    category:string
+  ) : Promise<Product[]> {
+    const result = await this.prisma.product.findMany({
+      where:{category_name:category},
+      include:{images:true}
+    })
+
+    return result
+  }
+
   async deleteProduct(id: number): Promise<Product> {
     const result = await this.prisma.product.delete({ where: { id } });
     return result;
