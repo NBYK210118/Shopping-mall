@@ -8,6 +8,14 @@ import { GetUser } from 'src/user/get-user.decorator';
 export class ProductController {
   constructor(private productService: ProductService) {}
 
+  @Get(':category')
+  async getAllProducts(
+    @Param('category') category: string,
+  ): Promise<Product[]> {
+    console.log(category);
+    return this.productService.getAllProducts(category);
+  }
+
   @UseGuards(AuthGuard())
   @Get(':id')
   async getProduct(@Param('id') id: number): Promise<Product> {
@@ -21,11 +29,5 @@ export class ProductController {
     @Param('category') category: string,
   ) {
     return this.productService.getCategoryItems(user, category);
-  }
-
-  @UseGuards(AuthGuard())
-  @Post('onsales')
-  async getAllProducts(@Body('category') category:string) : Promise<Product[]>{
-    return this.productService.getAllProducts(category)
   }
 }

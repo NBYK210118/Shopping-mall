@@ -1,12 +1,12 @@
-import { useContext, useEffect, useState } from "react";
-import { Images } from "../../images_list";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faHeart, faShoppingCart } from "@fortawesome/free-solid-svg-icons";
-import { faHeart as faHeartRegular } from "@fortawesome/free-regular-svg-icons";
-import ProductApi from "./product_api";
-import AuthContext from "../../auth.context";
+import { useContext, useEffect, useState } from 'react';
+import { Images } from '../../images_list';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faHeart, faShoppingCart } from '@fortawesome/free-solid-svg-icons';
+import { faHeart as faHeartRegular } from '@fortawesome/free-regular-svg-icons';
+import ProductApi from './product_api';
+import AuthContext from '../../auth.context';
 
-export const Clothes = () => {
+export const Clothes = ({ category }) => {
   const [isFilledHeart, setFilledHeart] = useState(false);
   const { token, setUser } = useContext(AuthContext);
   const toggleHeart = () => {
