@@ -16,7 +16,6 @@ export function Products() {
 
   useEffect(() => {
     const storedCategory = localStorage.getItem('category');
-    console.log(storedCategory);
     const waitForProducts = async () => {
       const response = await ProductApi.getAllProducts(storedCategory, navigate);
       setCurrentProducts(response.data);
@@ -28,7 +27,6 @@ export function Products() {
   }, []);
 
   useEffect(() => {
-    console.log(currentProducts);
     setManageProductsLikes(
       currentProducts.reduce((acc, product) => {
         acc[product.id] = false;
@@ -37,16 +35,23 @@ export function Products() {
     );
   }, [currentProducts]);
 
-  useEffect(() => {
-    console.log('manageProductsLikes: ', manageProductsLikes);
-  }, [manageProductsLikes]);
-
   const toggleHeart = (productId) => {
     setManageProductsLikes({
       ...manageProductsLikes,
       [productId]: !manageProductsLikes[productId],
     });
   };
+
+  useEffect(() => {
+    console.log('manageProductsLikes: ', manageProductsLikes);
+    if (manageProductsLikes) {
+      const formData = new FormData();
+      formData.append('likes', JSON.stringify(manageProductsLikes));
+      ProductApi.updatelikeProduct(token, formData, navigate).then((response) => {
+        console.log('updalikeProduct response.data:', response.data);
+      });
+    }
+  }, [manageProductsLikes]);
 
   const Items = () => {
     if (currentProducts) {
@@ -80,7 +85,7 @@ export function Products() {
         );
       });
     } else {
-      <div id="proudct_noneitem"></div>;
+      <div id="proudct_none_item"></div>;
     }
   };
 

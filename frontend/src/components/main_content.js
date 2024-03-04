@@ -331,7 +331,9 @@ export default function MainContent() {
                 transitionDuration: '1000ms',
               }}
             >
-              <h2 className="text-2xl font-semibold">Welcome! [{user['profile']['nickname']}]!</h2>
+              <h2 className="text-2xl font-semibold">
+                Welcome! [{user['profile'] ? user['profile']['nickname'] : 'Username'}]!
+              </h2>
               <p>Check out what's new since your last visit.</p>
             </div>
           )}

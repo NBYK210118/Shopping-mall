@@ -1,8 +1,18 @@
-import { Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Post,
+  Req,
+  Res,
+  UseGuards,
+} from '@nestjs/common';
 import { ProductService } from './product.service';
 import { AuthGuard } from '@nestjs/passport';
 import { Product, User } from '@prisma/client';
 import { GetUser } from 'src/user/get-user.decorator';
+import { Request, Response } from 'express';
 
 @Controller('product')
 export class ProductController {

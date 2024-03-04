@@ -153,6 +153,14 @@ export class UserController {
   }
 
   @UseGuards(AuthGuard())
+  @Post('/islikeit')
+  async updatelikeProduct(@GetUser() user: User, @Body('likes') data: string) {
+    const parsedData = JSON.parse(data);
+    const result = await this.userService.updatelikeProduct(user, parsedData);
+    return result;
+  }
+
+  @UseGuards(AuthGuard())
   @Post('/my-store/delete-product')
   async deleteProduct(
     @GetUser() user: User,
