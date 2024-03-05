@@ -1,28 +1,45 @@
-import { useContext, useEffect, useState } from "react";
-import { Images } from "../images_list";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faHeart, faShoppingCart } from "@fortawesome/free-solid-svg-icons";
-import { faHeart as faHeartRegular } from "@fortawesome/free-regular-svg-icons";
-import ProductApi from "./products/product_api";
-import AuthContext from "../auth.context";
-import { useNavigate } from "react-router-dom";
+import { useContext, useEffect, useState } from 'react';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faHeart, faShoppingCart } from '@fortawesome/free-solid-svg-icons';
+import { faHeart as faHeartRegular } from '@fortawesome/free-regular-svg-icons';
+import ProductApi from './product_api';
+import AuthContext from '../../auth.context';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 
 export function Products() {
-  const [isFilledHeart, setFilledHeart] = useState(false);
-  const { token, user, setUser, category, setCategory, setLoading } =
-    useContext(AuthContext);
+  const { token, user, setUser, category, setCategory, setLoading } = useContext(AuthContext);
   const [currentProducts, setCurrentProducts] = useState([]);
   const [manageProductsLikes, setManageProductsLikes] = useState({});
   const navigate = useNavigate();
+  let [searchParams, setSearchParams] = useSearchParams();
+  let param = searchParams.get('category');
+
+  const checkUserLikedProduct = (product, user) => {
+    return product.likedBy.some((like) => like.userId === user.id);
+  };
+
+  const toggleHeart = (productId) => {
+    setManageProductsLikes({
+      ...manageProductsLikes,
+      [productId]: !manageProductsLikes[productId],
+    });
+  };
 
   useEffect(() => {
-    const storedCategory = localStorage.getItem("category");
     const waitForProducts = async () => {
-      const response = await ProductApi.getAllProducts(
-        storedCategory,
-        navigate
-      );
-      setCurrentProducts(response.data);
+      try {
+        setLoading(true);
+        const response = await ProductApi.getAllProducts(token, param, navigate);
+        if (response && response.data) {
+          setCurrentProducts(response.data);
+          console.log('response.data: ', response.data);
+        } else {
+          console.log('No products');
+        }
+      } catch (error) {
+      } finally {
+        setLoading(false);
+      }
     };
 
     setLoading(true);
@@ -33,29 +50,19 @@ export function Products() {
   useEffect(() => {
     setManageProductsLikes(
       currentProducts.reduce((acc, product) => {
-        acc[product.id] = false;
+        acc[product.id] = checkUserLikedProduct(product, user);
         return acc;
       }, {})
     );
   }, [currentProducts]);
 
-  const toggleHeart = (productId) => {
-    setManageProductsLikes({
-      ...manageProductsLikes,
-      [productId]: !manageProductsLikes[productId],
-    });
-  };
-
   useEffect(() => {
-    console.log("manageProductsLikes: ", manageProductsLikes);
     if (manageProductsLikes) {
       const formData = new FormData();
-      formData.append("likes", JSON.stringify(manageProductsLikes));
-      ProductApi.updatelikeProduct(token, formData, navigate).then(
-        (response) => {
-          console.log("updalikeProduct response.data:", response.data);
-        }
-      );
+      formData.append('likes', JSON.stringify(manageProductsLikes));
+      ProductApi.updatelikeProduct(token, formData, navigate).then((response) => {
+        console.log(response.data);
+      });
     }
   }, [manageProductsLikes]);
 
@@ -68,15 +75,13 @@ export function Products() {
             className="min-h-60 min-w-36 cursor-pointer p-3 mx-5 my-2 border boder-solid border-black"
           >
             <img
-              src={val.images[0]["imgUrl"]}
+              src={val.images[0]['imgUrl']}
               alt="상품 이미지"
               className="w-full max-w-[250px] min-h-72 mw-md:max-w-[210px] mw-md:max-h-[100px] object-cover hover:scale-[1.04] transition-all duration-300"
             />
 
             <h3 className="text-md md:text-sm mb-1">{val.name}</h3>
-            <p className="text-sm md:text-xs mb-2">
-              {val.price.toLocaleString("ko-kr")}원
-            </p>
+            <p className="text-sm md:text-xs mb-2">{val.price.toLocaleString('ko-kr')}원</p>
             <div className="w-full flex justfiy-between items-center space-x-14">
               <FontAwesomeIcon
                 icon={manageProductsLikes[val.id] ? faHeart : faHeartRegular} // isFilledHeart 상태에 따라 아이콘을 변경하는 로직 추가 필요
@@ -102,14 +107,8 @@ export function Products() {
   };
 
   return (
-    <div
-      id="products_main"
-      className="w-[100%] h-[100%] flex justify-center relative"
-    >
-      <div
-        id="products_container"
-        className="w-[100%] h-[100%] absolute top-16 mw-md:top-16"
-      >
+    <div id="products_main" className="w-[100%] h-[100%] flex justify-center">
+      <div id="products_container" className="w-[100%] h-[100%] absolute top-20 mw-md:top-16">
         <div className="mx-auto px-4">
           <div className="flex flex-wrap items-end mw-md:justify-around mw-md:overflow-y-scroll">
             {currentProducts && <Items />}

@@ -145,7 +145,7 @@ export class UserService {
   }
 
   async updateNickname(user: User, nickname: string): Promise<User> {
-    const updated_profile = await this.prisma.profile.update({
+    await this.prisma.profile.update({
       where: { userId: user.id },
       data: { nickname },
     });
@@ -373,46 +373,65 @@ export class UserService {
 
   async updatelikeProduct(user: User, data: Object) {
     const products_states = { ...data };
-    const isLiked = Object.keys(products_states)
-      .filter((val) => products_states[val] === true)
-      .map((val) => parseInt(val));
-    const NotLiked = Object.keys(products_states)
-      .filter((val) => products_states[val] === false)
-      .map((val) => parseInt(val));
+    const checking = Object.keys(products_states).filter(
+      (val) => products_states[val] === true,
+    );
+
+    if (!checking) {
+      return;
+    }
 
     const found = await this.prisma.wishList.findUnique({
       where: { userId: user.id },
     });
 
     if (!found) {
-      console.log('찜 목록 없었음');
       await this.prisma.wishList.create({
         data: { userId: user.id },
       });
     }
-    console.log('찜 목록 있었음');
 
-    if (isLiked) {
-      for (const key of isLiked) {
-        await this.prisma.wishList.update({
-          where: { userId: user.id },
-          data: { products: { connect: { id: key } } },
+    for (const [productId, liked] of Object.entries(products_states)) {
+      const id = parseInt(productId);
+      const found = await this.prisma.userProduct.findFirst({
+        where: { productId: id, userId: user.id },
+      });
+
+      if (liked) {
+        if (!found) {
+          await this.prisma.userProduct.create({
+            data: {
+              userId: user.id,
+              productId: id,
+            },
+          });
+          await this.prisma.wishList.update({
+            where: { userId: user.id },
+            data: { products: { connect: { id } } },
+          });
+        }
+      } else {
+        if (!found) {
+          continue;
+        }
+        await this.prisma.userProduct.delete({
+          where: {
+            userId_productId: {
+              productId: id,
+              userId: user.id,
+            },
+          },
         });
-      }
-    }
-
-    if (NotLiked) {
-      for (const key of NotLiked) {
         await this.prisma.wishList.update({
           where: { userId: user.id },
-          data: { products: { disconnect: { id: key } } },
+          data: { products: { disconnect: { id } } },
         });
       }
     }
 
     const result = await this.prisma.wishList.findUnique({
       where: { userId: user.id },
-      include: { products: true },
+      include: { products: { select: { likedBy: true } } },
     });
 
     return result;

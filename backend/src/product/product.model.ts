@@ -7,7 +7,8 @@ export class Product implements Prisma.ProductCreateInput {
   manufacturer: string;
   category: Prisma.CategoryCreateNestedOneWithoutProductsInput;
   category_name: string;
-  likedBy?: Prisma.UserCreateNestedManyWithoutProductInput;
+  likedBy?: Prisma.UserProductCreateNestedManyWithoutProductInput;
+  userProduct?: Prisma.UserProductCreateNestedManyWithoutProductInput;
   reviews?: Prisma.ReviewCreateNestedManyWithoutProductInput;
   status?: string;
   SellingList?: Prisma.SellingListCreateNestedOneWithoutProductsInput;
@@ -22,28 +23,6 @@ export class Product implements Prisma.ProductCreateInput {
   OrderProduct?: Prisma.OrderProductCreateNestedManyWithoutProductInput;
   createdAt?: string | Date;
   updatedAt?: string | Date;
-}
-
-export class ProductUpdateInput implements Prisma.ProductUpdateInput {
-  OrderProduct?: Prisma.OrderProductUpdateManyWithoutProductNestedInput;
-  ProductImage?: Prisma.ProductImageUpdateManyWithoutProductNestedInput;
-  SellingList?: Prisma.SellingListUpdateOneWithoutProductsNestedInput;
-  WishList?: Prisma.WishListUpdateOneWithoutProductsNestedInput;
-  category?: Prisma.CategoryUpdateOneRequiredWithoutProductsNestedInput;
-  category_name?: string | Prisma.StringFieldUpdateOperationsInput;
-  createdAt?: string | Date | Prisma.DateTimeFieldUpdateOperationsInput;
-  description?: string | Prisma.StringFieldUpdateOperationsInput;
-  images?: Prisma.ImageUpdateManyWithoutProductsNestedInput;
-  inventory?: number | Prisma.IntFieldUpdateOperationsInput;
-  manufacturer?: string | Prisma.StringFieldUpdateOperationsInput;
-  name?: string | Prisma.StringFieldUpdateOperationsInput;
-  orders?: Prisma.OrderUpdateManyWithoutProductsNestedInput;
-  price?: number | Prisma.IntFieldUpdateOperationsInput;
-  reviews?: Prisma.ReviewUpdateManyWithoutProductNestedInput;
-  status?: string | Prisma.NullableStringFieldUpdateOperationsInput;
-  updatedAt?: string | Date | Prisma.DateTimeFieldUpdateOperationsInput;
-  viewedProduct?: Prisma.ViewedProductUpdateOneWithoutProductsNestedInput;
-  likedBy?: Prisma.UserUpdateManyWithoutProductNestedInput;
 }
 
 export class SellingList implements Prisma.SellingListCreateInput {

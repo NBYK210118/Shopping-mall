@@ -6,23 +6,21 @@ import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
 import { JwtStrategy } from './jwt.strategy';
 import { PrismaModule } from 'src/database/prisma.module';
-import { MulterModule } from '@nestjs/platform-express';
-import { MulterConfigService } from './multer-config.service';
 import { StoreuserService } from 'src/storeuser/storeuser.service';
 
 @Module({
-  imports:[
-    PassportModule.register({defaultStrategy: 'jwt'}),
+  imports: [
+    PassportModule.register({ defaultStrategy: 'jwt' }),
     JwtModule.register({
       secret: 'Secret1234',
-      signOptions:{
-        expiresIn: 60 * 60
-      }
+      signOptions: {
+        expiresIn: 60 * 60,
+      },
     }),
     PrismaModule,
   ],
   controllers: [UserController],
-  providers: [UserService, StoreuserService,PrismaService, JwtStrategy],
-  exports:[JwtStrategy,PassportModule]
+  providers: [UserService, StoreuserService, PrismaService, JwtStrategy],
+  exports: [JwtStrategy, PassportModule],
 })
 export class UserModule {}

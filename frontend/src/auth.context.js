@@ -13,7 +13,12 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(JSON.parse(localStorage.getItem('user')));
   const [loading, setLoading] = useState(true);
   const [category, setCategory] = useState(localStorage.getItem('category'));
+  const [clickedSellingProduct, setClickedSellingProduct] = useState(null);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    console.log('clickedSellingProduct: ', clickedSellingProduct);
+  }, [clickedSellingProduct]);
 
   useEffect(() => {
     if (token && user) {
@@ -43,7 +48,20 @@ export const AuthProvider = ({ children }) => {
   }, [category]);
 
   return (
-    <AuthContext.Provider value={{ token, setToken, user, setUser, loading, setLoading, category, setCategory }}>
+    <AuthContext.Provider
+      value={{
+        token,
+        setToken,
+        user,
+        setUser,
+        loading,
+        setLoading,
+        category,
+        setCategory,
+        clickedSellingProduct,
+        setClickedSellingProduct,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );

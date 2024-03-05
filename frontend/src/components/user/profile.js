@@ -1,13 +1,11 @@
-import { useContext, useEffect, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import { Images } from '../../images_list';
-import AuthContext from '../../auth.context';
+import { useAuth } from '../../auth.context';
 import DataService from '../../data_services';
 import { useNavigate } from 'react-router-dom';
 
 export default function UserProfile(props) {
-  const { token } = useContext(AuthContext);
-  const { user, setUser } = useContext(AuthContext);
-  const { loading, setLoading } = useContext(AuthContext);
+  const { token, user, setUser, loading, setLoading } = useAuth();
   const fileInputRef = useRef(null);
   const [firstName, setFirstName] = useState(user['firstName']);
   const [lastName, setLastName] = useState(user['lastName']);
@@ -19,7 +17,6 @@ export default function UserProfile(props) {
   const [currentProfileImg, setCurrentProfileImg] = useState(null);
   const [profileImgSize, setProfileImgSize] = useState(0);
   const [imageUrl, setImageUrl] = useState(user['profile']['imageUrl']);
-  const [testUrl, setTestUrl] = useState('');
   const [userInfo, setUserInfo] = useState(false);
   const navigate = useNavigate();
 
@@ -87,7 +84,7 @@ export default function UserProfile(props) {
 
   return (
     <>
-      <div className="flex items-center w-full h-full mw-md:w-[100vw] mw-md:h-[100vh]">
+      <div className="flex items-center w-full h-full miw-xl:w-[60vw] miw-xl:h-[70vh] mw-md:w-[100vw] mw-md:h-[100vh]">
         <div
           id="left_content"
           className="w-[50%] h-full mw-md:w-full mw-md:h-[60%] flex flex-col justify-center mw-md:bg-"
@@ -171,9 +168,9 @@ export default function UserProfile(props) {
             id="left_content"
             className="h-[70%] -mt-2 flex justify-center border border-transparent rounded-lg bg-gray-100 shadow-lg"
           >
-            <div className="w-[80%] h-full mt-10 flex justify-around items-around">
+            <div className="w-[80%] h-full mt-10 flex justify-center items-around">
               {/* 유저 정보 라벨링/입력 받기 */}
-              <div id="labels_col" className="w-full h-[85%] flex flex-col justify-around">
+              <div id="labels_col" className="w-full h-[85%] flex flex-col justify-around items-center">
                 <div className="w-full h-[10%] flex  justify-center">
                   <div className="w-[30%] mr-5 flex justify-center items-center">
                     <label
@@ -183,7 +180,7 @@ export default function UserProfile(props) {
                       First Name
                     </label>
                   </div>
-                  <div className="w-[70%]">
+                  <div className="w-[70%] flex items-center">
                     {userInfo ? (
                       <input type="text" value={firstName} onChange={(e) => setFirstName(e.target.value)} />
                     ) : (
@@ -192,7 +189,7 @@ export default function UserProfile(props) {
                   </div>
                 </div>
 
-                <div className="w-full h-[10%] flex  justify-center">
+                <div className="w-full h-[10%] flex justify-center items-center">
                   <div className="w-[30%] mr-5 flex justify-center items-center">
                     <label
                       htmlFor="lastName"
@@ -210,7 +207,7 @@ export default function UserProfile(props) {
                   </div>
                 </div>
 
-                <div className="w-full h-[10%] flex  justify-center">
+                <div className="w-full h-[10%] flex justify-center items-center">
                   <div className="w-[30%] mr-5 flex justify-center items-center">
                     <label
                       htmlFor="email"
@@ -228,7 +225,7 @@ export default function UserProfile(props) {
                   </div>
                 </div>
 
-                <div className="w-full h-[10%] flex  justify-center">
+                <div className="w-full h-[10%] flex justify-center items-center">
                   <div className="w-[30%] mr-5 flex justify-center items-center">
                     <label htmlFor="store" className="font-bold text-xl mw-md:text-[0.8rem] mw-md:text-nowrap">
                       Store
@@ -245,7 +242,7 @@ export default function UserProfile(props) {
                   </div>
                 </div>
 
-                <div className="w-full h-[10%] flex justify-center">
+                <div className="w-full h-[10%] flex justify-center items-center">
                   <div className="w-[30%] mr-5 flex justify-center items-center">
                     <label htmlFor="address" className="font-bold text-xl mw-md:text-[0.8rem] mw-md:text-nowrap">
                       Address
@@ -270,10 +267,10 @@ export default function UserProfile(props) {
                     )}
                   </div>
                 </div>
-                <div id="edit_button_div" className="w-full h-[15%] mt-5 flex justify-center">
+                <div id="edit_button_div" className="w-[70%] h-[15%] mt-5 flex justify-center">
                   {userInfo ? (
                     <div
-                      className="w-[30%] h-full mr-5 p-2 flex justify-center items-center border border-transparent rounded-lg bg-sky-500 hover:bg-sky-600 hover:cursor-pointer"
+                      className="w-[20%] h-full mr-5 p-2 flex justify-center items-center border border-transparent rounded-lg bg-sky-500 hover:bg-sky-600 cursor-pointer"
                       onClick={(e) => handleProfileUpdate(e)}
                     >
                       <span className="text-white text-center font-bold hover:bg-sky-600 hover:cursor-pointer">
@@ -282,10 +279,10 @@ export default function UserProfile(props) {
                     </div>
                   ) : (
                     <div
-                      className="w-[30%] h-full mr-5 p-2 flex justify-center items-center border border-transparent rounded-lg bg-sky-500 hover:bg-sky-600 hover:cursor-pointer"
+                      className="w-[20%] h-full mr-5 p-2 flex justify-center items-center border border-transparent rounded-lg bg-sky-500 hover:bg-sky-600 cursor-pointer"
                       onClick={() => setUserInfo(!userInfo)}
                     >
-                      <span className="text-lg mw-md:text-sm text-white text-center font-bold hover:bg-sky-600 hover:cursor-pointer">
+                      <span className="mw-md:text-sm text-white text-center font-bold hover:bg-sky-600 hover:cursor-pointer">
                         Edit
                       </span>
                     </div>

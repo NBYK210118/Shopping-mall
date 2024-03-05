@@ -2,16 +2,14 @@ import { useContext, useState } from 'react';
 import { Images } from '../images_list';
 import { useNavigate } from 'react-router-dom';
 import DataService from '../data_services';
-import AuthContext from '../auth.context';
+import { useAuth } from '../auth.context';
 import Loading from '../loading';
 
 const SignIn = () => {
   const [isOpenModal, setIsOpenModal] = useState(true);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const { setToken } = useContext(AuthContext);
-  const { setUser } = useContext(AuthContext);
-  const [loading, setLoading] = useState(false);
+  const { setToken, setUser, loading, setLoading } = useAuth();
 
   const navigate = useNavigate();
 

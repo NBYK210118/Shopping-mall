@@ -5,17 +5,20 @@ import { ProductService } from 'src/product/product.service';
 
 @Injectable()
 export class CategoryService {
-    constructor(private prismaService:PrismaService,private productService:ProductService){}
+  constructor(
+    private prismaService: PrismaService,
+    private productService: ProductService,
+  ) {}
 
-    async getAllCategory() : Promise<Category[]>{
-        const result = await this.prismaService.category.findMany()
+  async getAllCategory(): Promise<Category[]> {
+    const result = await this.prismaService.category.findMany();
 
-        return result
-    }
+    return result;
+  }
 
-    async getAllProducts(category : string) : Promise<Product[]> {
-        const result = await this.productService.getAllProducts(category);
+  async getAllProducts(category: string): Promise<Product[]> {
+    const result = await this.productService.getAllProducts(category);
 
-        return result
-    } 
+    return result;
+  }
 }

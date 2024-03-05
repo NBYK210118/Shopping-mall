@@ -50,7 +50,7 @@ export class ProductService {
   async getAllProducts(category: string): Promise<Product[]> {
     const result = await this.prisma.product.findMany({
       where: { category_name: category },
-      include: { images: true },
+      include: { images: true, likedBy: true },
     });
 
     return result;
