@@ -97,7 +97,7 @@ export default function MainContent() {
 
   const Categories = () => {
     return (
-      <div className="-ml-12 flex flex-wrap justify-center mw-md:ml-0">
+      <div className="-ml-10 flex flex-wrap justify-center mw-md:ml-0">
         {categories.map((ctg, idx) => (
           <CategoryItem key={idx} {...ctg} className="w-1/4" />
         ))}
@@ -433,8 +433,7 @@ export default function MainContent() {
               }}
             >
               <h2 className="text-2xl font-semibold">
-                Welcome! [
-                {user["profile"] ? user["profile"]["nickname"] : "Username"}]!
+                Welcome! [{user ? user["profile"]["nickname"] : "Username"}]!
               </h2>
               <p>Check out what's new since your last visit.</p>
             </div>

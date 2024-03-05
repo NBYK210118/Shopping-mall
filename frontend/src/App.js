@@ -238,11 +238,11 @@ function App() {
   }, []);
 
   return (
-    <div className={`w-[100vw] h-[100vh] overflow-hidden`} id="main">
+    <div className={`w-[100vw] h-[100vh] overflow-y-scroll`} id="main">
       {loading && <Loading />}
       <AuthProvider>
         <MainHeader />
-        <div className="w-full h-full flex justify-center items-center mt-12 bg-white/55">
+        <div className="w-full h-full flex justify-center items-center mt-12 bg-white/55 max-h-[750px]">
           <Routes>
             <Route exact path="/" element={<MainContent />}></Route>
             <Route exact path="/home" element={<MainContent />}></Route>

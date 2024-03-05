@@ -15,13 +15,7 @@ export function Products() {
   const [manageProductsLikes, setManageProductsLikes] = useState({});
   const navigate = useNavigate();
 
-  const toggleHeart = (product_id) => {
-    setFilledHeart(!isFilledHeart);
-  };
-
   useEffect(() => {
-    const storedCategory = localStorage.getItem("category");
-    console.log(storedCategory);
     const storedCategory = localStorage.getItem("category");
     const waitForProducts = async () => {
       const response = await ProductApi.getAllProducts(
@@ -85,9 +79,6 @@ export function Products() {
             </p>
             <div className="w-full flex justfiy-between items-center space-x-14">
               <FontAwesomeIcon
-                icon={isFilledHeart ? faHeart : faHeartRegular} // isFilledHeart 상태에 따라 아이콘을 변경하는 로직 추가 필요
-                className="w-[10%] text-red-500 cursor-pointer hover:scale-[1.1] transition-all duration-300"
-                onClick={() => toggleHeart(val.id)}
                 icon={manageProductsLikes[val.id] ? faHeart : faHeartRegular} // isFilledHeart 상태에 따라 아이콘을 변경하는 로직 추가 필요
                 className="w-[20%] text-red-500 text-2xl cursor-pointer hover:scale-[1.1] transition-all duration-300"
                 onClick={() => toggleHeart(val.id)}

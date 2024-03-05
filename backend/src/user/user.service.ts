@@ -385,10 +385,12 @@ export class UserService {
     });
 
     if (!found) {
+      console.log('찜 목록 없었음');
       await this.prisma.wishList.create({
         data: { userId: user.id },
       });
     }
+    console.log('찜 목록 있었음');
 
     if (isLiked) {
       for (const key of isLiked) {

@@ -18,13 +18,6 @@ import { Request, Response } from 'express';
 export class ProductController {
   constructor(private productService: ProductService) {}
 
-  @Get(':category')
-  async getAllProducts(
-    @Param('category') category: string,
-  ): Promise<Product[]> {
-    return this.productService.getAllProducts(category);
-  }
-
   @UseGuards(AuthGuard())
   @Get(':id')
   async getProduct(@Param('id') id: number): Promise<Product> {
@@ -32,7 +25,7 @@ export class ProductController {
   }
 
   @UseGuards(AuthGuard())
-  @Post('/:category')
+  @Get('/my-store/:category')
   async getCategoryItems(
     @GetUser() user: User,
     @Param('category') category: string,
