@@ -146,11 +146,18 @@ export class UserController {
   @UseGuards(AuthGuard())
   @Post('/my-store')
   async getProductsWhileUpdate(@Body('checklist') checklist: string) {
-    console.log(checklist);
     const converted_checklist = checklist
       .split(',')
       .map((val) => parseInt(val));
     return this.userService.getProductsWhileUpdate(converted_checklist);
+  }
+
+  @UseGuards(AuthGuard())
+  @Post('/islikeit')
+  async updatelikeProduct(@GetUser() user: User, @Body('likes') data: string) {
+    const parsedData = JSON.parse(data);
+    const result = await this.userService.updatelikeProduct(user, parsedData);
+    return result;
   }
 
   @UseGuards(AuthGuard())

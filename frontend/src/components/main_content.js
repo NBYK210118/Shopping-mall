@@ -433,7 +433,8 @@ export default function MainContent() {
               }}
             >
               <h2 className="text-2xl font-semibold">
-                Welcome! [{user["profile"]["nickname"]}]!
+                Welcome! [
+                {user["profile"] ? user["profile"]["nickname"] : "Username"}]!
               </h2>
               <p>Check out what's new since your last visit.</p>
             </div>

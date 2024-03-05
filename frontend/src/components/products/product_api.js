@@ -96,11 +96,35 @@ const categoriesItem = async (token, category, navigate) => {
   }
 };
 
+const updatelikeProduct = async (token, likes, navigate) => {
+  try {
+    const data = await http.post('/user/islikeit', likes, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    return data;
+  } catch (error) {
+    if (error.response.status === 401) {
+      alert('Unauthorized');
+      localStorage.clear();
+      navigate('/signin');
+    } else if (error.response.status === 400) {
+      alert('잘못된 요청');
+      localStorage.clear();
+      navigate('');
+    } else if (error.response.status === 500) {
+      alert('서버 에러!');
+      localStorage.clear();
+      navigate('');
+    }
+  }
+};
+
 const ProductApi = {
   findProduct,
   categoriesItem,
   getAllProducts,
   getAllCategories,
+  updatelikeProduct,
 };
 
 export default ProductApi;

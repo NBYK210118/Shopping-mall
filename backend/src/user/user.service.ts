@@ -3,7 +3,7 @@ import {
   UnauthorizedException,
   UploadedFile,
 } from '@nestjs/common';
-import { Image, Product, Profile, User } from '@prisma/client';
+import { Image, Product, Profile, User, WishList } from '@prisma/client';
 import { PrismaService } from 'src/database/prisma.service';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
@@ -371,8 +371,52 @@ export class UserService {
     return products;
   }
 
+  async updatelikeProduct(user: User, data: Object) {
+    const products_states = { ...data };
+    const isLiked = Object.keys(products_states)
+      .filter((val) => products_states[val] === true)
+      .map((val) => parseInt(val));
+    const NotLiked = Object.keys(products_states)
+      .filter((val) => products_states[val] === false)
+      .map((val) => parseInt(val));
+
+    const found = await this.prisma.wishList.findUnique({
+      where: { userId: user.id },
+    });
+
+    if (!found) {
+      await this.prisma.wishList.create({
+        data: { userId: user.id },
+      });
+    }
+
+    if (isLiked) {
+      for (const key of isLiked) {
+        await this.prisma.wishList.update({
+          where: { userId: user.id },
+          data: { products: { connect: { id: key } } },
+        });
+      }
+    }
+
+    if (NotLiked) {
+      for (const key of NotLiked) {
+        await this.prisma.wishList.update({
+          where: { userId: user.id },
+          data: { products: { disconnect: { id: key } } },
+        });
+      }
+    }
+
+    const result = await this.prisma.wishList.findUnique({
+      where: { userId: user.id },
+      include: { products: true },
+    });
+
+    return result;
+  }
+
   async deleteProduct(user: User, list: number[]) {
-    console.log(list);
     await this.prisma.product.deleteMany({
       where: { id: { in: list } },
     });

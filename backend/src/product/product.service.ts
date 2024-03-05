@@ -47,15 +47,13 @@ export class ProductService {
     return result;
   }
 
-  async getAllProducts(
-    category:string
-  ) : Promise<Product[]> {
+  async getAllProducts(category: string): Promise<Product[]> {
     const result = await this.prisma.product.findMany({
-      where:{category_name:category},
-      include:{images:true}
-    })
+      where: { category_name: category },
+      include: { images: true },
+    });
 
-    return result
+    return result;
   }
 
   async deleteProduct(id: number): Promise<Product> {

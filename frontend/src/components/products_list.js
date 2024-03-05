@@ -12,6 +12,7 @@ export function Products() {
   const { token, user, setUser, category, setCategory, setLoading } =
     useContext(AuthContext);
   const [currentProducts, setCurrentProducts] = useState([]);
+  const [manageProductsLikes, setManageProductsLikes] = useState({});
   const navigate = useNavigate();
 
   const toggleHeart = (product_id) => {
@@ -21,6 +22,7 @@ export function Products() {
   useEffect(() => {
     const storedCategory = localStorage.getItem("category");
     console.log(storedCategory);
+    const storedCategory = localStorage.getItem("category");
     const waitForProducts = async () => {
       const response = await ProductApi.getAllProducts(
         storedCategory,
@@ -35,8 +37,33 @@ export function Products() {
   }, []);
 
   useEffect(() => {
-    console.log(currentProducts);
+    setManageProductsLikes(
+      currentProducts.reduce((acc, product) => {
+        acc[product.id] = false;
+        return acc;
+      }, {})
+    );
   }, [currentProducts]);
+
+  const toggleHeart = (productId) => {
+    setManageProductsLikes({
+      ...manageProductsLikes,
+      [productId]: !manageProductsLikes[productId],
+    });
+  };
+
+  useEffect(() => {
+    console.log("manageProductsLikes: ", manageProductsLikes);
+    if (manageProductsLikes) {
+      const formData = new FormData();
+      formData.append("likes", JSON.stringify(manageProductsLikes));
+      ProductApi.updatelikeProduct(token, formData, navigate).then(
+        (response) => {
+          console.log("updalikeProduct response.data:", response.data);
+        }
+      );
+    }
+  }, [manageProductsLikes]);
 
   const Items = () => {
     if (currentProducts) {
@@ -61,6 +88,9 @@ export function Products() {
                 icon={isFilledHeart ? faHeart : faHeartRegular} // isFilledHeart 상태에 따라 아이콘을 변경하는 로직 추가 필요
                 className="w-[10%] text-red-500 cursor-pointer hover:scale-[1.1] transition-all duration-300"
                 onClick={() => toggleHeart(val.id)}
+                icon={manageProductsLikes[val.id] ? faHeart : faHeartRegular} // isFilledHeart 상태에 따라 아이콘을 변경하는 로직 추가 필요
+                className="w-[20%] text-red-500 text-2xl cursor-pointer hover:scale-[1.1] transition-all duration-300"
+                onClick={() => toggleHeart(val.id)}
               />
               <div className="w-[90%] flex justify-end">
                 <button className="font-semibold text-nowrap text-xs mx-1 py-1 px-2 bg-blue-500 text-white rounded hover:bg-blue-600">
@@ -76,7 +106,7 @@ export function Products() {
         );
       });
     } else {
-      <div id="proudct_noneitem"></div>;
+      <div id="proudct_none_item"></div>;
     }
   };
 
