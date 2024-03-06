@@ -1,10 +1,10 @@
-import { Images } from '../../images_list';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faHeart } from '@fortawesome/free-solid-svg-icons';
-import { faHeart as faHeartRegular } from '@fortawesome/free-regular-svg-icons';
-import { useEffect, useState } from 'react';
-import { useAuth } from '../../auth.context';
-import ProductApi from '../products/product_api';
+import { Images } from "../../images_list";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faHeart } from "@fortawesome/free-solid-svg-icons";
+import { faHeart as faHeartRegular } from "@fortawesome/free-regular-svg-icons";
+import { useEffect, useState } from "react";
+import { useAuth } from "../../auth.context";
+import ProductApi from "../products/product_api";
 
 export default function UserWishlist() {
   const { user, token, navigate, setLoading } = useAuth();
@@ -12,9 +12,14 @@ export default function UserWishlist() {
 
   useEffect(() => {
     const getUserWishList = async () => {
-      const response = await ProductApi.fetchUserWishList(token, user.id, navigate);
+      const response = await ProductApi.fetchUserWishList(
+        token,
+        user.id,
+        navigate
+      );
       if (response && response.data) {
         setCurrentLikedProducts(response.data.products);
+        console.log(response.data);
       }
     };
     setLoading(true);
@@ -23,17 +28,45 @@ export default function UserWishlist() {
   }, []);
 
   const Items = () => {
-    return currentLikedProducts ? (
-      currentLikedProducts.map((val) => {
+    //{val.images[0].imgUrl}
+    // return Array(5).fill(
+    //   <div
+    //     id="wishlist-item"
+    //     className="flex flex-col items-center padding-[12px] border border-solid border-black rounded-[4px]"
+    //     style={{ flex: "0 1 calc(20% - 16px);" }}
+    //   >
+    //     <img
+    //       src="https://source.unsplash.com/random/200x200?product"
+    //       alt="Product Image"
+    //       className="max-w-[100%] h-auto mb-[8px]"
+    //     />
+    //     <div id="product-info" className="text-center">
+    //       <h3 className="m-0">Product Name</h3>
+    //       <p className="mx-0 my-[4px]">$20.00</p>
+    //       <button
+    //         type="button"
+    //         className="mb-1 py-[6px] px-[16px] border-none rounded-[4px] bg-[#0044cc] text-white cursor-pointer"
+    //       >
+    //         Like ❤️
+    //       </button>
+    //     </div>
+    //   </div>
+    // );
+    return currentLikedProducts.map((val) => {
+      return (
         <div
           id="wishlist-item"
           className="flex flex-col items-center padding-[12px] border border-solid border-black rounded-[4px]"
-          style={{ flex: '0 1 calc(20% - 16px);' }}
+          style={{ flex: "0 1 calc(20% - 16px);" }}
         >
           <img
-            src="https://source.unsplash.com/random/200x200?product"
+            src={
+              val.images
+                ? val.images[0].imgUrl
+                : `https://source.unsplash.com/random/200x200?product`
+            }
             alt="Product Image"
-            className="max-w-[100%] h-auto mb-[8px]"
+            className="h-[200px] max-w-[180px] max-h-[250px] mb-[8px]"
           />
           <div id="product-info" className="text-center">
             <h3 className="m-0">Product Name</h3>
@@ -45,16 +78,17 @@ export default function UserWishlist() {
               Like ❤️
             </button>
           </div>
-        </div>;
-      })
-    ) : (
-      <div>Nothing Found</div>
-    );
+        </div>
+      );
+    });
   };
+
   return (
     <div
       id="wishlist_container"
-      className="flex flex-wrap justify-start items-start gap-[16px] p-[24px] max-w-[80vw] w-[90vw] h-[100vh] border border-solid border-[#ccc] rounded-[8px] overflow-auto absolute top-[16px] left-[50%] -translate-x-[50%] bg-white"
+      className={`flex flex-wrap ${
+        currentLikedProducts.length > 3 ? "justify-center" : "justify-start"
+      } items-start gap-[16px] p-[24px] max-w-[80vw] w-[90vw] h-[100vh] border border-solid border-[#ccc] rounded-[8px] overflow-auto absolute top-[16px] left-[50%] -translate-x-[50%] bg-white`}
     >
       <Items />
     </div>
