@@ -10,6 +10,7 @@ import { Navigation } from 'swiper/modules';
 import DataService from '../data_services';
 import Skeleton from 'react-loading-skeleton';
 import 'react-loading-skeleton/dist/skeleton.css';
+import ProductApi from './products/product_api';
 
 export default function MainContent() {
   const navigate = useNavigate();
@@ -17,6 +18,7 @@ export default function MainContent() {
   const [showMessage, setShowMessage] = useState(true);
   const [slideOut, setSlideOut] = useState(false);
   const [salesProducts, setSalesProducts] = useState(null);
+  const [wishProducts, setWishProducts] = useState([]);
 
   // 첫 로드 때 환영합니다 메시지 띄워주기
   useEffect(() => {
@@ -36,7 +38,7 @@ export default function MainContent() {
   }, []);
 
   useEffect(() => {
-    if (user && user['sellinglistId']) {
+    if (user && user['sellinglistId'] && user['wishlist']) {
       const getSalesProducts = async () => {
         const products = user['sellinglist']['products'];
         const product_ids = products.map((val, idx) => {
@@ -48,11 +50,22 @@ export default function MainContent() {
         const response = await DataService.getProductsWhileUpdate(token, formData, navigate);
         setSalesProducts(response.data);
       };
+      const getUserWishList = async () => {
+        const response = await ProductApi.fetchUserWishList(token, user.id, navigate);
+        if (response && response.data) {
+          setWishProducts(response.data.products);
+        }
+      };
       setLoading(true);
       getSalesProducts();
+      getUserWishList();
       setLoading(false);
     }
   }, []);
+
+  useEffect(() => {
+    console.log(`wishProducts: ${wishProducts}`);
+  }, [wishProducts]);
 
   const handleCategoryClick = (category) => {
     setCategory(category);
@@ -138,6 +151,7 @@ export default function MainContent() {
         </Swiper>
       );
     } else {
+      const slidesPerViewSetting = Math.max(1, salesProducts.length);
       return (
         <Swiper
           className="max-w-[800px] mw-md:max-w-[200px]"
@@ -147,15 +161,15 @@ export default function MainContent() {
           navigation={true}
           breakpoints={{
             640: {
-              slidesPerView: 2,
+              slidesPerView: Math.min(2, salesProducts.length),
               spaceBetween: 20,
             },
             768: {
-              slidesPerView: 2,
+              slidesPerView: Math.min(2, salesProducts.length),
               spaceBetween: 30,
             },
             1024: {
-              slidesPerView: 4,
+              slidesPerView: slidesPerViewSetting,
               spaceBetween: 40,
             },
           }}
@@ -191,89 +205,95 @@ export default function MainContent() {
   };
 
   const Cards = () => {
-    const watchListItems = [
-      {
-        id: 1,
-        title: 'Watch Item',
-        description: 'Description',
-        image: Images.macbook,
-        price: 'price',
-      },
-      {
-        id: 2,
-        title: 'Watch Item',
-        description: 'Description',
-        image: Images.macbook,
-        price: 'price',
-      },
-      {
-        id: 3,
-        title: 'Watch Item',
-        description: 'Description',
-        image: Images.macbook,
-        price: 'price',
-      },
-      {
-        id: 4,
-        title: 'Watch Item',
-        description: 'Description',
-        image: Images.macbook,
-        price: 'price',
-      },
-      {
-        id: 5,
-        title: 'Watch Item',
-        description: 'Description',
-        image: Images.macbook,
-        price: 'price',
-      },
-    ];
-    return (
-      <Swiper
-        className="max-w-[800px] mw-md:max-w-[200px]"
-        spaceBetween={10}
-        slidesPerView={2}
-        modules={[Navigation]}
-        navigation={true}
-        breakpoints={{
-          640: {
-            slidesPerView: 2,
-            spaceBetween: 20,
-          },
-          768: {
-            slidesPerView: 2,
-            spaceBetween: 30,
-          },
-          1024: {
-            slidesPerView: 4,
-            spaceBetween: 40,
-          },
-        }}
-      >
-        {watchListItems.map((item, index) => (
-          <SwiperSlide key={index}>
-            <div className="p-2 flex flex-col justify-between cursor-pointer">
-              {' '}
-              <div className="bg-white rounded-lg shadow overflow-hidden hover:-translate-y-1 transition-transform duration-200">
-                <img
-                  src={Images.Bluejean}
-                  alt={`Item ${index + 1}`}
-                  className="w-full max-h-[200px] object-cover"
-                  style={{ height: '200px' }}
-                />
-                <div className="p-1 text-md">
-                  {' '}
-                  <h3>
-                    {item.title} {index + 1}
-                  </h3>
-                  <p className="text-xs text-gray-600">{item.description}</p>
-                </div>
+    const tmp = JSON.stringify(wishProducts);
+    console.log('tmp', tmp);
+    const likedProducts = JSON.parse(tmp);
+    console.log('likedProducts', likedProducts);
+
+    const slidesPerViewSetting = Math.max(1, likedProducts.length);
+
+    if (!likedProducts) {
+      return (
+        <Swiper
+          className="max-w-[800px] mw-md:max-w-[256px]"
+          spaceBetween={10}
+          slidesPerView={2}
+          modules={[Navigation]}
+          navigation={true}
+          breakpoints={{
+            640: {
+              slidesPerView: 2,
+              spaceBetween: 20,
+            },
+            768: {
+              slidesPerView: 2,
+              spaceBetween: 30,
+            },
+            1024: {
+              slidesPerView: 4,
+              spaceBetween: 40,
+            },
+          }}
+        >
+          {[...Array(4)].map((_, index) => (
+            <SwiperSlide key={index}>
+              <div className="p-2 flex flex-col justify-between">
+                <Skeleton height={170} />
+                <Skeleton count={2} />
               </div>
-            </div>
-          </SwiperSlide>
-        ))}
-      </Swiper>
-    );
+            </SwiperSlide>
+          ))}
+        </Swiper>
+      );
+    } else {
+      return (
+        <Swiper
+          className="max-w-[800px] mw-md:max-w-[200px]"
+          spaceBetween={10}
+          slidesPerView={2}
+          modules={[Navigation]}
+          navigation={true}
+          breakpoints={{
+            640: {
+              slidesPerView: Math.min(2, likedProducts.length),
+              spaceBetween: 20,
+            },
+            768: {
+              slidesPerView: Math.min(2, likedProducts.length),
+              spaceBetween: 30,
+            },
+            1024: {
+              slidesPerView: slidesPerViewSetting,
+              spaceBetween: 40,
+            },
+          }}
+        >
+          {likedProducts &&
+            likedProducts.map((item, index) => (
+              <SwiperSlide key={index}>
+                <div className="p-2 flex flex-col justify-between cursor-pointer">
+                  {' '}
+                  <div className="bg-white rounded-lg shadow overflow-hidden hover:-translate-y-1 transition-transform duration-200">
+                    <img
+                      src={item.images[0]?.imgUrl}
+                      alt={`Item ${index + 1}`}
+                      className="w-full max-h-[200px] object-cover"
+                      style={{ height: '200px' }}
+                    />
+                    <div className="p-1 text-md">
+                      {' '}
+                      <h3>{item.name}</h3>
+                      <p className="text-xs text-gray-600">
+                        {item.price.toLocaleString('ko-kr')}원 {item.description}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </SwiperSlide>
+            ))}
+        </Swiper>
+      );
+    }
   };
 
   const WatchList = () => {
@@ -315,56 +335,105 @@ export default function MainContent() {
       },
     ];
 
-    return (
-      <Swiper
-        className="max-w-[800px] mw-md:max-w-[200px]"
-        spaceBetween={10}
-        slidesPerView={2}
-        modules={[Navigation]} // Add the Navigation module here
-        navigation={true} // Enable navigation arrows
-        breakpoints={{
-          640: {
-            slidesPerView: 2,
-            spaceBetween: 20,
-          },
-          768: {
-            slidesPerView: 2,
-            spaceBetween: 30,
-          },
-          1024: {
-            slidesPerView: 4,
-            spaceBetween: 40,
-          },
-        }}
-      >
-        {watchListItems.map((item, index) => (
-          <SwiperSlide key={index}>
-            <div className="p-2 flex flex-col justify-between cursor-pointer">
-              {' '}
-              {/* Reduced padding */}
-              <div className="bg-white rounded-lg shadow overflow-hidden hover:-translate-y-1 transition-transform duration-200">
-                <img
-                  src={item.image}
-                  alt={`Item ${index + 1}`}
-                  className="w-full max-h-[170px] object-cover" // Half of 250px
-                  style={{ height: '170px' }}
-                />
-                <div className="p-1 text-md">
-                  {' '}
-                  {/* Adjusted padding and text size */}
-                  <h3>
-                    {item.title} {index + 1}
-                  </h3>
-                  <p className="text-xs text-gray-600">
-                    {item.price} {item.description}
-                  </p>
+    if (!watchListItems) {
+      return (
+        <Swiper
+          className="max-w-[800px] mw-md:max-w-[200px]"
+          spaceBetween={10}
+          slidesPerView={2}
+          modules={[Navigation]}
+          navigation={true}
+          breakpoints={{
+            640: {
+              slidesPerView: 2,
+              spaceBetween: 20,
+            },
+            768: {
+              slidesPerView: 2,
+              spaceBetween: 30,
+            },
+            1024: {
+              slidesPerView: 4,
+              spaceBetween: 40,
+            },
+          }}
+        >
+          {watchListItems.map((item, index) => (
+            <SwiperSlide key={index}>
+              <div className="p-2 flex flex-col justify-between cursor-pointer">
+                {' '}
+                <div className="bg-white rounded-lg shadow overflow-hidden hover:-translate-y-1 transition-transform duration-200">
+                  <img
+                    src={Images.Bluejean}
+                    alt={`Item ${index + 1}`}
+                    className="w-full max-h-[200px] object-cover"
+                    style={{ height: '200px' }}
+                  />
+                  <div className="p-1 text-md">
+                    {' '}
+                    <h3>
+                      {item.title} {index + 1}
+                    </h3>
+                    <p className="text-xs text-gray-600">{item.description}</p>
+                  </div>
                 </div>
               </div>
-            </div>
-          </SwiperSlide>
-        ))}
-      </Swiper>
-    );
+            </SwiperSlide>
+          ))}
+        </Swiper>
+      );
+    } else {
+      return (
+        <Swiper
+          className="max-w-[800px] mw-md:max-w-[200px]"
+          spaceBetween={10}
+          slidesPerView={2}
+          modules={[Navigation]} // Add the Navigation module here
+          navigation={true} // Enable navigation arrows
+          breakpoints={{
+            640: {
+              slidesPerView: 2,
+              spaceBetween: 20,
+            },
+            768: {
+              slidesPerView: 2,
+              spaceBetween: 30,
+            },
+            1024: {
+              slidesPerView: 4,
+              spaceBetween: 40,
+            },
+          }}
+        >
+          {watchListItems.map((item, index) => (
+            <SwiperSlide key={index}>
+              <div className="p-2 flex flex-col justify-between cursor-pointer">
+                {' '}
+                {/* Reduced padding */}
+                <div className="bg-white rounded-lg shadow overflow-hidden hover:-translate-y-1 transition-transform duration-200">
+                  <img
+                    src={item.image}
+                    alt={`Item ${index + 1}`}
+                    className="w-full max-h-[170px] object-cover" // Half of 250px
+                    style={{ height: '170px' }}
+                  />
+                  <div className="p-1 text-md">
+                    {' '}
+                    {/* Adjusted padding and text size */}
+                    <h3>
+                      {item.title} {index + 1}
+                    </h3>
+                    <p className="text-xs text-gray-600">
+                      {item.price} {item.description}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </SwiperSlide>
+          ))}
+        </Swiper>
+      );
+    }
   };
 
   const AdBanner = () => {
