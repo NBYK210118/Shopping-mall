@@ -4,6 +4,8 @@ import { Images } from '../../images_list';
 import { useEffect, useRef, useState } from 'react';
 import DataService from '../../data_services';
 import ProductApi from '../products/product_api';
+import { faArrowDown } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 export default function PersonalStore() {
   const { token, user, setUser, clickedSellingProduct } = useAuth(); // AuthProvider 로 부터 제공받는 변수들
@@ -168,7 +170,8 @@ export default function PersonalStore() {
   };
 
   // 상품 수정하기에서 Submit 버튼 클릭시 API 호출
-  const handleUpdateProduct = () => {
+  const handleUpdateProduct = (e) => {
+    e.preventDefault();
     const formData = new FormData();
     formData.append('image', imageUrl);
     formData.append('image_size', productSize);
@@ -377,8 +380,8 @@ export default function PersonalStore() {
         return (
           <div
             className={`w-[90%] h-[25%] p-2 flex justify-around items-center border border-solid border-gray-300 
-          rounded-lg hover:bg-green-500 transition-all duration-100 hover:cursor-pointer 
-          ${selectedList.includes(val.id) ? ' bg-green-500 font-bold ' : ''}`}
+          rounded-lg hover:bg-gray-200 transition-all duration-150 hover:cursor-pointer 
+          ${selectedList.includes(val.id) ? ' bg-gradient-to-bl from-cyan-400 to-blue-600 font-bold text-white' : ''}`}
             onClick={(e) => handleSellingListClick(val.id)}
           >
             <div className="w-full flex items-center justify-around">
@@ -474,7 +477,7 @@ export default function PersonalStore() {
       <div
         id="selected_items"
         className={`w-full h-[25%] p-3 flex flex-col justify-center border rounded-lg 
-        hover:cursor-pointer hover:scale-[1.02] transition-all duration-300
+        hover:cursor-pointer hover:-translate-y-1 transition-all duration-300
         ${currentProduct?.name === val.name ? ' bg-gray-300' : ''}`}
         onClick={() => setCurrentProduct(val)}
       >
@@ -504,11 +507,13 @@ export default function PersonalStore() {
   };
 
   return (
-    <>
+    <div className={`flex justify-center items-center`}>
       <div
-        className={`mw-md:absolute mw-md:top-32 mw-md:w-[76vw] mw-md:h-[75vh] miw-xl:w-[60vw] miw-xl:h-[70vh] w-[80vw] h-[100vh] absolute top-16 flex items-center border border-gray-300 rounded-lg${
-          activeOption === '상품 추가' ? ' justify-around' : ''
-        } ${activeOption === '상품 수정' ? ' justify-center' : ''}`}
+        className={`absolute mw-md:top-32 mw-md:w-[76%] mw-md:h-[75%] miw-xl:w-[60%] miw-xl:h-full top-[5.5rem] ${
+          activeOption ? 'left-44 ' : 'left-100 '
+        } flex items-center border border-gray-300 rounded-lg${activeOption === '상품 추가' ? ' justify-around' : ''} ${
+          activeOption === '상품 수정' ? ' justify-center' : ''
+        }`}
       >
         <div
           id="mystore_left_content"
@@ -531,7 +536,7 @@ export default function PersonalStore() {
                       style={{ display: 'none' }}
                       onChange={(e) => handleFileChange(e)}
                     />
-                    <span className="mw-md:flex mw-md:items-center text-[1.2rem] font-bold mw-md:text-[0.6rem]">
+                    <span className="mw-md:flex mw-md:items-center  font-bold text-[1.2rem] mw-md:text-[0.6rem]">
                       Upload
                     </span>
                   </div>
@@ -550,32 +555,27 @@ export default function PersonalStore() {
             </div>
           )}
           {activeOption === '상품 수정' && (
-            <div className="w-full h-full ml-10 flex flex-col items-center">
-              <div className="w-[85%] h-[80%] mb-5 border border-gray-300 rounded-xl">
-                {imageUrl && <img src={imageUrl} alt="preview" className="w-full h-full" />}
+            <div className="flex flex-col items-center justify-center w-full h-full">
+              <div className="w-4/5 h-4/5 mb-5 border border-gray-300 rounded-xl overflow-hidden">
+                {imageUrl && <img src={imageUrl} alt="preview" className="object-cover w-full h-full" />}
               </div>
-              <div className="w-full h-[10%] flex justify-around">
-                <div className="w-[35%] h-full flex items-end">
-                  <div
-                    className="w-full h-full p-2 flex justify-center items-center border border-transparent rounded-xl text-white bg-blue-500 hover:cursor-pointer hover:bg-blue-600"
-                    onClick={() => handleClick()}
+              <div className="flex items-center justify-center w-full h-1/6 ml-10">
+                <div className="w-1/3 h-full flex items-center">
+                  <span
+                    className="flex items-center justify-center p-3 cursor-pointer   text-white bg-blue-500 rounded-xl hover:bg-blue-600 focus:outline-none transition-all duration-300"
+                    onClick={() => fileInputRef.current.click()}
                   >
-                    <input
-                      type="file"
-                      ref={fileInputRef}
-                      style={{ display: 'none' }}
-                      onChange={(e) => handleFileChange(e)}
-                    />
-                    <span className="text-[1.2rem] font-bold">Upload</span>
-                  </div>
+                    <span className="font-bold text-xl">Upload</span>
+                    <input type="file" ref={fileInputRef} className="hidden" onChange={(e) => handleFileChange(e)} />
+                  </span>
                 </div>
-                <div className="w-[35%] h-full flex items-end">
-                  <div
-                    className="w-full h-full flex justify-center items-center border border-transparent rounded-xl text-white bg-yellow-500 hover:cursor-pointer hover:bg-yellow-600"
-                    onClick={() => handleBeforeButton()}
+                <div className="w-1/3 h-full flex items-center">
+                  <span
+                    className="flex items-center justify-center p-3 cursor-pointer text-white bg-yellow-500 rounded-xl hover:bg-yellow-600 focus:outline-none transition-all duration-300"
+                    onClick={handleBeforeButton}
                   >
-                    <span className="text-[1.2rem] font-bold">Before</span>
-                  </div>
+                    <span className="font-bold text-xl">Before</span>
+                  </span>
                 </div>
               </div>
             </div>
@@ -583,7 +583,9 @@ export default function PersonalStore() {
         </div>
         <div
           id="mystore_right_content_or_maincontent"
-          className={`${activeOption === '상품 추가' ? 'w-1/2 ' : 'w-full '} h-full flex flex-col`}
+          className={`${activeOption === '상품 추가' ? 'w-1/2 ' : 'w-full '} ${
+            activeOption === '상품 추가' ? 'relative ' : ''
+          } h-full flex flex-col`}
         >
           {activeOption === '상품 추가' && (
             <>
@@ -744,165 +746,97 @@ export default function PersonalStore() {
           )}
           {activeOption === '상품 수정' && (
             <>
-              <div className="w-[80%] h-[85%] ml-3 flex flex-col justify-center items-center">
-                <div className="w-full mb-3 flex justify-around">
-                  <div className="w-[15%] ">
-                    <label htmlFor="" className="font-semibold">
+              <div className="max-w-4xl mx-20 py-14">
+                <div className="bg-white rounded px-8 mb-4 -mt-10">
+                  <div className="mb-4">
+                    <label className="block text-gray-700 text-sm font-bold mb-2" for="product_name">
                       상품명
                     </label>
-                  </div>
-                  <div className="w-[70%] ">
                     <input
+                      className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline border-gray-400 hover:border-gray-500"
+                      id="product_name"
                       type="text"
-                      name="product_name"
-                      className="pl-2 w-full border border-gray-400"
                       placeholder="Enter your product name"
-                      value={productName}
-                      onChange={(e) => setProductName(e.target.value)}
                     />
                   </div>
-                </div>
-                <div className="w-full mb-3 flex justify-around">
-                  <div className="w-[15%] ">
-                    <label htmlFor="" className="text-nowrap font-semibold">
+                  <div className="mb-4">
+                    <label className="block text-gray-700 text-sm font-bold mb-2" for="product_detail">
                       상세설명
                     </label>
+                    <textarea
+                      className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline border-gray-400 hover:border-gray-500"
+                      id="product_detail"
+                      placeholder="Enter the detail of the product"
+                    ></textarea>
                   </div>
-                  <div className="w-[70%] flex flex-col">
-                    <div className="w-full">
-                      <textarea
-                        className="w-full pl-2 mb-2 border border-gray-400"
-                        placeholder="Enter the detail of the product"
-                        name="detial"
-                        id="product_detail"
-                        value={productDetail}
-                        onChange={(e) => setProductDetail(e.target.value)}
-                      ></textarea>
-                    </div>
-                    <div className="w-full mb-3">
-                      <input
-                        type="text"
-                        className="pl-2 w-full border border-gray-400"
-                        placeholder="Enter your product detail"
-                        value={productSecDetail}
-                        onChange={(e) => setProductSecDetail(e.target.value)}
-                      />
-                    </div>
-                    <div className="w-full ">
-                      <input
-                        type="text"
-                        className="pl-2 w-full border border-gray-400"
-                        placeholder="Enter your product detail"
-                        value={productThirdDetail}
-                        onChange={(e) => setProductThirdDetail(e.target.value)}
-                      />
-                    </div>
-                  </div>
-                </div>
-                <div className="w-full mb-3 flex justify-around">
-                  <div className="w-[15%]">
-                    <label htmlFor="" className="w-[10%] font-semibold">
+                  <div className="mb-4">
+                    <label className="block text-gray-700 text-sm font-bold mb-2" for="product_price">
                       가격
                     </label>
-                  </div>
-                  <div className="w-[70%] flex flex-row">
                     <input
+                      className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline border-gray-400 hover:border-gray-500"
+                      id="product_price"
                       type="text"
-                      name="product_name"
-                      className="w-full border border-gray-400 text-right pr-3"
                       placeholder="Enter the price"
-                      ref={priceInputRef}
-                      value={productPrice}
-                      onChange={(e) => handlePriceComma(e)}
                     />
-                    <span>원</span>
                   </div>
-                </div>
-                <div className="w-full mb-3 flex justify-around">
-                  <div className="w-[15%]">
-                    <label htmlFor="" className="w-[10%] font-semibold text-nowrap">
+                  <div className="mb-4">
+                    <label className="block text-gray-700 text-sm font-bold mb-2" for="product_maker">
                       제조사/원산지
                     </label>
-                  </div>
-                  <div className="w-[70%] flex items-center ml-10">
                     <input
+                      className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline border-gray-400 hover:border-gray-500"
+                      id="product_maker"
                       type="text"
-                      name="product_name"
-                      className="w-full pl-2 border border-gray-400"
                       placeholder="Enter the manufacturer"
-                      value={productMaker}
-                      onChange={(e) => setProductMaker(e.target.value)}
                     />
                   </div>
-                </div>
-                <div className="w-full mb-3 flex justify-around">
-                  <div className="w-[15%]">
-                    <label htmlFor="" className="w-[10%] font-semibold text-nowrap">
+                  <div className="mb-4">
+                    <label className="block text-gray-700 text-sm font-bold mb-2" for="categories">
                       카테고리
                     </label>
-                  </div>
-                  <div className="w-[70%]">
                     <select
-                      name="categories"
-                      id=""
-                      className="w-[50%] pl-2 text-center border border-gray-400"
-                      value={categoryInput}
-                      onChange={(e) => setCategoryInput(e.target.value)}
+                      class="block appearance-none w-full bg-white border border-gray-400 hover:border-gray-500 px-4 py-2 pr-8 rounded shadow leading-tight focus:outline-none focus:shadow-outline"
+                      id="categories"
                     >
-                      <option value="Fashion" selected>
-                        Fashion
-                      </option>
-                      <option value="Furniture">Furniture</option>
-                      <option value="Foods">Foods</option>
-                      <option value="Electronics">Electronics</option>
+                      <option>Fashion</option>
+                      <option>Furniture</option>
+                      <option>Foods</option>
+                      <option>Electronics</option>
                     </select>
                   </div>
-                </div>
-                <div className="w-full mb-3 flex justify-around">
-                  <div className="w-[15%]">
-                    <label htmlFor="" className="w-[10%] font-semibold text-nowrap">
+                  <div className="mb-4">
+                    <label className="block text-gray-700 text-sm font-bold mb-2" for="inventory">
                       재고 수량
                     </label>
-                  </div>
-                  <div className="w-[70%]">
                     <input
+                      className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline border-gray-400 hover:border-gray-500"
+                      id="inventory"
                       type="text"
-                      name="inventory"
-                      className="w-full pl-2 border border-gray-400"
-                      placeholder="Enter the manufacturer"
-                      value={inventory}
-                      onChange={(e) => setInventory(e.target.value)}
+                      placeholder="Enter the inventory quantity"
                     />
                   </div>
-                </div>
-                <div className="w-full mb-3 flex justify-around">
-                  <div className="w-[15%]">
-                    <label htmlFor="" className="w-[10%] font-semibold text-nowrap">
+                  <div className="mb-4">
+                    <label className="block text-gray-700 text-sm font-bold mb-2" for="status">
                       판매 여부
                     </label>
-                  </div>
-                  <div className="w-[70%]">
                     <select
-                      name="status"
-                      id=""
-                      className="w-[50%] pl-2 text-center border border-gray-400"
-                      value={statusInput}
-                      onChange={(e) => setStatusInput(e.target.value)}
+                      className="block appearance-none w-full bg-white border border-gray-400 hover:border-gray-700 hover:bg-gray-200 cursor-pointer px-4 py-2 pr-8 rounded shadow leading-tight focus:outline-none focus:shadow-outline"
+                      id="status"
                     >
-                      <option selected value="판매중">
-                        판매중
-                      </option>
-                      <option value="보류">보류</option>
+                      <option>판매중</option>
+                      <option>보류</option>
                     </select>
                   </div>
-                </div>
-              </div>
-              <div className="w-full h-[8%] flex justify-center">
-                <div
-                  className="w-[25%] h-full flex justify-center items-center border border-transparent rounded-lg bg-sky-500 hover:bg-sky-600 hover:cursor-pointer"
-                  onClick={() => handleUpdateProduct()}
-                >
-                  <span className="text-white font-bold text-[1.2rem]">Submit</span>
+                  <div className="flex items-center justify-center">
+                    <button
+                      className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline transition-all duration-300"
+                      type="button"
+                      onClick={(e) => handleUpdateProduct(e)}
+                    >
+                      <span className="font-bold mw-md:[0.9rem]">제출</span>
+                    </button>
+                  </div>
                 </div>
               </div>
             </>
@@ -967,13 +901,17 @@ export default function PersonalStore() {
                     </div>
                   )}
                 </div>
-                <div className={`w-full h-[10%] flex items-center mt-2 ${clickedCategory ? '' : 'justify-center'}`}>
+                <div
+                  className={`w-full h-[10%] flex items-center mt-2 ${manageProduct ? 'pt-2' : ''} ${
+                    clickedCategory ? '' : 'justify-center'
+                  }`}
+                >
                   {manageProduct ? (
                     <>
                       <div className="mw-md:w-[75px] w-full h-1/3 flex justify-center items-end">
                         <div
                           onClick={() => handleButtons('상품 추가')}
-                          className="w-[60%] h-[30%] p-5 flex justify-center items-center border border-transparent rounded-lg bg-green-600 hover:cursor-pointer hover:bg-green-700"
+                          className="w-[60%] h-[30%] p-5 flex justify-center items-center border border-transparent rounded-lg bg-green-600 hover:cursor-pointer hover:bg-green-700 transition-all duration-300"
                         >
                           <span className="text-white text-nowrap font-semibold mw-md:text-[0.6rem]">상품 추가</span>
                         </div>
@@ -989,7 +927,7 @@ export default function PersonalStore() {
                       <div className="mw-md:w-[75px] w-full h-1/3 flex justify-center items-end">
                         <div
                           onClick={() => handleCancelSelling()}
-                          className="w-[60%] h-[30%] p-5 flex justify-center items-center border border-transparent rounded-lg bg-red-500 hover:cursor-pointer hover:bg-red-600"
+                          className="w-[60%] h-[30%] p-5 flex justify-center items-center border border-transparent rounded-lg bg-red-500 hover:cursor-pointer hover:bg-red-600  transition-all duration-300"
                         >
                           <span className="text-white font-semibold mw-md:text-[0.6rem] text-nowrap">상품 취소</span>
                         </div>
@@ -997,7 +935,7 @@ export default function PersonalStore() {
                       <div className="mw-md:w-[75px] w-full h-1/3 flex justify-center items-end">
                         <div
                           onClick={() => setManageProduct(!manageProduct)}
-                          className="w-[60%] h-[30%] p-5 flex justify-center items-center border border-transparent rounded-lg bg-yellow-500 hover:cursor-pointer hover:bg-yellow-600"
+                          className="w-[60%] h-[30%] p-5 flex justify-center items-center border border-transparent rounded-lg bg-yellow-500 hover:cursor-pointer hover:bg-yellow-600  transition-all duration-300"
                         >
                           <span className="text-white font-semibold mw-md:text-[0.6rem] text-nowrap">이전으로</span>
                         </div>
@@ -1037,12 +975,14 @@ export default function PersonalStore() {
       </div>
       {activeOption === '상품 수정' && (
         <div
-          className={`w-1/3 h-full flex flex-col justify-around items-center border border-gray-300 rounded-lg 
+          className={`absolute right-52 top-[5.5rem] w-auto h-full flex flex-col ${
+            productsList.length > 1 ? 'justify-around ' : 'justify-start mt-2 '
+          } items-center border border-gray-300 rounded-lg 
       ${activeOption === '상품 수정' ? ' justify-center' : ''}`}
         >
           <SelectedProductsList />
         </div>
       )}
-    </>
+    </div>
   );
 }

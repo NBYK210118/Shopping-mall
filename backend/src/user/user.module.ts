@@ -14,7 +14,7 @@ import { StoreuserService } from 'src/storeuser/storeuser.service';
     JwtModule.register({
       secret: 'Secret1234',
       signOptions: {
-        expiresIn: 60 * 60,
+        expiresIn: 60 * 120,
       },
     }),
     PrismaModule,

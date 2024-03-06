@@ -29,7 +29,6 @@ export const AuthProvider = ({ children }) => {
           if (response.data) {
             console.log('response.data: ', response.data['user']);
             setToken(storedToken);
-            setUser(response.data['user']);
           } else if (response.status === 401) {
             alert('Unauthorized!');
             navigate('/signin');
@@ -45,7 +44,7 @@ export const AuthProvider = ({ children }) => {
         });
       }
     }
-  }, [category]);
+  }, []);
 
   return (
     <AuthContext.Provider

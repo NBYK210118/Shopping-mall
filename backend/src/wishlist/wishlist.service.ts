@@ -17,6 +17,7 @@ export class WishlistService {
             price: true,
             name: true,
             images: true,
+            likedBy: true,
           },
         },
       },
