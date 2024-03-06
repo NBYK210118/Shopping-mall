@@ -84,7 +84,7 @@ export default function UserProfile(props) {
 
   return (
     <>
-      <div className="flex items-center w-full h-full miw-xl:w-[60vw] miw-xl:h-[70vh] mw-md:w-[100vw] mw-md:h-[100vh]">
+      <div className="flex items-center w-full h-full mt-8 miw-xl:w-[60vw] miw-xl:h-[70vh] mw-md:w-[100vw] mw-md:h-[100vh]">
         <div
           id="left_content"
           className="w-[50%] h-full mw-md:w-full mw-md:h-[60%] flex flex-col justify-center mw-md:bg-"

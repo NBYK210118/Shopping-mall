@@ -13,8 +13,7 @@ import 'react-loading-skeleton/dist/skeleton.css';
 import ProductApi from './products/product_api';
 
 export default function MainContent() {
-  const navigate = useNavigate();
-  const { token, user, loading, setLoading, category, setCategory, setClickedSellingProduct } = useAuth();
+  const { token, user, loading, setLoading, navigate, category, setCategory, setClickedSellingProduct } = useAuth();
   const [showMessage, setShowMessage] = useState(true);
   const [slideOut, setSlideOut] = useState(false);
   const [salesProducts, setSalesProducts] = useState(null);
@@ -206,9 +205,7 @@ export default function MainContent() {
 
   const Cards = () => {
     const tmp = JSON.stringify(wishProducts);
-    console.log('tmp', tmp);
     const likedProducts = JSON.parse(tmp);
-    console.log('likedProducts', likedProducts);
 
     const slidesPerViewSetting = Math.max(1, likedProducts.length);
 

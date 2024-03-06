@@ -60,6 +60,7 @@ export const AuthProvider = ({ children }) => {
         setCategory,
         clickedSellingProduct,
         setClickedSellingProduct,
+        navigate,
       }}
     >
       {children}

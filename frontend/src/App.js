@@ -208,8 +208,7 @@ function MainHeader() {
 }
 
 function App() {
-  const [loading, setLoading] = useState(false);
-  const navigate = useNavigate();
+  const { loading, setLoading } = useAuth();
 
   useEffect(() => {
     setLoading(true);
@@ -222,19 +221,17 @@ function App() {
   return (
     <div className={`w-full h-full overflow-x-hidden overflow-y-scroll`} id="main">
       {loading && <Loading />}
-      <AuthProvider>
-        <MainHeader />
-        <div className="w-full h-full flex justify-center items-center mt-12">
-          <Routes>
-            <Route exact path="/" element={<MainContent />}></Route>
-            <Route exact path="/home" element={<MainContent />}></Route>
-            <Route exact path="/user/*" element={<Mypage />}></Route>
-            <Route exact path="/signin" element={<SignIn />}></Route>
-            <Route exact path="/signup" element={<SignUp />}></Route>
-            <Route exact path="/products/*" element={<Products />}></Route>
-          </Routes>
-        </div>
-      </AuthProvider>
+      <MainHeader />
+      <div className="w-full h-full flex justify-center items-center mt-12 bg-gradient-to-r from-indigo-500 from-10% via-sky-500 via-30% to-emerald-500 to-90%s bg-opacity-10">
+        <Routes>
+          <Route exact path="/" element={<MainContent />}></Route>
+          <Route exact path="/home" element={<MainContent />}></Route>
+          <Route exact path="/user/*" element={<Mypage />}></Route>
+          <Route exact path="/signin" element={<SignIn />}></Route>
+          <Route exact path="/signup" element={<SignUp />}></Route>
+          <Route exact path="/products/*" element={<Products />}></Route>
+        </Routes>
+      </div>
     </div>
   );
 }

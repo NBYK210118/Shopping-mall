@@ -1,15 +1,15 @@
 import { useState, useEffect } from 'react';
-import { Route, Routes, useNavigate } from 'react-router-dom';
+import { Route, Routes, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import UserProfile from './profile';
 import PersonalStore from './personal_store';
 import UserWishlist from './user_wishlist';
 import UserSettings from './user_settings';
 
 const Mypage = () => {
+  const navigate = useNavigate();
   const [activeMenu, setActiveMenu] = useState(
-    JSON.parse(localStorage.getItem('activeMenu')) ? JSON.parse(localStorage.getItem('activeMenu')) : 'Profile'
+    localStorage.getItem('activeMenu') ? JSON.parse(localStorage.getItem('activeMenu')) : 'Profile'
   );
-  const [loading, setLoading] = useState(false);
   const [menuStates, setMenuStates] = useState(
     localStorage.getItem('menuStates')
       ? JSON.parse(localStorage.getItem('menuStates'))
@@ -20,8 +20,7 @@ const Mypage = () => {
           Settings: false,
         }
   );
-
-  const navigate = useNavigate();
+  const location = useLocation();
 
   const items = [
     { txt: 'Profile', to: 'my-profile' },
@@ -30,6 +29,18 @@ const Mypage = () => {
     { txt: 'My Orders', to: 'my-orders' },
     { txt: 'Settings', to: 'settings' },
   ];
+
+  // url 에 맞는 사이드바 상태 표시
+  useEffect(() => {
+    const pathname = location.pathname;
+    const pathSegments = pathname.split('/');
+    const desiredSegment = pathSegments[2];
+    items.forEach((item) => {
+      if (item.to === desiredSegment) {
+        handleActive(item.txt, item.to);
+      }
+    });
+  }, []);
 
   const handleActive = async (menu, to) => {
     setActiveMenu(menu);
@@ -67,7 +78,7 @@ const Mypage = () => {
     <div className="w-[75%] h-full flex justify-center">
       <div className="w-[95%] h-[70%] flex justify-center items-center absolute left-28 top-16">
         <div id="mypage_content" className="w-[90%] h-[90%] flex">
-          <div className="w-[8%] h-[70%] mt-1 mw-md:w-[12%] mw-md:h-[50%] mw-md:top-28 fixed left-5 top-20 flex flex-col justify-evenly items-center border border-gray-100 border-solid rounded-lg bg-slate-200">
+          <div className="w-[8%] h-[70%] mt-10 mw-md:w-[12%] mw-md:h-[50%] mw-md:top-28 fixed left-5 top-20 flex flex-col justify-evenly items-center border border-gray-100 border-solid rounded-lg bg-slate-200">
             <SideBar />
           </div>
           <div className="w-full h-[95%] mw-md:h-1/2 flex justify-center">
