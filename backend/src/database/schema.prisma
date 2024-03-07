@@ -124,6 +124,7 @@ model Product {
   OrderProduct  OrderProduct[]
   likedBy UserProduct[]
   ProductImage  ProductImage[]
+  reviewProduct ReviewProduct[]
   WishList      WishList?      @relation(fields: [wishListId], references: [id])
   wishListId    Int?
   SellingList   SellingList?   @relation(fields: [sellingListId], references: [id])
@@ -154,8 +155,19 @@ model Review {
   txt    String
   user   User   @relation(fields: [userId], references: [id])
   userId Int
-  product Product @relation(fields: [productId], references: [id])
+  product Product? @relation(fields: [productId], references: [id])
+  productId Int?
+  reviewProduct ReviewProduct[]
+}
+
+model ReviewProduct {
+  id Int @id @default(autoincrement())
+  review Review @relation(fields:[reviewId], references: [id])
+  reviewId Int
+  product Product @relation(fields:[productId],references: [id])
   productId Int
+
+  @@unique([reviewId,productId])
 }
 
 model StoreUser {

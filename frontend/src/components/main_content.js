@@ -461,7 +461,7 @@ export default function MainContent() {
             </div>
           )}
 
-          <div className="w-full h-full overflow-hidden flex flex-wrap justify-between p-4 bg-gradient-to-r from-indigo-500 from-10% via-sky-500 via-30% to-emerald-500 to-90%s bg-opacity-10">
+          <div className="w-full h-full overflow-hidden flex flex-wrap justify-between p-4 bg-gradient-to-r from-indigo-500 from-10% via-sky-500 via-50% to-indigo-500 to-95% bg-opacity-10">
             <div
               id="main_left_content"
               className="w-[35%] h-auto flex flex-col justify-center items-center max-w-[512px] mx-auto -mt-16"

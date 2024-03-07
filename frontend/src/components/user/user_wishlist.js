@@ -66,7 +66,7 @@ export default function UserWishlist() {
       return (
         <div
           id="wishlist-item"
-          className="flex flex-col items-center padding-[12px] border border-solid border-black rounded-[4px]"
+          className="flex flex-col items-center padding-[12px] rounded-[4px]"
           style={{ flex: '0 1 calc(20% - 16px);' }}
         >
           <img
@@ -79,13 +79,13 @@ export default function UserWishlist() {
             <p className="mx-0 my-[4px]">{val.price.toLocaleString('ko-kr')}원</p>
             <button
               type="button"
-              className="flex items-center mb-1 py-[6px] px-[16px] border-none rounded-[4px] bg-[#0044cc] text-white cursor-pointer"
+              className="flex items-center mb-1 py-[6px] px-[16px] border-none rounded-[4px] bg-[#0044ccd5] text-white cursor-pointer"
               onClick={(e) => toggleHeart(e, val.id)}
             >
               Like
               <FontAwesomeIcon
                 icon={manageLikedProduct[val.id] ? faHeart : faHeartRegular}
-                className={`ml-1 text-red-500 hover:-translate-y-1 transition-all duration-300`}
+                className={`ml-1 text-[#ff0000d5] hover:-translate-y-1 transition-all duration-300`}
               />
             </button>
           </div>

@@ -373,7 +373,7 @@ export class UserService {
 
   async updatelikeProduct(user: User, data: Object) {
     const products_states = { ...data };
-    console.log('products_state', products_states);
+    console.log(products_states);
     const checking = Object.keys(products_states).filter(
       (val) => products_states[val] === true,
     );

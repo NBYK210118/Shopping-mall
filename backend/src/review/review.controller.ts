@@ -1,0 +1,19 @@
+import { Body, Controller, Post, Res, UseGuards } from '@nestjs/common';
+import { ReviewService } from './review.service';
+import { ReviewDto } from './dto/review.dto';
+import { AuthGuard } from '@nestjs/passport';
+import { User } from '@prisma/client';
+import { GetUser } from 'src/user/get-user.decorator';
+import { Response } from 'express';
+
+@Controller('review')
+export class ReviewController {
+  constructor(private reviewService: ReviewService) {}
+
+  @UseGuards(AuthGuard())
+  @Post('/update')
+  async reviewUpdate(@GetUser() user: User, @Body() data: ReviewDto) {
+    const result = await this.reviewService.reviewUpdate(user, data);
+    return result;
+  }
+}

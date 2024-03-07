@@ -22,7 +22,6 @@ export class WishlistService {
         },
       },
     });
-    console.log(result);
     return result;
   }
 }

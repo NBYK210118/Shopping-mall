@@ -1,4 +1,4 @@
-import { http } from "../../http-common";
+import { http } from '../../http-common';
 
 // PersonalStore 에서 선택된 상품의 정보 불러오기 -> PersonalStore 에선 getProductsWhileUpdate 와 같이 사용됨
 const findProduct = async (token, id, navigate) => {
@@ -12,19 +12,19 @@ const findProduct = async (token, id, navigate) => {
     return data;
   } catch (error) {
     if (error.response.status === 401) {
-      alert("Unauthorized");
+      alert('Unauthorized');
       localStorage.clear();
-      navigate("/signin");
+      navigate('/signin');
     } else if (error.response.status === 500) {
-      alert("서버 에러");
+      alert('서버 에러');
       localStorage.clear();
-      navigate("/home");
+      navigate('/home');
     } else if (error.response.status === 400) {
-      alert("잘못된 요청!");
+      alert('잘못된 요청!');
       localStorage.clear();
-      navigate("/home");
+      navigate('/home');
     }
-    console.log("상품 불러오기 실패", error);
+    console.log('상품 불러오기 실패', error);
   }
 };
 
@@ -37,44 +37,44 @@ const getAllProducts = async (token, category, navigate) => {
     return data;
   } catch (error) {
     if (error.response.status === 401) {
-      alert("Unauthroized");
+      alert('Unauthroized');
       localStorage.clear();
-      navigate("/signin");
+      navigate('/signin');
     } else if (error.response.status === 500) {
-      alert("서버 에러");
+      alert('서버 에러');
       localStorage.clear();
-      navigate("/home");
+      navigate('/home');
     } else if (error.response.status === 400) {
-      alert("잘못된 요청!");
+      alert('잘못된 요청!');
       localStorage.clear();
-      navigate("/home");
+      navigate('/home');
     }
-    console.log("getAllproducts error: ", error);
+    console.log('getAllproducts error: ', error);
   }
 };
 
 // 모든 카테고리 종류 가져오기
 const getAllCategories = async (token, navigate) => {
   try {
-    const data = await http.get("/category", {
+    const data = await http.get('/category', {
       headers: { Authorization: `Bearer ${token}` },
     });
     return data;
   } catch (error) {
     if (error.response.status === 401) {
-      alert("Unauthroized");
+      alert('Unauthroized');
       localStorage.clear();
-      navigate("/signin");
+      navigate('/signin');
     } else if (error.response.status === 500) {
-      alert("서버 에러");
+      alert('서버 에러');
       localStorage.clear();
-      navigate("/home");
+      navigate('/home');
     } else if (error.response.status === 400) {
-      alert("잘못된 요청!");
+      alert('잘못된 요청!');
       localStorage.clear();
-      navigate("/home");
+      navigate('/home');
     }
-    console.log("getAllCategories error: ", error);
+    console.log('getAllCategories error: ', error);
   }
 };
 
@@ -87,17 +87,17 @@ const categoriesItem = async (token, category, navigate) => {
     return data;
   } catch (error) {
     if (error.response.status === 401) {
-      alert("Unauthorized");
+      alert('Unauthorized');
       localStorage.clear();
-      navigate("/signin");
+      navigate('/signin');
     } else if (error.response.status === 400) {
-      alert("잘못된 요청");
+      alert('잘못된 요청');
       localStorage.clear();
-      navigate("");
+      navigate('');
     } else if (error.response.status === 500) {
-      alert("서버 에러!");
+      alert('서버 에러!');
       localStorage.clear();
-      navigate("");
+      navigate('');
     }
   }
 };
@@ -105,23 +105,23 @@ const categoriesItem = async (token, category, navigate) => {
 // 좋아요 상호작용 업데이트
 const updatelikeProduct = async (token, likes, navigate) => {
   try {
-    const data = await http.post("/user/islikeit", likes, {
+    const data = await http.post('/user/islikeit', likes, {
       headers: { Authorization: `Bearer ${token}` },
     });
     return data;
   } catch (error) {
     if (error.response.status === 401) {
-      alert("Unauthorized");
+      alert('Unauthorized');
       localStorage.clear();
-      navigate("/signin");
+      navigate('/signin');
     } else if (error.response.status === 400) {
-      alert("잘못된 요청");
+      alert('잘못된 요청');
       localStorage.clear();
-      navigate("");
+      navigate('');
     } else if (error.response.status === 500) {
-      alert("서버 에러!");
+      alert('서버 에러!');
       localStorage.clear();
-      navigate("");
+      navigate('');
     }
   }
 };
@@ -136,15 +136,38 @@ const fetchUserWishList = async (token, userId, navigate) => {
   } catch (error) {
     if (error.response.status === 401) {
       localStorage.clear();
-      navigate("/signin");
+      navigate('/signin');
     } else if (error.response.status === 400) {
-      alert("잘못된 요청");
+      alert('잘못된 요청');
       localStorage.clear();
-      navigate("");
+      navigate('');
     } else if (error.response.status === 500) {
-      alert("서버 에러!");
+      alert('서버 에러!');
       localStorage.clear();
-      navigate("");
+      navigate('');
+    }
+  }
+};
+
+// 특정 상품에 대한 사용자의 리뷰 업데이트
+const updateReview = async (token, formData, navigate) => {
+  try {
+    const data = await http.post(`/review/update`, formData, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    return data;
+  } catch (error) {
+    if (error.response.status === 401) {
+      localStorage.clear();
+      navigate('/signin');
+    } else if (error.response.status === 400) {
+      alert('잘못된 요청');
+      localStorage.clear();
+      navigate('');
+    } else if (error.response.status === 500) {
+      alert('서버 에러!');
+      localStorage.clear();
+      navigate('');
     }
   }
 };
@@ -156,6 +179,7 @@ const ProductApi = {
   getAllCategories,
   updatelikeProduct,
   fetchUserWishList,
+  updateReview,
 };
 
 export default ProductApi;
