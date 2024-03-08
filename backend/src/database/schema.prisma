@@ -33,14 +33,6 @@ model Image {
   ProductImage ProductImage[]
 }
 
-model ViewedProduct{
-  id Int @id @default(autoincrement())
-  viewedAt DateTime @default(now())
-  user User @relation(fields: [userId], references: [id])
-  products Product[]
-  userId Int @unique
-}
-
 model Profile {
   id            Int      @id @default(autoincrement())
   nickname      String   @default("Username")
@@ -78,24 +70,24 @@ model Store {
 }
 
 model User {
-  id            Int          @id @default(autoincrement())
-  firstName     String
-  lastName      String
-  email         String       @unique
-  password      String
-  orders        Order[]
-  profile       Profile?
-  store         Store?       @relation(fields: [storeId], references: [id])
-  storeId       Int?         @unique
-  wishlist      WishList?
-  wishlistId    Int?         @unique
-  sellinglist   SellingList?
-  sellinglistId Int?         @unique
-  likedProducts UserProduct[]
-  reviews       Review[]
-  createdAt     DateTime     @default(now())
-  updatedAt     DateTime     @updatedAt
-  StoreUser     StoreUser[]
+  id             Int             @id @default(autoincrement())
+  firstName      String
+  lastName       String
+  email          String          @unique
+  password       String
+  orders         Order[]
+  profile        Profile?
+  store          Store?          @relation(fields: [storeId], references: [id])
+  storeId        Int?            @unique
+  wishlist       WishList?
+  wishlistId     Int?            @unique
+  sellinglist    SellingList?
+  sellinglistId  Int?            @unique
+  likedProducts  UserProduct[]
+  reviews        Review[]
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  StoreUser      StoreUser[]
   viewedProducts ViewedProduct[]
 }
 
@@ -106,37 +98,38 @@ model Category {
 }
 
 model Product {
-  id            Int            @id @default(autoincrement())
-  name          String
-  price         Int
-  description   String
-  manufacturer  String
-  category_name String
-  category      Category       @relation(fields: [categoryId], references: [id])
-  categoryId    Int
-  status        String?
-  orders        Order[]
-  images        Image[]
-  reviews Review[]
-  inventory     Int
-  createdAt     DateTime       @default(now())
-  updatedAt     DateTime       @updatedAt
-  OrderProduct  OrderProduct[]
-  likedBy UserProduct[]
-  ProductImage  ProductImage[]
-  reviewProduct ReviewProduct[]
-  WishList      WishList?      @relation(fields: [wishListId], references: [id])
-  wishListId    Int?
-  SellingList   SellingList?   @relation(fields: [sellingListId], references: [id])
-  sellingListId Int?
-  viewedProduct ViewedProduct? @relation(fields:[viewedProductId], references: [id])
+  id              Int             @id @default(autoincrement())
+  name            String
+  price           Int
+  description     String
+  manufacturer    String
+  category_name   String
+  category        Category        @relation(fields: [categoryId], references: [id])
+  categoryId      Int
+  status          String?
+  viewed_count    Int             @default(0)
+  orders          Order[]
+  images          Image[]
+  reviews         Review[]
+  inventory       Int
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+  OrderProduct    OrderProduct[]
+  likedBy         UserProduct[]
+  ProductImage    ProductImage[]
+  reviewProduct   ReviewProduct[]
+  WishList        WishList?       @relation(fields: [wishListId], references: [id])
+  wishListId      Int?
+  SellingList     SellingList?    @relation(fields: [sellingListId], references: [id])
+  sellingListId   Int?
+  viewedProduct   ViewedProduct?  @relation(fields: [viewedProductId], references: [id])
   viewedProductId Int?
 }
 
 model WishList {
   id       Int       @id @default(autoincrement())
   user     User      @relation(fields: [userId], references: [id])
-  userId   Int @unique
+  userId   Int       @unique
   products Product[]
 }
 
@@ -150,24 +143,32 @@ model SellingList {
 }
 
 model Review {
-  id     Int    @id @default(autoincrement())
-  stars  Int    @default(5)
-  txt    String
-  user   User   @relation(fields: [userId], references: [id])
-  userId Int
-  product Product? @relation(fields: [productId], references: [id])
-  productId Int?
+  id            Int             @id @default(autoincrement())
+  stars         Int             @default(5)
+  txt           String
+  user          User            @relation(fields: [userId], references: [id])
+  userId        Int
+  product       Product?        @relation(fields: [productId], references: [id])
+  productId     Int?
   reviewProduct ReviewProduct[]
 }
 
 model ReviewProduct {
-  id Int @id @default(autoincrement())
-  review Review @relation(fields:[reviewId], references: [id])
-  reviewId Int
-  product Product @relation(fields:[productId],references: [id])
+  id        Int     @id @default(autoincrement())
+  review    Review  @relation(fields: [reviewId], references: [id])
+  reviewId  Int
+  product   Product @relation(fields: [productId], references: [id])
   productId Int
 
-  @@unique([reviewId,productId])
+  @@unique([reviewId, productId])
+}
+
+model ViewedProduct {
+  id       Int       @id @default(autoincrement())
+  viewedAt DateTime  @default(now())
+  user     User      @relation(fields: [userId], references: [id])
+  products Product[]
+  userId   Int
 }
 
 model StoreUser {
@@ -200,9 +201,10 @@ model OrderProduct {
 }
 
 model UserProduct {
-  user User @relation(fields: [userId], references: [id])
-  userId Int
-  product Product @relation(fields: [productId], references: [id])
+  user      User    @relation(fields: [userId], references: [id])
+  userId    Int
+  product   Product @relation(fields: [productId], references: [id])
   productId Int
+
   @@id([userId, productId])
 }

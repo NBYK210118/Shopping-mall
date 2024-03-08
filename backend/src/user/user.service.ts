@@ -373,14 +373,11 @@ export class UserService {
 
   async updatelikeProduct(user: User, data: Object) {
     const products_states = { ...data };
-    console.log(products_states);
     const checking = Object.keys(products_states).filter(
       (val) => products_states[val] === true,
     );
 
-    if (!checking) {
-      return;
-    }
+    if (!checking) return;
 
     const found = await this.prisma.wishList.findUnique({
       where: { userId: user.id },
@@ -400,7 +397,7 @@ export class UserService {
 
       if (liked) {
         if (!found) {
-          await this.prisma.userProduct.create({
+          let userproduct = await this.prisma.userProduct.create({
             data: {
               userId: user.id,
               productId: id,
@@ -432,7 +429,7 @@ export class UserService {
 
     const result = await this.prisma.wishList.findUnique({
       where: { userId: user.id },
-      include: { products: { select: { likedBy: true } } },
+      include: { products: { select: { id:true, likedBy: true } } },
     });
 
     return result;

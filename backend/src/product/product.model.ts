@@ -23,6 +23,12 @@ export class Product implements Prisma.ProductCreateInput {
   OrderProduct?: Prisma.OrderProductCreateNestedManyWithoutProductInput;
   createdAt?: string | Date;
   updatedAt?: string | Date;
+  reviewProduct?: Prisma.ReviewProductCreateNestedManyWithoutProductInput;
+}
+
+export class ReviewedProduct implements Prisma.ReviewProductCreateInput{
+  product: Prisma.ProductCreateNestedOneWithoutReviewProductInput;
+  review: Prisma.ReviewCreateNestedOneWithoutReviewProductInput;
 }
 
 export class SellingList implements Prisma.SellingListCreateInput {

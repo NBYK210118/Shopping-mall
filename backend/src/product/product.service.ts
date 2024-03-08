@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { Product, User } from '@prisma/client';
+import { Product, User, ViewedProduct } from '@prisma/client';
+import { NotFoundError } from 'rxjs';
 import { PrismaService } from 'src/database/prisma.service';
 
 @Injectable()
@@ -55,6 +56,44 @@ export class ProductService {
 
     return result;
   }
+
+  // 현재 상품 상세 정보 페이지에 올라와있는 상품이 현재 사용자가 올렸던 상품인지
+  async isUsersProduct(user:User,productId:number):Promise<Boolean> {
+    const found = await this.prisma.sellingList.findFirst({
+      where:{userId:user.id,products:{some:{id:productId}}}
+    })
+
+    if(!found) return false;
+
+    return true;
+  }
+
+  async guestWatchedProduct(productId:number){
+    const product = await this.prisma.product.findUnique({where:{id:productId}});
+    await this.prisma.product.update({
+      where:{id:productId},
+      data:{viewed_count:product.viewed_count+1}
+    })
+  }
+
+  async userWatchedProduct(user:User, productId:number) : Promise<ViewedProduct> {
+    const product = await this.prisma.product.findUnique({where:{id:productId}});
+
+    if(!product){
+      throw new Error("상품이 존재하지 않습니다");
+    }
+
+   await this.prisma.product.update({
+    where:{id:product.id},
+    data:{viewed_count:product.viewed_count+1}
+   })
+
+   const viewedproduct = await this.prisma.viewedProduct.create({
+      data:{userId:user.id, products:{connect:{id:productId}}}
+    })
+
+    return viewedproduct
+  } 
 
   async deleteProduct(id: number): Promise<Product> {
     const result = await this.prisma.product.delete({ where: { id } });

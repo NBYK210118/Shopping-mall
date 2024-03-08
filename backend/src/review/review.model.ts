@@ -5,4 +5,5 @@ export class Review implements Prisma.ReviewCreateInput {
   stars?: number;
   product: Prisma.ProductCreateNestedOneWithoutReviewsInput;
   user: Prisma.UserCreateNestedOneWithoutReviewsInput;
+  reviewProduct?: Prisma.ReviewProductCreateNestedManyWithoutReviewInput;
 }
