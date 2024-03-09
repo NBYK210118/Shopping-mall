@@ -58,42 +58,54 @@ export class ProductService {
   }
 
   // 현재 상품 상세 정보 페이지에 올라와있는 상품이 현재 사용자가 올렸던 상품인지
-  async isUsersProduct(user:User,productId:number):Promise<Boolean> {
+  async isUsersProduct(user: User, productId: number): Promise<Boolean> {
     const found = await this.prisma.sellingList.findFirst({
-      where:{userId:user.id,products:{some:{id:productId}}}
-    })
+      where: { userId: user.id, products: { some: { id: productId } } },
+    });
 
-    if(!found) return false;
+    if (!found) return false;
 
     return true;
   }
 
-  async guestWatchedProduct(productId:number){
-    const product = await this.prisma.product.findUnique({where:{id:productId}});
+  async guestWatchedProduct(productId: number) {
+    const product = await this.prisma.product.findUnique({
+      where: { id: productId },
+    });
     await this.prisma.product.update({
-      where:{id:productId},
-      data:{viewed_count:product.viewed_count+1}
-    })
+      where: { id: productId },
+      data: { viewed_count: product.viewed_count + 1 },
+    });
   }
 
-  async userWatchedProduct(user:User, productId:number) : Promise<ViewedProduct> {
-    const product = await this.prisma.product.findUnique({where:{id:productId}});
+  async userWatchedProduct(
+    user: User,
+    productId: number,
+  ): Promise<ViewedProduct[]> {
+    const product = await this.prisma.product.findUnique({
+      where: { id: productId },
+    });
 
-    if(!product){
-      throw new Error("상품이 존재하지 않습니다");
+    if (!product) {
+      throw new Error('상품이 존재하지 않습니다');
     }
 
-   await this.prisma.product.update({
-    where:{id:product.id},
-    data:{viewed_count:product.viewed_count+1}
-   })
+    await this.prisma.product.update({
+      where: { id: product.id },
+      data: { viewed_count: product.viewed_count + 1 },
+    });
 
-   const viewedproduct = await this.prisma.viewedProduct.create({
-      data:{userId:user.id, products:{connect:{id:productId}}}
-    })
+    await this.prisma.viewedProduct.update({
+      where: { userId: user.id },
+      data: { products: { connect: { id: productId } } },
+    });
 
-    return viewedproduct
-  } 
+    const viewedproduct = await this.prisma.viewedProduct.findMany({
+      where: { userId: user.id },
+    });
+
+    return viewedproduct;
+  }
 
   async deleteProduct(id: number): Promise<Product> {
     const result = await this.prisma.product.delete({ where: { id } });

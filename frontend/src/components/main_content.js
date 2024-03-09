@@ -1,31 +1,24 @@
-import { useEffect, useState } from "react";
-import { useAuth } from "../auth.context";
-import { Images } from "../images_list";
-import { Swiper, SwiperSlide } from "swiper/react";
-import "swiper/css/pagination";
-import "swiper/css/navigation";
-import "swiper/css";
-import { Navigation } from "swiper/modules";
-import DataService from "../data_services";
-import Skeleton from "react-loading-skeleton";
-import "react-loading-skeleton/dist/skeleton.css";
-import ProductApi from "./products/product_api";
+import { useEffect, useState } from 'react';
+import { useAuth } from '../auth.context';
+import { Images } from '../images_list';
+import { Swiper, SwiperSlide } from 'swiper/react';
+import 'swiper/css/pagination';
+import 'swiper/css/navigation';
+import 'swiper/css';
+import { Navigation } from 'swiper/modules';
+import DataService from '../data_services';
+import Skeleton from 'react-loading-skeleton';
+import 'react-loading-skeleton/dist/skeleton.css';
+import ProductApi from './products/product_api';
+import { Link } from 'react-router-dom';
 
 export default function MainContent() {
-  const {
-    token,
-    user,
-    loading,
-    setLoading,
-    navigate,
-    category,
-    setCategory,
-    setClickedSellingProduct,
-  } = useAuth();
+  const { token, user, loading, setLoading, navigate, category, setCategory, setClickedSellingProduct } = useAuth();
   const [showMessage, setShowMessage] = useState(true);
   const [slideOut, setSlideOut] = useState(false);
   const [salesProducts, setSalesProducts] = useState(null);
   const [wishProducts, setWishProducts] = useState([]);
+  const [watchedProducts, setWatchedProducts] = useState(null);
 
   // 첫 로드 때 환영합니다 메시지 띄워주기
   useEffect(() => {
@@ -45,67 +38,58 @@ export default function MainContent() {
   }, []);
 
   useEffect(() => {
-    if (user && user["sellinglistId"] && user["wishlist"]) {
+    if (user && user['sellinglistId'] && user['wishlist']) {
       const getSalesProducts = async () => {
-        const products = user["sellinglist"]["products"];
+        const products = user['sellinglist']['products'];
         const product_ids = products.map((val, idx) => {
           return val.id;
         });
         const formData = new FormData();
-        formData.append("checklist", product_ids);
+        formData.append('checklist', product_ids);
 
-        const response = await DataService.getProductsWhileUpdate(
-          token,
-          formData,
-          navigate
-        );
+        const response = await DataService.getProductsWhileUpdate(token, formData, navigate);
         setSalesProducts(response.data);
       };
       const getUserWishList = async () => {
-        const response = await ProductApi.fetchUserWishList(
-          token,
-          user.id,
-          navigate
-        );
+        const response = await ProductApi.fetchUserWishList(token, user.id, navigate);
         if (response && response.data) {
           setWishProducts(response.data.products);
+        }
+      };
+      const recentUserWatched = async () => {
+        const response = await ProductApi.userRecentWatched(token, navigate);
+        if (response && response.data) {
+          setWatchedProducts(response.data);
         }
       };
       setLoading(true);
       getSalesProducts();
       getUserWishList();
+      recentUserWatched();
       setLoading(false);
     }
   }, []);
 
-  useEffect(() => {
-    console.log(`wishProducts: ${wishProducts}`);
-  }, [wishProducts]);
-
   const handleCategoryClick = (category) => {
     setCategory(category);
-    localStorage.setItem("category", category);
+    localStorage.setItem('category', category);
     navigate(`/products/?category=${category}`);
   };
 
-  useEffect(() => {
-    console.log("salesProducts", salesProducts);
-  }, [salesProducts]);
-
   const handleMoveToMystore = (productId) => {
     setClickedSellingProduct(productId);
-    navigate("/user/my-store");
+    navigate('/user/my-store');
   };
 
   const categories = [
-    { txt: "의류", category: "의류", icon: "checkroom" },
-    { txt: "전자제품", category: "전자제품", icon: "laptop_mac" },
-    { txt: "식품", category: "식품", icon: "restaurant" },
-    { txt: "가구", category: "가구", icon: "chair" },
-    { txt: "스포츠", category: "스포츠", icon: "fitness_center" },
-    { txt: "게임", category: "게임", icon: "sports_esports" },
-    { txt: "도서", category: "도서", icon: "book" },
-    { txt: "장난감", category: "장난감", icon: "toys" },
+    { txt: '의류', category: '의류', icon: 'checkroom' },
+    { txt: '전자제품', category: '전자제품', icon: 'laptop_mac' },
+    { txt: '식품', category: '식품', icon: 'restaurant' },
+    { txt: '가구', category: '가구', icon: 'chair' },
+    { txt: '스포츠', category: '스포츠', icon: 'fitness_center' },
+    { txt: '게임', category: '게임', icon: 'sports_esports' },
+    { txt: '도서', category: '도서', icon: 'book' },
+    { txt: '장난감', category: '장난감', icon: 'toys' },
   ];
 
   const CategoryItem = ({ category, txt, icon }) => {
@@ -114,12 +98,8 @@ export default function MainContent() {
         onClick={() => handleCategoryClick(category)}
         className="flex flex-col items-center justify-center w-[6rem] h-[6rem] mw-md:w-[4rem] mw-md:h-[4rem] p-2 m-2 border border-solid border-black rounded-lg cursor-pointer hover:bg-sky-100 transition-all duration-300 hover:scale-105"
       >
-        <span className="material-symbols-outlined text-7xl mw-md:text-3xl">
-          {icon}
-        </span>
-        <span className="mt-2 text-sm mw-md:text-[0.7rem] mw-md:text-nowrap">
-          {txt}
-        </span>
+        <span className="material-symbols-outlined text-7xl mw-md:text-3xl">{icon}</span>
+        <span className="mt-2 text-sm mw-md:text-[0.7rem] mw-md:text-nowrap">{txt}</span>
       </div>
     );
   };
@@ -170,10 +150,7 @@ export default function MainContent() {
         </Swiper>
       );
     } else {
-      const slidesPerViewSetting =
-        Math.max(1, salesProducts.length) > 5
-          ? 5
-          : Math.max(1, salesProducts.length);
+      const slidesPerViewSetting = Math.max(1, salesProducts.length) > 5 ? 5 : Math.max(1, salesProducts.length);
       return (
         <Swiper
           className="max-w-[800px] mw-md:max-w-[200px] mw-md:max-h-[200px]"
@@ -201,19 +178,19 @@ export default function MainContent() {
                 className={`p-2 flex flex-col justify-between cursor-pointer`}
                 onClick={() => handleMoveToMystore(item.id)}
               >
-                {" "}
+                {' '}
                 <div className="bg-white rounded-lg shadow overflow-hidden hover:-translate-y-1 transition-transform duration-200">
                   <img
                     src={item.images[0].imgUrl}
                     alt={`Item ${index + 1}`}
                     className="w-full max-h-[170px] mw-md:max-h-[80px] object-cover"
-                    style={{ height: "170px" }}
+                    style={{ height: '170px' }}
                   />
                   <div className="p-1 text-md">
-                    {" "}
+                    {' '}
                     <h3 className="font-bold">{item.name}</h3>
                     <p className="text-xs text-gray-600 text-ellipsis overflow-hidden whitespace-nowrap">
-                      {item.price.toLocaleString("ko-kr")}원 {item.description}
+                      {item.price.toLocaleString('ko-kr')}원 {item.description}
                     </p>
                   </div>
                 </div>
@@ -229,28 +206,26 @@ export default function MainContent() {
     const tmp = JSON.stringify(wishProducts);
     const likedProducts = JSON.parse(tmp);
 
-    const slidesPerViewSetting =
-      Math.max(1, likedProducts.length) > 5
-        ? 5
-        : Math.max(1, likedProducts.length);
+    const slidesPerViewSetting = Math.max(1, likedProducts.length) > 5 ? 5 : Math.max(1, likedProducts.length);
     if (!likedProducts) {
       return (
         <Swiper
           className="max-w-[800px] mw-md:max-w-[200px] mw-md:max-h-[200px]"
           spaceBetween={10}
           modules={[Navigation]}
+          slidesPerView={2}
           navigation={true}
           breakpoints={{
             640: {
-              slidesPerView: slidesPerViewSetting,
+              slidesPerView: 2,
               spaceBetween: 20,
             },
             768: {
-              slidesPerView: slidesPerViewSetting,
+              slidesPerView: 2,
               spaceBetween: 30,
             },
             1024: {
-              slidesPerView: slidesPerViewSetting,
+              slidesPerView: 4,
               spaceBetween: 40,
             },
           }}
@@ -290,24 +265,25 @@ export default function MainContent() {
           {likedProducts &&
             likedProducts.map((item, index) => (
               <SwiperSlide key={index}>
-                <div className="p-2 flex flex-col justify-between cursor-pointer">
-                  {" "}
-                  <div className="bg-white rounded-lg shadow overflow-hidden hover:-translate-y-1 transition-transform duration-200">
-                    <img
-                      src={item.images[0]?.imgUrl}
-                      alt={`Item ${index + 1}`}
-                      className={`w-full max-h-[120px] h-[120px] object-cover`}
-                    />
-                    <div className="p-1 text-md">
-                      {" "}
-                      <h3 className="font-bold">{item.name}</h3>
-                      <p className="text-xs text-gray-600 text-ellipsis overflow-hidden whitespace-nowrap">
-                        {item.price.toLocaleString("ko-kr")}원{" "}
-                        {item.description}
-                      </p>
+                <Link to="/user/wishlist">
+                  <div className="p-2 flex flex-col justify-between cursor-pointer">
+                    {' '}
+                    <div className="bg-white rounded-lg shadow overflow-hidden hover:-translate-y-1 transition-transform duration-200">
+                      <img
+                        src={item.images[0]?.imgUrl}
+                        alt={`Item ${index + 1}`}
+                        className={`w-full max-h-[120px] h-[120px] object-cover`}
+                      />
+                      <div className="p-1 text-md">
+                        {' '}
+                        <h3 className="font-bold">{item.name}</h3>
+                        <p className="text-xs text-gray-600 text-ellipsis overflow-hidden whitespace-nowrap">
+                          {item.price.toLocaleString('ko-kr')}원 {item.description}
+                        </p>
+                      </div>
                     </div>
                   </div>
-                </div>
+                </Link>
               </SwiperSlide>
             ))}
         </Swiper>
@@ -316,48 +292,43 @@ export default function MainContent() {
   };
 
   const WatchList = () => {
-    const watchListItems = [
-      {
-        id: 1,
-        title: "Watch Item",
-        description: "Description",
-        image: Images.macbook,
-        price: "price",
-      },
-      {
-        id: 2,
-        title: "Watch Item",
-        description: "Description",
-        image: Images.macbook,
-        price: "price",
-      },
-      {
-        id: 3,
-        title: "Watch Item",
-        description: "Description",
-        image: Images.macbook,
-        price: "price",
-      },
-      {
-        id: 4,
-        title: "Watch Item",
-        description: "Description",
-        image: Images.macbook,
-        price: "price",
-      },
-      {
-        id: 5,
-        title: "Watch Item",
-        description: "Description",
-        image: Images.macbook,
-        price: "price",
-      },
-    ];
-
-    if (!watchListItems) {
+    const slidesPerViewSetting = Math.max(1, watchedProducts?.length) > 5 ? 5 : Math.max(1, watchedProducts?.length);
+    if (!watchedProducts) {
       return (
         <Swiper
           className="max-w-[800px] mw-md:max-w-[200px] mw-md:max-h-[200px]"
+          spaceBetween={10}
+          modules={[Navigation]}
+          navigation={true}
+          breakpoints={{
+            640: {
+              slidesPerView: 2,
+              spaceBetween: 20,
+            },
+            768: {
+              slidesPerView: 2,
+              spaceBetween: 30,
+            },
+            1024: {
+              slidesPerView: slidesPerViewSetting,
+              spaceBetween: 40,
+            },
+          }}
+        >
+          {[...Array(4)].map((_, index) => (
+            <SwiperSlide key={index}>
+              <div className="p-2 flex flex-col justify-between">
+                <Skeleton height={170} />
+                <Skeleton count={2} />
+              </div>
+            </SwiperSlide>
+          ))}
+        </Swiper>
+      );
+    } else {
+      return (
+        <Swiper
+          className="max-w-[800px] mw-md:max-w-[200px]"
           spaceBetween={10}
           slidesPerView={2}
           modules={[Navigation]}
@@ -372,80 +343,24 @@ export default function MainContent() {
               spaceBetween: 30,
             },
             1024: {
-              slidesPerView: 4,
+              slidesPerView: slidesPerViewSetting,
               spaceBetween: 40,
             },
           }}
         >
-          {watchListItems.map((item, index) => (
+          {watchedProducts.map((item, index) => (
             <SwiperSlide key={index}>
               <div className="p-2 flex flex-col justify-between cursor-pointer">
-                {" "}
                 <div className="bg-white rounded-lg shadow overflow-hidden hover:-translate-y-1 transition-transform duration-200">
                   <img
-                    src={Images.Bluejean}
+                    src={item.images[0].imgUrl}
                     alt={`Item ${index + 1}`}
-                    className="w-full max-h-[200px] object-cover"
-                    style={{ height: "200px" }}
+                    className="w-full max-h-[120px] h-[120px] object-cover"
                   />
                   <div className="p-1 text-md">
-                    {" "}
-                    <h3>
-                      {item.title} {index + 1}
-                    </h3>
-                    <p className="text-xs text-gray-600 text-ellipsis overflow-hidden whitespace-nowrap">
-                      {item.description}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </SwiperSlide>
-          ))}
-        </Swiper>
-      );
-    } else {
-      return (
-        <Swiper
-          className="max-w-[800px] mw-md:max-w-[200px]"
-          spaceBetween={10}
-          slidesPerView={2}
-          modules={[Navigation]} // Add the Navigation module here
-          navigation={true} // Enable navigation arrows
-          breakpoints={{
-            640: {
-              slidesPerView: 2,
-              spaceBetween: 20,
-            },
-            768: {
-              slidesPerView: 2,
-              spaceBetween: 30,
-            },
-            1024: {
-              slidesPerView: 4,
-              spaceBetween: 40,
-            },
-          }}
-        >
-          {watchListItems.map((item, index) => (
-            <SwiperSlide key={index}>
-              <div className="p-2 flex flex-col justify-between cursor-pointer">
-                {" "}
-                {/* Reduced padding */}
-                <div className="bg-white rounded-lg shadow overflow-hidden hover:-translate-y-1 transition-transform duration-200">
-                  <img
-                    src={item.image}
-                    alt={`Item ${index + 1}`}
-                    className="w-full max-h-[170px] object-cover" // Half of 250px
-                    style={{ height: "170px" }}
-                  />
-                  <div className="p-1 text-md">
-                    {" "}
-                    {/* Adjusted padding and text size */}
-                    <h3>
-                      {item.title} {index + 1}
-                    </h3>
-                    <p className="text-xs text-gray-600">
-                      {item.price} {item.description}
+                    <h3>{item.name}</h3>
+                    <p className="text-xs text-gray-600 text-ellipsis whitespace-nowrap overflow-hidden">
+                      {item.price.toLocaleString('ko-kr')}원 {item.description}
                     </p>
                   </div>
                 </div>
@@ -463,11 +378,7 @@ export default function MainContent() {
         {/* Advertisement Banner */}
         {Array(6).fill(
           <div className="flex justify-center items-center mt-5 mx-auto mw-md:justify-evenly w-full h-48 bg-gray-300">
-            <img
-              src="https://via.placeholder.com/1024x192"
-              alt="Advertisement"
-              className="max-w-full h-auto"
-            />
+            <img src="https://via.placeholder.com/1024x192" alt="Advertisement" className="max-w-full h-auto" />
           </div>
         )}
       </>
@@ -481,38 +392,30 @@ export default function MainContent() {
           {showMessage && (
             <div
               className={`fixed -bottom-24 mx-auto w-full p-4 z-50 bg-gradient-to-tr bg-cyan-500 text-white text-center transition-all duration-1000 ${
-                slideOut ? "-translate-y-full" : "translate-y-10"
+                slideOut ? '-translate-y-full' : 'translate-y-10'
               }`}
               style={{
-                transitionProperty: "transform",
-                transitionDuration: "1000ms",
+                transitionProperty: 'transform',
+                transitionDuration: '1000ms',
               }}
             >
-              <h2 className="text-2xl font-semibold">
-                Welcome! [{user ? user["profile"]["nickname"] : "Username"}]!
-              </h2>
+              <h2 className="text-2xl font-semibold">Welcome! [{user ? user['profile']['nickname'] : 'Username'}]!</h2>
               <p>Check out what's new since your last visit.</p>
             </div>
           )}
 
-          <div className="w-full h-full overflow-hidden flex flex-wrap justify-between p-4 bg-gradient-to-r from-indigo-500 from-10% via-sky-500 via-50% to-indigo-500 to-95% bg-opacity-10">
+          <div className="w-full h-full overflow-hidden flex flex-wrap justify-between p-4 bg-gray-200">
             <div
               id="main_left_content"
-              className="w-[35%] h-auto flex flex-col justify-center items-center max-w-[512px] mx-auto -mt-16"
+              className="w-[35%] h-auto flex flex-col justify-center items-center max-w-[512px] mx-auto -mt-4"
             >
               {/* Recommended Products */}
               <div className="mt-5 mb-6 mw-md:mb-2 mw-md:mr-0 p-4">
-                <h3 className="text-xl font-semibold mb-3 mw-md:text-sm">
-                  Recommended for You
-                </h3>
+                <h3 className="text-xl font-semibold mb-3 mw-md:text-sm">Recommended for You</h3>
                 <div className="grid grid-cols-1 miw-md:grid-cols-2 miw-lg:grid-cols-3 miw-xl:grid-cols-4 gap-4">
                   {[...Array(4)].map((_, index) => (
                     <div key={index} className="flex flex-col items-center">
-                      <img
-                        src="https://via.placeholder.com/150"
-                        alt={`Product ${index + 1}`}
-                        className="mb-2"
-                      />
+                      <img src="https://via.placeholder.com/150" alt={`Product ${index + 1}`} className="mb-2" />
                       <p className="mw-md:text-sm">Product Name {index + 1}</p>
                     </div>
                   ))}
@@ -521,17 +424,11 @@ export default function MainContent() {
 
               {/* Sales and Promotions */}
               <div className="mb-2 p-4">
-                <h3 className="text-xl font-semibold mb-3 mw-md:text-nowrap text-center mw-md:text-lg">
-                  On Sale Now
-                </h3>
+                <h3 className="text-xl font-semibold mb-3 mw-md:text-nowrap text-center mw-md:text-lg">On Sale Now</h3>
                 <div className="grid grid-cols-1 miw-md:grid-cols-2 miw-lg:grid-cols-3 miw-xl:grid-cols-4 gap-4">
                   {[...Array(4)].map((_, index) => (
                     <div key={index} className="flex flex-col items-center">
-                      <img
-                        src="https://via.placeholder.com/150"
-                        alt={`Product ${index + 1}`}
-                        className="mb-2"
-                      />
+                      <img src="https://via.placeholder.com/150" alt={`Product ${index + 1}`} className="mb-2" />
                       <p className="mw-md:text-sm">Product Name {index + 1}</p>
                     </div>
                   ))}
@@ -540,17 +437,11 @@ export default function MainContent() {
 
               {/* Advertising Space */}
               <div className="mx-5 mb-2 p-4">
-                <h3 className="text-xl font-semibold mb-3 mw-md:text-lg mw-md:text-nowrap">
-                  Featured Ads
-                </h3>
+                <h3 className="text-xl font-semibold mb-3 mw-md:text-lg mw-md:text-nowrap">Featured Ads</h3>
                 <div className="grid grid-cols-4 mw-sm:grid-cols-2 mw-md:grid-cols-4 gap-4">
                   {[...Array(4)].map((_, index) => (
                     <div className="flex flex-col items-center">
-                      <img
-                        src="https://via.placeholder.com/150"
-                        alt="Ad"
-                        className="mb-2"
-                      />
+                      <img src="https://via.placeholder.com/150" alt="Ad" className="mb-2" />
                       <p className="mw-md:hidden">Ad Description</p>
                     </div>
                   ))}
@@ -559,27 +450,18 @@ export default function MainContent() {
 
               {/* User Activity*/}
               <div className="mb-6 p-4">
-                <h3 className="text-xl font-semibold mb-3 mw-md:text-lg mw-md:text-nowrap">
-                  Recent Activity
-                </h3>
+                <h3 className="text-xl font-semibold mb-3 mw-md:text-lg mw-md:text-nowrap">Recent Activity</h3>
                 <div className="grid grid-cols-4 mw-sm:grid-cols-2 mw-md:grid-cols-4 gap-4">
                   {[...Array(4)].map((_, index) => (
                     <div className="flex flex-col items-center">
-                      <img
-                        src="https://via.placeholder.com/150"
-                        alt="Activity"
-                        className="mb-2"
-                      />
+                      <img src="https://via.placeholder.com/150" alt="Activity" className="mb-2" />
                       <p className="mw-md:hidden">Activity Description</p>
                     </div>
                   ))}
                 </div>
               </div>
             </div>
-            <div
-              id="main_right_content"
-              className="w-1/2 h-auto max-w-[1024px] mt-5 mx-auto mw-md:justify-evenly"
-            >
+            <div id="main_right_content" className="w-1/2 h-auto max-w-[1024px] mt-5 mx-auto mw-md:justify-evenly">
               {/* Categories */}
               <div className="flex flex-col justify-around max-w-[1024px] mt-5 mx-auto mw-md:justify-evenly">
                 <h1 className="font-bold text-xl mw-md:text-sm">카테고리</h1>
@@ -587,40 +469,26 @@ export default function MainContent() {
               </div>
               {/* Sales */}
               <div className="flex flex-col justify-around max-w-[1024px] mt-5 mx-auto mw-md:justify-evenly">
-                <h1 className="font-bold text-xl mw-md:text-sm">
-                  판매 중인 상품
-                </h1>
+                <h1 className="font-bold text-xl mw-md:text-sm">판매 중인 상품</h1>
                 <Sales />
               </div>
               {/* Favorites */}
               <div className="flex flex-col justify-around max-w-[1024px] mt-5 mx-auto mw-md:justify-evenly">
-                <h1 className="font-bold text-xl mw-md:text-sm">
-                  좋아요 리스트
-                </h1>
+                <h1 className="font-bold text-xl mw-md:text-sm">좋아요 리스트</h1>
                 <Cards />
               </div>
               {/* WatchList */}
               <div className="flex flex-col justify-around max-w-[1024px] mt-5 mx-auto mw-md:justify-evenly">
-                <h1 className="font-bold text-xl mw-md:text-sm">
-                  내가 본 상품들
-                </h1>
+                <h1 className="font-bold text-xl mw-md:text-sm">내가 본 상품들</h1>
                 <WatchList />
               </div>
               {/* Advertisement Banner */}
               <div className="flex justify-center items-center mt-5 mx-auto mw-md:justify-evenly w-full h-48 bg-gray-300">
-                <img
-                  src="https://via.placeholder.com/1024x192"
-                  alt="Advertisement"
-                  className="max-w-full h-auto"
-                />
+                <img src="https://via.placeholder.com/1024x192" alt="Advertisement" className="max-w-full h-auto" />
               </div>
               {/* Advertisement Banner */}
               <div className="flex justify-center items-center py-10 mt-5 mx-auto mw-md:justify-evenly w-full h-48 bg-gray-300">
-                <img
-                  src="https://via.placeholder.com/1024x192"
-                  alt="Advertisement"
-                  className="max-w-full h-auto"
-                />
+                <img src="https://via.placeholder.com/1024x192" alt="Advertisement" className="max-w-full h-auto" />
               </div>
             </div>
           </div>
@@ -633,17 +501,11 @@ export default function MainContent() {
           >
             {/* Recommended Products */}
             <div className="mt-5 mb-6 mw-md:mb-2 mw-md:mr-0 p-4">
-              <h3 className="text-xl font-semibold mb-3 mw-md:text-sm">
-                Recommended for You
-              </h3>
+              <h3 className="text-xl font-semibold mb-3 mw-md:text-sm">Recommended for You</h3>
               <div className="grid grid-cols-1 miw-md:grid-cols-2 miw-lg:grid-cols-3 miw-xl:grid-cols-4 gap-4">
                 {[...Array(4)].map((_, index) => (
                   <div key={index} className="flex flex-col items-center">
-                    <img
-                      src="https://via.placeholder.com/150"
-                      alt={`Product ${index + 1}`}
-                      className="mb-2"
-                    />
+                    <img src="https://via.placeholder.com/150" alt={`Product ${index + 1}`} className="mb-2" />
                     <p className="mw-md:text-sm">Product Name {index + 1}</p>
                   </div>
                 ))}
@@ -652,17 +514,11 @@ export default function MainContent() {
 
             {/* Sales and Promotions */}
             <div className="mb-2 p-4">
-              <h3 className="text-xl font-semibold mb-3 mw-md:text-nowrap text-center mw-md:text-lg">
-                On Sale Now
-              </h3>
+              <h3 className="text-xl font-semibold mb-3 mw-md:text-nowrap text-center mw-md:text-lg">On Sale Now</h3>
               <div className="grid grid-cols-1 miw-md:grid-cols-2 miw-lg:grid-cols-3 miw-xl:grid-cols-4 gap-4">
                 {[...Array(4)].map((_, index) => (
                   <div key={index} className="flex flex-col items-center">
-                    <img
-                      src="https://via.placeholder.com/150"
-                      alt={`Product ${index + 1}`}
-                      className="mb-2"
-                    />
+                    <img src="https://via.placeholder.com/150" alt={`Product ${index + 1}`} className="mb-2" />
                     <p className="mw-md:text-sm">Product Name {index + 1}</p>
                   </div>
                 ))}
@@ -671,17 +527,11 @@ export default function MainContent() {
 
             {/* Advertising Space */}
             <div className="mx-5 mb-2 p-4">
-              <h3 className="text-xl font-semibold mb-3 mw-md:text-lg mw-md:text-nowrap">
-                Featured Ads
-              </h3>
+              <h3 className="text-xl font-semibold mb-3 mw-md:text-lg mw-md:text-nowrap">Featured Ads</h3>
               <div className="grid grid-cols-4 mw-sm:grid-cols-2 mw-md:grid-cols-4 gap-4">
                 {[...Array(4)].map((_, index) => (
                   <div className="flex flex-col items-center">
-                    <img
-                      src="https://via.placeholder.com/150"
-                      alt="Ad"
-                      className="mb-2"
-                    />
+                    <img src="https://via.placeholder.com/150" alt="Ad" className="mb-2" />
                     <p className="mw-md:hidden">Ad Description</p>
                   </div>
                 ))}
@@ -690,27 +540,18 @@ export default function MainContent() {
 
             {/* User Activity*/}
             <div className="mb-6 p-4">
-              <h3 className="text-xl font-semibold mb-3 mw-md:text-lg mw-md:text-nowrap">
-                Recent Activity
-              </h3>
+              <h3 className="text-xl font-semibold mb-3 mw-md:text-lg mw-md:text-nowrap">Recent Activity</h3>
               <div className="grid grid-cols-4 mw-sm:grid-cols-2 mw-md:grid-cols-4 gap-4">
                 {[...Array(4)].map((_, index) => (
                   <div className="flex flex-col items-center">
-                    <img
-                      src="https://via.placeholder.com/150"
-                      alt="Activity"
-                      className="mb-2"
-                    />
+                    <img src="https://via.placeholder.com/150" alt="Activity" className="mb-2" />
                     <p className="mw-md:hidden">Activity Description</p>
                   </div>
                 ))}
               </div>
             </div>
           </div>
-          <div
-            id="main_right_content"
-            className="w-1/2 h-auto max-w-[1024px] mt-5 mx-auto mw-md:justify-evenly"
-          >
+          <div id="main_right_content" className="w-1/2 h-auto max-w-[1024px] mt-5 mx-auto mw-md:justify-evenly">
             <div className="flex flex-col justify-around max-w-[1024px] mt-5 mx-auto mw-md:justify-evenly">
               <h1 className="font-bold text-xl mw-md:text-sm">카테고리</h1>
               <Categories />

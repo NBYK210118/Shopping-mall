@@ -18,17 +18,23 @@ export function Products() {
   };
 
   const toggleHeart = (productId) => {
-    setManageProductsLikes({
-      ...manageProductsLikes,
-      [productId]: !manageProductsLikes[productId],
-    });
+    if (token) {
+      setManageProductsLikes({
+        ...manageProductsLikes,
+        [productId]: !manageProductsLikes[productId],
+      });
+    } else {
+      alert('로그인 하셔야 합니다!');
+      navigate('/signin');
+      throw new Error('Unauthorized!');
+    }
   };
 
   useEffect(() => {
     const waitForProducts = async () => {
       try {
         setLoading(true);
-        const response = await ProductApi.getAllProducts(token, param, navigate);
+        const response = await ProductApi.getAllProducts(param, navigate);
         if (response && response.data) {
           setCurrentProducts(response.data);
           console.log('response.data: ', response.data);
@@ -47,21 +53,25 @@ export function Products() {
   }, []);
 
   useEffect(() => {
-    setManageProductsLikes(
-      currentProducts.reduce((acc, product) => {
-        acc[product.id] = checkUserLikedProduct(product, user);
-        return acc;
-      }, {})
-    );
+    if (token) {
+      setManageProductsLikes(
+        currentProducts.reduce((acc, product) => {
+          acc[product.id] = checkUserLikedProduct(product, user);
+          return acc;
+        }, {})
+      );
+    }
   }, [currentProducts]);
 
   useEffect(() => {
-    if (manageProductsLikes) {
-      const formData = new FormData();
-      formData.append('likes', JSON.stringify(manageProductsLikes));
-      ProductApi.updatelikeProduct(token, formData, navigate).then((response) => {
-        console.log(response.data);
-      });
+    if (token) {
+      if (manageProductsLikes) {
+        const formData = new FormData();
+        formData.append('likes', JSON.stringify(manageProductsLikes));
+        ProductApi.updatelikeProduct(token, formData, navigate).then((response) => {
+          console.log(response.data);
+        });
+      }
     }
   }, [manageProductsLikes]);
 
@@ -89,13 +99,16 @@ export function Products() {
                 onClick={() => toggleHeart(val.id)}
               />
               <div className="w-[80%] mw-md:w-1/2 flex justify-end">
-                <button className="font-semibold text-nowrap text-xs mw-md:text-[0.5rem] mx-1 py-1 px-2 bg-blue-500 text-white rounded hover:bg-blue-600">
+                <Link
+                  to={`/products/${val.id}/buy`}
+                  className="font-semibold text-nowrap text-xs mw-md:text-[0.5rem] mx-1 py-1 px-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-all duration-150"
+                >
                   구매
-                </button>
-                <button className="font-semibold text-nowrap mw-md:text-[0.5rem] flex justify-around items-center text-xs py-1 px-2 bg-green-500 text-white rounded hover:bg-green-600">
+                </Link>
+                <Link className="font-semibold text-nowrap mw-md:text-[0.5rem] flex justify-around items-center text-xs py-1 px-2 bg-green-500 text-white rounded hover:bg-green-600 transition-all duration-150">
                   <FontAwesomeIcon icon={faShoppingCart} />
                   장바구니 담기
-                </button>
+                </Link>
               </div>
             </div>
           </div>

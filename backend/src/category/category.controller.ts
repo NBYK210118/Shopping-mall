@@ -7,7 +7,6 @@ import { AuthGuard } from '@nestjs/passport';
 export class CategoryController {
   constructor(private categoryService: CategoryService) {}
 
-  @UseGuards(AuthGuard())
   @Get('/:name')
   async getAllProducts(@Param('name') category: string): Promise<Product[]> {
     const result = await this.categoryService.getAllProducts(category);

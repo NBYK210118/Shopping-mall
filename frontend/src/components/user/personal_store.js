@@ -368,10 +368,6 @@ export default function PersonalStore() {
     });
   };
 
-  useEffect(() => {
-    console.log('categoryItems: ', categoryItems);
-  }, [categoryItems]);
-
   const UsersOnSale = () => {
     let Result;
 

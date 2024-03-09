@@ -43,6 +43,7 @@ export const AuthProvider = ({ children }) => {
           }
         });
       }
+    } else {
     }
   }, []);
 

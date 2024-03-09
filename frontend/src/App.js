@@ -9,6 +9,7 @@ import SignUp from './components/user/signUp';
 import { AuthProvider, useAuth } from './auth.context';
 import Loading from './loading';
 import ProductDetail from './components/products/product_detail';
+import BuyNow from './components/buy_now';
 
 function MainHeader() {
   const [isMenuOpen, setMenuOpen] = useState(false);
@@ -231,6 +232,7 @@ function App() {
           <Route exact path="/signin" element={<SignIn />}></Route>
           <Route exact path="/signup" element={<SignUp />}></Route>
           <Route path="/products/*" element={<Products />}></Route>
+          <Route path="/products/:productId/buy" element={<BuyNow />}></Route>
           <Route path="/products/:productId" element={<ProductDetail />}></Route>
         </Routes>
       </div>
