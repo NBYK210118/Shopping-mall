@@ -37,13 +37,13 @@ model Profile {
   id            Int      @id @default(autoincrement())
   nickname      String   @default("Username")
   address       String   @default("")
-  phoneNumber String     @default("")
+  phoneNumber   String   @default("")
   paymentMethod String   @default("")
   user          User     @relation(fields: [userId], references: [id])
   userId        Int      @unique
   imageUrl      String?
   profile_image Image?   @relation(fields: [imageId], references: [id])
-  imageId       Int
+  imageId       Int?
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 }
@@ -170,7 +170,7 @@ model ViewedProduct {
   viewedAt DateTime  @default(now())
   user     User      @relation(fields: [userId], references: [id])
   products Product[]
-  userId   Int  @unique
+  userId   Int       @unique
 }
 
 model StoreUser {
