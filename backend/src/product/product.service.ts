@@ -86,8 +86,18 @@ export class ProductService {
       where: { id: productId },
     });
 
+    const viewed_product = await this.prisma.viewedProduct.findUnique({
+      where: { userId: user.id },
+    });
+
     if (!product) {
       throw new Error('상품이 존재하지 않습니다');
+    }
+
+    if (!viewed_product) {
+      await this.prisma.viewedProduct.create({
+        data: { userId: user.id },
+      });
     }
 
     await this.prisma.product.update({

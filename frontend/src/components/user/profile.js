@@ -4,7 +4,7 @@ import { useAuth } from '../../auth.context';
 import DataService from '../../data_services';
 import { useNavigate } from 'react-router-dom';
 
-export default function UserProfile(props) {
+export default function UserProfile() {
   const { token, user, setUser, loading, setLoading } = useAuth();
   const fileInputRef = useRef(null);
   const [firstName, setFirstName] = useState(user['firstName']);
@@ -64,7 +64,6 @@ export default function UserProfile(props) {
     setUser(response.data);
     localStorage.setItem('user', JSON.stringify(response.data));
     setNickname(response.data['profile']['nickname']);
-    setEditClick(!editClick);
   };
 
   const handleProfileUpdate = async (e) => {
@@ -89,14 +88,14 @@ export default function UserProfile(props) {
   return (
     <>
       <>
-        <div className="flex flex-col miw-lg:flex-row w-full h-full mt-8 bg-gray-100">
+        <div className="flex flex-col miw-lg:flex-row w-full h-full mt-10 bg-gray-100 border border-solid border-gray-300 rounded">
           {/* Left Panel */}
-          <div className="flex flex-col w-full miw-lg:w-1/2 h-60 miw-lg:h-auto bg-white shadow-md rounded-lg overflow-hidden">
+          <div className="flex flex-col w-full miw-lg:w-1/2 miw-lg:h-auto bg-white shadow-md rounded-lg overflow-hidden">
             <div className="flex items-center justify-between p-6 border-b">
               <div className="flex items-center">
                 <div className="p-1 rounded-full bg-gray-300 text-gray-500">
                   {imageUrl ? (
-                    <img src={imageUrl} alt="profile_img" className="rounded-full" />
+                    <img src={imageUrl} alt="profile_img" className="max-w-[160px] rounded-full" />
                   ) : (
                     <span className="material-symbols-outlined text-7xl">account_circle</span>
                   )}

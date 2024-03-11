@@ -54,6 +54,7 @@ export function Products() {
 
   useEffect(() => {
     if (token) {
+      console.log(currentProducts);
       setManageProductsLikes(
         currentProducts.reduce((acc, product) => {
           acc[product.id] = checkUserLikedProduct(product, user);
@@ -76,52 +77,51 @@ export function Products() {
   }, [manageProductsLikes]);
 
   const Items = () => {
-    if (currentProducts) {
-      return currentProducts.map((val, idx) => {
-        return (
-          <div
-            id="product_item"
-            className="min-h-60 min-w-36 max-h-[390px] mw-md:max-w-[100px] mw-md:max-h-[150px] cursor-pointer p-3 mx-5 my-2 border boder-solid border-gray-300"
-          >
-            <Link to={`/products/${val.id}`} key={val.id}>
-              <img
-                src={val.images[0]['imgUrl']}
-                alt="상품 이미지"
-                className="w-full max-w-[250px] miw-md:min-h-72 max-h-[290px] mw-md:max-w-[210px] mw-md:min-h-36 mw-md:max-h-[140px] object-cover hover:scale-[1.04] transition-all duration-300"
-              />
-            </Link>
-            <h3 className="font-bold text-md mw-md:text-sm mb-1">{val.name}</h3>
-            <p className="text-sm mw-md:text-xs mb-2">{val.price.toLocaleString('ko-kr')}원</p>
-            <div className="w-full flex justfiy-between items-center space-x-14">
-              <FontAwesomeIcon
-                icon={manageProductsLikes[val.id] ? faHeart : faHeartRegular} // isFilledHeart 상태에 따라 아이콘을 변경하는 로직 추가 필요
-                className="w-[20%] text-red-500 text-2xl mw-md:text-sm cursor-pointer hover:scale-[1.1] transition-all duration-300"
-                onClick={() => toggleHeart(val.id)}
-              />
-              <div className="w-[80%] mw-md:w-1/2 flex justify-end">
-                <Link
-                  to={`/products/${val.id}/buy`}
-                  className="font-semibold text-nowrap text-xs mw-md:text-[0.5rem] mx-1 py-1 px-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-all duration-150"
-                >
-                  구매
-                </Link>
-                <Link className="font-semibold text-nowrap mw-md:text-[0.5rem] flex justify-around items-center text-xs py-1 px-2 bg-green-500 text-white rounded hover:bg-green-600 transition-all duration-150">
-                  <FontAwesomeIcon icon={faShoppingCart} />
-                  장바구니 담기
-                </Link>
-              </div>
+    if (currentProducts !== undefined && currentProducts.length > 0) {
+      console.log(currentProducts);
+      return currentProducts.map((val, idx) => (
+        <div
+          id="product_item"
+          className="min-h-60 min-w-36 max-h-[390px] mw-md:max-w-[100px] mw-md:max-h-[150px] cursor-pointer p-3 mx-5 my-2 border boder-solid border-gray-300"
+        >
+          <Link to={`/products/${val.id}`} key={val.id}>
+            <img
+              src={val.images[0]['imgUrl']}
+              alt="상품 이미지"
+              className="w-full max-w-[250px] miw-md:min-h-72 max-h-[290px] mw-md:max-w-[210px] mw-md:min-h-36 mw-md:max-h-[140px] object-cover hover:scale-[1.04] transition-all duration-300"
+            />
+          </Link>
+          <h3 className="font-bold text-md mw-md:text-sm mb-1">{val.name}</h3>
+          <p className="text-sm mw-md:text-xs mb-2">{val.price.toLocaleString('ko-kr')}원</p>
+          <div className="w-full flex justfiy-between items-center space-x-14">
+            <FontAwesomeIcon
+              icon={manageProductsLikes[val.id] ? faHeart : faHeartRegular} // isFilledHeart 상태에 따라 아이콘을 변경하는 로직 추가 필요
+              className="w-[20%] text-red-500 text-2xl mw-md:text-sm cursor-pointer hover:scale-[1.1] transition-all duration-300"
+              onClick={() => toggleHeart(val.id)}
+            />
+            <div className="w-[80%] mw-md:w-1/2 flex justify-end">
+              <Link
+                to={`/products/${val.id}/buy`}
+                className="font-semibold text-nowrap text-xs mw-md:text-[0.5rem] mx-1 py-1 px-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-all duration-150"
+              >
+                구매
+              </Link>
+              <Link className="font-semibold text-nowrap mw-md:text-[0.5rem] flex justify-around items-center text-xs py-1 px-2 bg-green-500 text-white rounded hover:bg-green-600 transition-all duration-150">
+                <FontAwesomeIcon icon={faShoppingCart} />
+                장바구니 담기
+              </Link>
             </div>
           </div>
-        );
-      });
+        </div>
+      ));
     } else {
-      <div id="proudct_none_item"></div>;
+      <div id="proudct_none_item">죄송합니다. 판매 중인 상품이 없습니다</div>;
     }
   };
 
   return (
-    <div id="products_main" className="w-[100%] h-[100%] flex justify-center">
-      <div id="products_container" className="w-[100%] h-[100%] absolute top-20 mw-md:top-16">
+    <div id="products_main" className="w-full h-full flex justify-center mt-10">
+      <div id="products_container" className="w-full h-full">
         <div className="mx-auto px-4">
           <div className="miw-md:flex flex-wrap items-end mw-md:grid mw-md:grid-cols-2 mw-md:overflow-y-scroll">
             {currentProducts && <Items />}

@@ -115,42 +115,20 @@ export default function MainContent() {
   };
 
   const Sales = () => {
-    if (!salesProducts) {
+    if (!salesProducts || salesProducts.length === 0) {
+      // 데이터가 로드되지 않았거나 데이터가 없는 경우 메시지 표시
       return (
-        <Swiper
-          className="max-w-[800px] mw-md:max-w-[200px] mw-md:max-h-[200px]"
-          spaceBetween={10}
-          slidesPerView={2}
-          modules={[Navigation]}
-          navigation={true}
-          breakpoints={{
-            640: {
-              slidesPerView: 2,
-              spaceBetween: 20,
-            },
-            768: {
-              slidesPerView: 2,
-              spaceBetween: 30,
-            },
-            1024: {
-              slidesPerView: 4,
-              spaceBetween: 40,
-            },
-          }}
-        >
-          {/* 여기에서 스켈레톤 컴포넌트를 슬라이드마다 렌더링 */}
-          {[...Array(4)].map((_, index) => (
-            <SwiperSlide key={index}>
-              <div className="p-2 flex flex-col justify-between">
-                <Skeleton height={170} />
-                <Skeleton count={2} />
-              </div>
-            </SwiperSlide>
-          ))}
-        </Swiper>
+        <div className="max-w-[800px] mw-md:max-w-[200px] mw-md:max-h-[200px] flex justify-center items-center">
+          <div className="text-center p-4">
+            <p className="font-bold">판매 중인 상품이 없습니다.</p>
+            <p className="text-blue-500 hover:underline cursor-pointer" onClick={() => navigate('/user/my-store')}>
+              판매하실 상품을 등록해주세요.
+            </p>
+          </div>
+        </div>
       );
     } else {
-      const slidesPerViewSetting = Math.max(1, salesProducts.length) > 5 ? 5 : Math.max(1, salesProducts.length);
+      // 데이터가 있을 때의 렌더링 로직
       return (
         <Swiper
           className="max-w-[800px] mw-md:max-w-[200px] mw-md:max-h-[200px]"
@@ -167,7 +145,7 @@ export default function MainContent() {
               spaceBetween: 30,
             },
             1024: {
-              slidesPerView: slidesPerViewSetting,
+              slidesPerView: Math.max(1, salesProducts.length) > 5 ? 5 : Math.max(1, salesProducts.length),
               spaceBetween: 40,
             },
           }}
@@ -175,19 +153,17 @@ export default function MainContent() {
           {salesProducts.map((item, index) => (
             <SwiperSlide key={index}>
               <div
-                className={`p-2 flex flex-col justify-between cursor-pointer`}
+                className="p-2 flex flex-col justify-between cursor-pointer"
                 onClick={() => handleMoveToMystore(item.id)}
               >
-                {' '}
                 <div className="bg-white rounded-lg shadow overflow-hidden hover:-translate-y-1 transition-transform duration-200">
                   <img
                     src={item.images[0].imgUrl}
                     alt={`Item ${index + 1}`}
-                    className="w-full max-h-[170px] mw-md:max-h-[80px] object-cover"
+                    className="w-full object-cover"
                     style={{ height: '170px' }}
                   />
                   <div className="p-1 text-md">
-                    {' '}
                     <h3 className="font-bold">{item.name}</h3>
                     <p className="text-xs text-gray-600 text-ellipsis overflow-hidden whitespace-nowrap">
                       {item.price.toLocaleString('ko-kr')}원 {item.description}
@@ -207,38 +183,20 @@ export default function MainContent() {
     const likedProducts = JSON.parse(tmp);
 
     const slidesPerViewSetting = Math.max(1, likedProducts.length) > 5 ? 5 : Math.max(1, likedProducts.length);
-    if (!likedProducts) {
+    if (!likedProducts || likedProducts.length === 0) {
+      // 데이터가 로드되지 않았거나 데이터가 없는 경우 메시지 표시
       return (
-        <Swiper
-          className="max-w-[800px] mw-md:max-w-[200px] mw-md:max-h-[200px]"
-          spaceBetween={10}
-          modules={[Navigation]}
-          slidesPerView={2}
-          navigation={true}
-          breakpoints={{
-            640: {
-              slidesPerView: 2,
-              spaceBetween: 20,
-            },
-            768: {
-              slidesPerView: 2,
-              spaceBetween: 30,
-            },
-            1024: {
-              slidesPerView: 4,
-              spaceBetween: 40,
-            },
-          }}
-        >
-          {[...Array(4)].map((_, index) => (
-            <SwiperSlide key={index}>
-              <div className="p-2 flex flex-col justify-between">
-                <Skeleton height={170} />
-                <Skeleton count={2} />
-              </div>
-            </SwiperSlide>
-          ))}
-        </Swiper>
+        <div className="max-w-[800px] mw-md:max-w-[200px] mw-md:max-h-[200px] flex justify-center items-center">
+          <div className="text-center p-4">
+            <p className="font-bold">좋아요를 누른 상품이 없습니다</p>
+            <p
+              className="text-blue-500 hover:underline cursor-pointer"
+              onClick={() => navigate('/products/?category=의류')}
+            >
+              마음에 드는 상품을 찾아보세요!
+            </p>
+          </div>
+        </div>
       );
     } else {
       return (
@@ -293,37 +251,20 @@ export default function MainContent() {
 
   const WatchList = () => {
     const slidesPerViewSetting = Math.max(1, watchedProducts?.length) > 5 ? 5 : Math.max(1, watchedProducts?.length);
-    if (!watchedProducts) {
+    if (!watchedProducts || watchedProducts.length === 0) {
+      // 데이터가 로드되지 않았거나 데이터가 없는 경우 메시지 표시
       return (
-        <Swiper
-          className="max-w-[800px] mw-md:max-w-[200px] mw-md:max-h-[200px]"
-          spaceBetween={10}
-          modules={[Navigation]}
-          navigation={true}
-          breakpoints={{
-            640: {
-              slidesPerView: 2,
-              spaceBetween: 20,
-            },
-            768: {
-              slidesPerView: 2,
-              spaceBetween: 30,
-            },
-            1024: {
-              slidesPerView: slidesPerViewSetting,
-              spaceBetween: 40,
-            },
-          }}
-        >
-          {[...Array(4)].map((_, index) => (
-            <SwiperSlide key={index}>
-              <div className="p-2 flex flex-col justify-between">
-                <Skeleton height={170} />
-                <Skeleton count={2} />
-              </div>
-            </SwiperSlide>
-          ))}
-        </Swiper>
+        <div className="max-w-[800px] mw-md:max-w-[200px] mw-md:max-h-[200px] flex justify-center items-center">
+          <div className="text-center p-4">
+            <p className="font-bold">둘러보셨던 상품이 없습니다</p>
+            <p
+              className="text-blue-500 hover:underline cursor-pointer"
+              onClick={() => navigate('/products/?category=의류')}
+            >
+              마음에 드는 상품을 찾아보세요!
+            </p>
+          </div>
+        </div>
       );
     } else {
       return (
@@ -467,6 +408,14 @@ export default function MainContent() {
                 <h1 className="font-bold text-xl mw-md:text-sm">카테고리</h1>
                 <Categories />
               </div>
+              {/* Advertisement Banner */}
+              <div className="flex justify-center items-center mt-5 mx-auto mw-md:justify-evenly w-full h-48 bg-gray-300">
+                <img src="https://via.placeholder.com/1024x192" alt="Advertisement" className="max-w-full h-auto" />
+              </div>
+              {/* Advertisement Banner */}
+              <div className="flex justify-center items-center py-10 mt-5 mx-auto mw-md:justify-evenly w-full h-48 bg-gray-300">
+                <img src="https://via.placeholder.com/1024x192" alt="Advertisement" className="max-w-full h-auto" />
+              </div>
               {/* Sales */}
               <div className="flex flex-col justify-around max-w-[1024px] mt-5 mx-auto mw-md:justify-evenly">
                 <h1 className="font-bold text-xl mw-md:text-sm">판매 중인 상품</h1>
@@ -481,14 +430,6 @@ export default function MainContent() {
               <div className="flex flex-col justify-around max-w-[1024px] mt-5 mx-auto mw-md:justify-evenly">
                 <h1 className="font-bold text-xl mw-md:text-sm">내가 본 상품들</h1>
                 <WatchList />
-              </div>
-              {/* Advertisement Banner */}
-              <div className="flex justify-center items-center mt-5 mx-auto mw-md:justify-evenly w-full h-48 bg-gray-300">
-                <img src="https://via.placeholder.com/1024x192" alt="Advertisement" className="max-w-full h-auto" />
-              </div>
-              {/* Advertisement Banner */}
-              <div className="flex justify-center items-center py-10 mt-5 mx-auto mw-md:justify-evenly w-full h-48 bg-gray-300">
-                <img src="https://via.placeholder.com/1024x192" alt="Advertisement" className="max-w-full h-auto" />
               </div>
             </div>
           </div>

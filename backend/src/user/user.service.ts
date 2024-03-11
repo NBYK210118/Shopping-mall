@@ -158,7 +158,11 @@ export class UserService {
     const { firstName, lastName, email, address, store } = data;
 
     const user_info = await this.emailUser(user.email);
-    if (user_info['store'] === null) {
+    const alreadyExistStore = await this.prisma.store.findUnique({
+      where: { name: store },
+    });
+
+    if (user_info.storeId === null && !alreadyExistStore) {
       const store_data = await this.prisma.store.create({
         data: { name: store, User: { connect: { id: user_info.id } } },
       });
@@ -166,7 +170,7 @@ export class UserService {
         data: { storeId: store_data.id, userId: user_info.id },
       });
     } else {
-      const store_name = user_info['store']['name'];
+      const store_name = alreadyExistStore.name;
 
       const updated_store = await this.prisma.store.update({
         where: { name: store_name },
