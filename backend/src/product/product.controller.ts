@@ -21,7 +21,8 @@ export class ProductController {
 
   @UseGuards(AuthGuard())
   @Get(':id')
-  async getProduct(@Param('id') id: number): Promise<Product> {
+  async getProduct(@Param('id', ParseIntPipe) id: number): Promise<Product> {
+    console.log(id);
     return this.productService.getProduct(id);
   }
 

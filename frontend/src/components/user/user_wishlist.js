@@ -118,7 +118,3 @@ export default function UserWishlist() {
     </div>
   );
 }
-
-// {`flex flex-wrap ${currentLikedProducts.length > 3 ? 'justify-center' : 'justify-start h-[80%]'} ${
-//   currentLikedProducts.length === 0 && 'w-[90vw] bg-gray-300/40'
-// } mt-12 items-start gap-[16px] w-full h-full p-[24px] border border-solid border-[#ccc] rounded-[8px] overflow-auto ml-96 -translate-x-[50%] bg-white`}

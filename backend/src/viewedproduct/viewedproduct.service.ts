@@ -11,13 +11,18 @@ export class ViewedproductService {
       where: { userId: user.id },
       include: {
         products: {
-          select: { images: true, price: true, name: true, description: true },
+          select: {
+            id: true,
+            images: true,
+            price: true,
+            name: true,
+            description: true,
+          },
         },
       },
     });
     const result = [];
     viewed_product.map((val) => val.products.map((val) => result.push(val)));
-
     return result;
   }
 }

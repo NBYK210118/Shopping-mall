@@ -7,12 +7,12 @@ import { useNavigate } from 'react-router-dom';
 export default function UserProfile() {
   const { token, user, setUser, loading, setLoading } = useAuth();
   const fileInputRef = useRef(null);
-  const [firstName, setFirstName] = useState(user['firstName']);
-  const [lastName, setLastName] = useState(user['lastName']);
+  const [firstName, setFirstName] = useState(user?.firstName);
+  const [lastName, setLastName] = useState(user?.lastName);
   const [email, setEmail] = useState(user['email']);
-  const [store, setStore] = useState(`(${user['store'] ? user['store']['name'] : 'None'}`);
-  const [nickname, setNickname] = useState(`(${user['profile'] ? user['profile']['nickname'] : 'Not yet'}`);
-  const [address, setAddress] = useState(`(${user['profile'] ? user['profile']['address'] : 'None'}`);
+  const [store, setStore] = useState(`${user['store'] ? user['store']['name'] : 'None'}`);
+  const [nickname, setNickname] = useState(`${user['profile'] ? user['profile']['nickname'] : 'Not yet'}`);
+  const [address, setAddress] = useState(`${user['profile'] ? user['profile']['address'] : 'None'}`);
   const [editClick, setEditClick] = useState(false);
   const [nickChange, setNickChange] = useState(false);
   const [currentProfileImg, setCurrentProfileImg] = useState(null);
@@ -88,12 +88,12 @@ export default function UserProfile() {
   return (
     <>
       <>
-        <div className="flex flex-col miw-lg:flex-row w-full h-full mt-10 bg-gray-100 border border-solid border-gray-300 rounded">
-          {/* Left Panel */}
-          <div className="flex flex-col w-full miw-lg:w-1/2 miw-lg:h-auto bg-white shadow-md rounded-lg overflow-hidden">
-            <div className="flex items-center justify-between p-6 border-b">
-              <div className="flex items-center">
-                <div className="p-1 rounded-full bg-gray-300 text-gray-500">
+        <div className="flex mw-md:flex-wrap justify-around w-full h-full mt-10 p-10 bg-gray-100 ">
+          {/* left Panel */}
+          <div className="flex flex-col bg-white shadow-md rounded-lg overflow-hidden">
+            <div className="flex items-center justify-between p-10 border-b mb-5">
+              <div className="flex items-center p-10">
+                <div className="rounded-full bg-gray-300 text-gray-500">
                   {imageUrl ? (
                     <img src={imageUrl} alt="profile_img" className="max-w-[160px] rounded-full" />
                   ) : (
@@ -220,9 +220,9 @@ export default function UserProfile() {
             </div>
           </div>
           {/* Right Panel */}
-          <div className="flex flex-col w-full miw-lg:w-1/2 h-60 miw-lg:h-auto p-6">
+          <div className="flex flex-col">
             <div className="flex justify-center items-center h-full bg-white shadow-md rounded-lg">
-              <div className="text-center border-b">
+              <div className="text-center border-b p-20">
                 <img src={Images.logo} alt="CAVE" className="mx-auto mb-4 w-80" />
                 <h2 className="text-2xl font-extrabold text-gray-900">CAVE</h2>
                 <p className="mt-2 text-base text-gray-500">CHOICE FOR EVERYONE</p>

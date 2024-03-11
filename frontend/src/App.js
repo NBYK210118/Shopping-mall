@@ -10,10 +10,21 @@ import { AuthProvider, useAuth } from './auth.context';
 import Loading from './loading';
 import ProductDetail from './components/products/product_detail';
 import BuyNow from './components/buy_now';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import {
+  faBook,
+  faBowlFood,
+  faCar,
+  faChair,
+  faDesktop,
+  faDumbbell,
+  faGamepad,
+  faShirt,
+} from '@fortawesome/free-solid-svg-icons';
 
 function MainHeader() {
   const [isMenuOpen, setMenuOpen] = useState(false);
-  const { token } = useAuth();
+  const { token, category, setCategory, setLoading } = useAuth();
   const navigate = useNavigate();
   const [openSearchBox, setOpenSearchBox] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
@@ -77,6 +88,48 @@ function MainHeader() {
     return links;
   };
 
+  const categories = [
+    { txt: '의류', icon: faShirt },
+    { txt: '전자제품', icon: faDesktop },
+    { txt: '식품', icon: faBowlFood },
+    { txt: '가구', icon: faChair },
+    { txt: '스포츠', icon: faDumbbell },
+    { txt: '게임', icon: faGamepad },
+    { txt: '도서', icon: faBook },
+    { txt: '장난감', icon: faCar },
+  ];
+
+  const handleCategoryClick = (category) => {
+    setLoading(true);
+    navigate(`/products/?category=${category}`);
+    setCategory(category);
+    localStorage.setItem('category', category);
+    window.location.reload();
+    setLoading(false);
+  };
+
+  const Categories = () => {
+    const result = categories.map((val) => (
+      <>
+        <li className="text-nowrap">
+          <span
+            className="rounded-t bg-gray-200 hover:bg-gray-400 py-2 px-4 block whitespace-no-wrap"
+            onClick={() => handleCategoryClick(val.txt)}
+          >
+            <FontAwesomeIcon icon={val.icon} className="mr-2" />
+            {val.txt}
+          </span>
+        </li>
+      </>
+    ));
+    return (
+      <div className="group relative border border-transparent rounded-lg flex p-3 hover:bg-sky-300 hover:cursor-pointer transition-all duration-300">
+        <span className="text-nowrap text-base text-white mw-md:text-black font-semibold">Categories</span>
+        <ul className="absolute hidden top-11 text-gray-700 pt-1 group-hover:block">{result}</ul>
+      </div>
+    );
+  };
+
   useEffect(() => {
     const handleScroll = () => {
       if (window.scrollY > 70) {
@@ -115,14 +168,15 @@ function MainHeader() {
           </button>
         </div>
         <div
-          className={`flex miw-md:w-[40vh] mw-md:h-[50vh] transition-all duration-300 justify-around items-center ml-5 mw-md:z-50 mw-md:${
+          className={`flex w-[40vh] mw-md:h-[50vh] transition-all duration-300 justify-around items-center ml-10 mw-md:z-50 mw-md:${
             isMenuOpen
               ? 'mw-md:flex-col mw-md:absolute mw-md:-left-10 mw-md:top-[70px] mw-md:bg-white mw-md:shadow-lg mw-md:rounded-lg mw-md:opacity-65 mw-md:hover:opacity-100'
               : 'hidden'
           }`}
           onClick={handleMenuClick}
         >
-          {<Menus />}
+          <Menus />
+          <Categories />
           {token ? (
             <>
               <div className="border border-transparent rounded-lg flex p-3 hover:bg-sky-300 hover:cursor-pointer transition-all duration-300">

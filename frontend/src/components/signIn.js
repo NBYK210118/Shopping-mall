@@ -4,6 +4,8 @@ import { useNavigate } from 'react-router-dom';
 import DataService from '../data_services';
 import { useAuth } from '../auth.context';
 import Loading from '../loading';
+import { faXmark } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 const SignIn = () => {
   const [isOpenModal, setIsOpenModal] = useState(true);
@@ -57,45 +59,47 @@ const SignIn = () => {
       {loading ? <Loading /> : null}
       {isOpenModal && (
         <div id="modal-container" className="fixed inset-0 bg-black/50 z-50 flex justify-around items-center">
-          <div id="modal" className="w-[22%] h-[55%] p-3 bg-white rounded-lg shadow-custom">
-            <div className="w-[100%] h-[9%] flex justify-end cursor-pointer p-2 mb-1" onClick={handleSignIn}>
-              <span className="text-lg font-[600]">X</span>
+          <div id="modal" className="w-[22%] h-[55%] mw-md:w-[62%] p-3 bg-white rounded-lg shadow-custom">
+            <div className="flex justify-end cursor-pointer p-2 mb-1" onClick={handleSignIn}>
+              <span className="text-lg font-[600]">
+                <FontAwesomeIcon icon={faXmark} />
+              </span>
             </div>
 
-            <div className="flex justify-center h-[50%]">
+            <div className="flex justify-center -mt-2">
               <img src={Images.logo} alt="" />
             </div>
 
-            <form onSubmit={handleSubmit} className="h-[40%] flex flex-col justify-around ml-2">
-              <div className="">
-                <label htmlFor="email" className="pb-2">
+            <form onSubmit={handleSubmit} className="flex flex-col justify-around ml-2 -mt-3">
+              <div className="mb-2 ">
+                <label htmlFor="email" className="pb-2 mw-md:text-[0.8rem]">
                   Email
                 </label>
                 <input
                   type="text"
                   placeholder="Input ID"
-                  className="focus:outline-none flex mb-2"
+                  className="w-[60%] flex p-[3px] text-[0.9rem] focus:outline-none mw-md:text-[0.7rem] pl-1 "
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                 />
               </div>
-              <div className="">
-                <label htmlFor="password" className="pb-2">
+              <div className="mw-md:mb-5">
+                <label htmlFor="password" className="pb-2 mw-md:text-[0.8rem]">
                   Password
                 </label>
                 <input
                   type="password"
                   placeholder="Input Password"
-                  className="focus:outline-none flex mt-2"
+                  className="w-[60%] flex mt-2 p-[3px] mw-md:mt-0 text-[0.9rem] focus:outline-none mw-md:text-[0.7rem] pl-1 "
                   value={password}
                   autoComplete="on"
                   onChange={(e) => setPassword(e.target.value)}
                 />
               </div>
-              <div className="flex flex-row justify-between">
-                <div className="flex items-end mb-2">
+              <div className="flex justify-between">
+                <div className="flex items-end mb-2 ml-1">
                   <span
-                    className="text-xs text-blue-500 font-[530] hover:underline cursor-pointer"
+                    className="text-xs text-blue-500 font-[530] hover:underline cursor-pointer mw-md:text-[0.7rem]"
                     onClick={() => navigate('/signup')}
                   >
                     Is this first time in Cave?
@@ -104,7 +108,7 @@ const SignIn = () => {
                 <input
                   type="submit"
                   value="Sign In"
-                  className="border border-transparent rounded-lg text-white font-[500] bg-sky-500 p-2 mr-2 hover:bg-sky-600 cursor-pointer"
+                  className="font-bold rounded-lg text-white bg-sky-500 p-2 -mb-1 hover:bg-sky-600 cursor-pointer mw-md:mb-1 mw-md:p-1 mw-md:text-[0.7rem]"
                 />
               </div>
             </form>

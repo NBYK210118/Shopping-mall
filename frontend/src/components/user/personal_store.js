@@ -481,7 +481,7 @@ export default function PersonalStore() {
   };
 
   return (
-    <div className={`w-full h-full miw-lg:mt-10 flex justify-center items-center border border-gray-300 rounded-lg`}>
+    <div className={`w-full h-full mt-10 flex justify-center items-center border border-gray-300 rounded-lg`}>
       <div
         className={`w-[90%] h-full flex items-center ${activeOption === '상품 추가' ? ' justify-around' : ''} ${
           activeOption === '상품 수정' ? ' justify-center' : ''

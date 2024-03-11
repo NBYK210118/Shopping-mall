@@ -3,8 +3,9 @@ import { Route, Routes, useLocation, useNavigate, useSearchParams } from 'react-
 import UserProfile from './profile';
 import PersonalStore from './personal_store';
 import UserWishlist from './user_wishlist';
-import { faHeart, faList, faStore, faUser } from '@fortawesome/free-solid-svg-icons';
+import { faClock, faHeart, faList, faStore, faUser } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { Watchlist } from './watchlist';
 
 const Mypage = () => {
   const navigate = useNavigate();
@@ -27,6 +28,7 @@ const Mypage = () => {
     { txt: 'Profile', to: 'my-profile', icon: faUser },
     { txt: 'My Store', to: 'my-store', icon: faStore },
     { txt: 'WishList', to: 'wishlist', icon: faHeart },
+    { txt: 'WatchList', to: 'watchlist', icon: faClock },
     { txt: 'My Orders', to: 'my-orders', icon: faList },
   ];
 
@@ -86,6 +88,7 @@ const Mypage = () => {
               <Route path="my-profile" element={<UserProfile />}></Route>
               <Route path="my-store" element={<PersonalStore />}></Route>
               <Route path="wishlist" element={<UserWishlist />}></Route>
+              <Route path="watchlist" element={<Watchlist />}></Route>
             </Routes>
           </div>
         </div>

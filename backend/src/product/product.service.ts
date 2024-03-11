@@ -24,7 +24,7 @@ export class ProductService {
 
   async getProduct(id: number): Promise<Product> {
     const result = await this.prisma.product.findUnique({
-      where: { id: Number(id) },
+      where: { id },
       include: { images: true, reviews: true, likedBy: true },
     });
     return result;

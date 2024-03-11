@@ -40,6 +40,7 @@ export const ProductDetail = () => {
   // 상품 리스트에서 상품을 클릭했을 때 로드됨
   useEffect(() => {
     setLoading(true);
+    console.log(productId);
     ProductApi.findProduct(token, productId, navigate).then((response) => {
       if (response && response.data) {
         setCurrentProduct(response.data);
