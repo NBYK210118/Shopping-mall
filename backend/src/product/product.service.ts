@@ -57,6 +57,18 @@ export class ProductService {
     return result;
   }
 
+  async getProductByName(keyword: string): Promise<Product | Product[]> {
+    const found = await this.prisma.product.findMany({
+      where: { name: { contains: keyword } },
+    });
+
+    if (!found) {
+      return [];
+    }
+
+    return found;
+  }
+
   // 현재 상품 상세 정보 페이지에 올라와있는 상품이 현재 사용자가 올렸던 상품인지
   async isUsersProduct(user: User, productId: number): Promise<Boolean> {
     const found = await this.prisma.sellingList.findFirst({

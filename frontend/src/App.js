@@ -79,7 +79,7 @@ function MainHeader() {
 
     const links = result.map((val, idx) => (
       <div key={idx} className="cursor-pointer rounded-lg block p-3 hover:bg-sky-300 transition-all duration-300">
-        <NavLink to={val.to} onClick={closeMenu} className="block text-base font-semibold text-white">
+        <NavLink to={val.to} onClick={closeMenu} className="text-base font-semibold">
           {val.text}
         </NavLink>
       </div>
@@ -113,7 +113,7 @@ function MainHeader() {
       <>
         <li className="text-nowrap">
           <span
-            className="rounded-t bg-gray-200 hover:bg-gray-400 py-2 px-4 block whitespace-no-wrap"
+            className="rounded-t bg-gray-200 hover:bg-gray-400 py-2 px-4 block"
             onClick={() => handleCategoryClick(val.txt)}
           >
             <FontAwesomeIcon icon={val.icon} className="mr-2" />
@@ -123,7 +123,7 @@ function MainHeader() {
       </>
     ));
     return (
-      <div className="group relative border border-transparent rounded-lg flex p-3 hover:bg-sky-300 hover:cursor-pointer transition-all duration-300">
+      <div className="group border border-transparent rounded-lg flex p-3 hover:bg-sky-300 hover:cursor-pointer transition-all duration-300">
         <span className="text-nowrap text-base text-white mw-md:text-black font-semibold">Categories</span>
         <ul className="absolute hidden top-11 text-gray-700 pt-1 group-hover:block">{result}</ul>
       </div>
@@ -168,7 +168,7 @@ function MainHeader() {
           </button>
         </div>
         <div
-          className={`flex w-[40vh] mw-md:h-[50vh] transition-all duration-300 justify-around items-center ml-10 mw-md:z-50 mw-md:${
+          className={`flex w-[40vh] mw-md:h-[50vh] mw-md:flex-col transition-all duration-300 justify-around items-center ml-10 mw-md:z-50 mw-md:${
             isMenuOpen
               ? 'mw-md:flex-col mw-md:absolute mw-md:-left-10 mw-md:top-[70px] mw-md:bg-white mw-md:shadow-lg mw-md:rounded-lg mw-md:opacity-65 mw-md:hover:opacity-100'
               : 'hidden'
@@ -249,7 +249,7 @@ function MainHeader() {
 
       {/* 로고 */}
       <div
-        className="h-[85%] mw-md:[150px] mw-md:mr-4 miw-md:w-[200px] miw-md:h-full flex items-center"
+        className="h-[85%] mw-md:[150px] mw-md:mr-4 w-[200px] miw-md:h-full flex items-center"
         id="main_header_logo"
         onClick={() => goHome()}
       >

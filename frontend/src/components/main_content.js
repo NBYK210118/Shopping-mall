@@ -323,7 +323,9 @@ export default function MainContent() {
                 transitionDuration: '1000ms',
               }}
             >
-              <h2 className="text-2xl font-semibold">Welcome! [{user ? user['profile']['nickname'] : 'Username'}]!</h2>
+              <h2 className="text-2xl font-semibold mw-md:text-lg">
+                Welcome! [{user ? user['profile']['nickname'] : 'Username'}]!
+              </h2>
               <p>Check out what's new since your last visit.</p>
             </div>
           )}
@@ -331,10 +333,10 @@ export default function MainContent() {
           <div className="w-full h-full overflow-hidden flex flex-wrap justify-between p-4 bg-gray-200">
             <div
               id="main_left_content"
-              className="w-[35%] h-auto flex flex-col justify-center items-center max-w-[512px] mx-auto -mt-28"
+              className="w-[35%] h-auto flex flex-col justify-center items-center max-w-[512px] mx-auto -mt-28 mw-md:-mt-80"
             >
               {/* Recommended Products */}
-              <div className="mt-36 mb-6 mw-md:mb-2 mw-md:mr-0 p-4">
+              <div className="mt-36 mw-md:mt-0 mb-6 mw-md:mb-2 mw-md:mr-0 p-4">
                 <h3 className="text-xl font-semibold mb-3 mw-md:text-sm">실시간 인기 상품!</h3>
                 <div className="grid grid-cols-2 gap-4 mw-md:grid-cols-2">
                   {[...Array(4)].map((_, index) => (

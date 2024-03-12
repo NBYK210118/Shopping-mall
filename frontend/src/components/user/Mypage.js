@@ -63,7 +63,7 @@ const Mypage = () => {
     return items.map((item, idx) => (
       <span
         key={idx}
-        className={`w-[80%] h-[10%] miw-lg:p-5 miw-lg:bg-white mw-md:w-full mw-md:h-[15%] mw-md:text-[0.64rem] text-nowrap text-black text-center border border-solid rounded-xl flex justify-center items-center hover:cursor-pointer transition-all duration-300 shadow-md ${
+        className={`group-hover:flex hidden p-5 w-[120px] mw-md:w-[60px] bg-white mw-md:text-[0.44rem] mw-md:p-3 mw-md:mb-1 text-nowrap text-black text-center border border-solid rounded-xl justify-center items-center cursor-pointer hover:-translate-y-1 transition-all duration-300 shadow-md ${
           menuStates[item.txt]
             ? 'bg-gradient-to-tr from-cyan-500 to-blue-600 shadow-lg font-bold text-white'
             : 'bg-gray-500 font-semibold hover:bg-gray-400 shadow'
@@ -80,7 +80,8 @@ const Mypage = () => {
     <div className="w-[75%] h-full flex justify-center">
       <div className="w-[95%] h-[70%] flex justify-center items-center">
         <div id="mypage_content" className="w-[90%] h-full flex">
-          <div className="h-[70%] mt-10 mw-md:w-[12%] mw-md:h-[50%] p-3 fixed miw-lg:left-0 left-5 top-20 mw-md:top-28 flex flex-col justify-evenly items-center">
+          <div className="group bg-blue-400 rounded-r-xl hover:bg-white h-[50%] mw-md:h-[50%] mt-10 p-1 fixed left-0 mw-md:left-2 top-20 mw-md:top-28 flex flex-col justify-evenly items-center transition-all duration-300 ">
+            <span className="font-bold text-white group-hover:hidden mw-md:text-[0.7rem]">Menu</span>
             <SideBar />
           </div>
           <div className="w-full h-full mw-md:h-1/2 flex justify-center mt-20 ml-10">

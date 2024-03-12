@@ -4,6 +4,8 @@ import { Images } from '../../images_list';
 import { useEffect, useRef, useState } from 'react';
 import DataService from '../../data_services';
 import ProductApi from '../products/product_api';
+import { Navigation } from 'swiper/modules';
+import { Swiper, SwiperSlide } from 'swiper/react';
 
 export default function PersonalStore() {
   const { token, user, setUser, clickedSellingProduct } = useAuth(); // AuthProvider 로 부터 제공받는 변수들
@@ -40,6 +42,8 @@ export default function PersonalStore() {
   const fileInputRef = useRef(null);
   const [activeOption, setActiveOption] = useState(null);
   const [manageProduct, setManageProduct] = useState(false);
+  const [searchKeyword, setSearchKeyword] = useState('');
+  const [searchingResult, setSearchingResult] = useState(null);
   const priceInputRef = useRef();
 
   // 이전 버튼 클릭 시 activeOption 비워주기
@@ -223,72 +227,45 @@ export default function PersonalStore() {
       { image: Images.Bluejean, txt: '의류' },
     ];
 
-    const result = category_images.map((val, idx) => (
-      <div
-        id="item_box"
-        className="border border-gray-300/50 rounded p-3 font-semibold flex flex-col justify-center items-center hover:cursor-pointer hover:scale-[1.05] hover:font-bold transition-all duration-300"
-        onClick={() => handleCategoryClick(val.txt)}
-      >
-        <img src={val.image} alt="" className="w-full h-full max-h-[100px] mr-2" />
-        <span className="mw-md:text-[0.7rem]">{val.txt}</span>
-      </div>
-    ));
-
     return (
-      <>
-        {currentpage.first && (
-          <div className="w-[75%] h-full flex justify-center items-center">
-            <div className="w-full h-full flex justify-around items-center">{result}</div>
-          </div>
-        )}
-        {currentpage.second && (
-          <div className="w-[80%] h-full">
-            <div className="w-full h-full flex justify-around items-center">{result}</div>
-            <span>2</span>
-          </div>
-        )}
-        {currentpage.third && (
-          <div className="w-[80%] h-full">
-            <div className="w-full h-full flex justify-around items-center">{result}</div>
-            <span>3</span>
-          </div>
-        )}
-        {currentpage.fourth && (
-          <div className="w-[80%] h-full">
-            <div className="w-full h-full flex justify-around items-center">{result}</div>
-            <span>4</span>
-          </div>
-        )}
-      </>
+      <Swiper
+        className={`max-w-[800px] mw-md:max-w-[300px] mw-md:max-h-[200px]`}
+        spaceBetween={10}
+        modules={[Navigation]}
+        navigation={true}
+        breakpoints={{
+          375: {
+            slidesPerView: 3,
+            spaceBetween: 5,
+          },
+          640: {
+            slidesPerView: 3,
+            spaceBetween: 20,
+          },
+          768: {
+            slidesPerView: 3,
+            spaceBetween: 30,
+          },
+          1024: {
+            slidesPerView: 4,
+            spaceBetween: 30,
+          },
+        }}
+      >
+        {category_images.map((val, idx) => (
+          <SwiperSlide key={idx}>
+            <div
+              id="item_box"
+              className="flex flex-col items-center max-w-[130px] mw-md:max-w-[90px] mw-md:p-4 border border-gray-300/50 rounded p-1 font-semibold cursor-pointer hover:-translate-y-1 transition-all duration-300"
+              onClick={() => handleCategoryClick(val.txt)}
+            >
+              <img src={val.image} alt="" className="w-full h-[100px] mw-md:h-[60px]" />
+              <span className="text-sm mw-md:text-[0.7rem] text-nowrap">{val.txt}</span>
+            </div>
+          </SwiperSlide>
+        ))}
+      </Swiper>
     );
-  };
-
-  const toPrev = () => {
-    setCurrentpage((prevState) => {
-      if (prevState.second) {
-        return { first: true, second: false, third: false, fourth: false };
-      } else if (prevState.third) {
-        return { first: false, second: true, third: false, fourth: false };
-      } else if (prevState.fourth) {
-        return { first: false, second: false, third: true, fourth: false };
-      } else {
-        return { first: false, second: false, third: false, fourth: true };
-      }
-    });
-  };
-
-  const toNext = () => {
-    setCurrentpage((prevState) => {
-      if (prevState.first) {
-        return { first: false, second: true, third: false, fourth: false };
-      } else if (prevState.second) {
-        return { first: false, second: false, third: true, fourth: false };
-      } else if (prevState.third) {
-        return { first: false, second: false, third: false, fourth: true };
-      } else {
-        return { first: true, second: false, third: false, fourth: false };
-      }
-    });
   };
 
   const handleClick = () => {
@@ -332,19 +309,27 @@ export default function PersonalStore() {
     });
   };
 
+  // 전체 상품 보기 버튼 기능
+  const handleShowAll = () => {
+    setClickedCategory('');
+    setSearchingResult(null);
+    setSearchKeyword(null);
+  };
+
   const SampleTable = () => {
     return (
       <>
-        <div className="w-[90%] items-center grid grid-cols-7 p-1 border-x border-y rounded-lg">
-          <span className="font-bold text-nowrap mw-md:text-[0.3rem]">상품번호/상태</span>
-          <span className="font-bold mw-md:text-[0.3rem]">상품명</span>
-          <span className="font-bold mw-md:text-[0.3rem]">가격</span>
-          <span className="font-bold mw-md:text-[0.3rem]">카테고리</span>
-          <span className="font-bold text-nowrap mw-md:text-[0.3rem]">제조사/원산지</span>
-          <span className="font-bold mw-md:text-[0.3rem]">상세설명</span>
+        <div className="w-full mw-md:w-[80vw] items-center grid grid-cols-7 mw-md:gap-8 p-1 px-5 mw-md:px-5 border-x border-y rounded-lg">
+          <span className="font-bold text-[0.8rem] text-nowrap mw-md:text-[0.45rem] mw-md:px-2">상품번호</span>
+          <span className="font-bold text-[0.8rem] text-nowrap mw-md:text-[0.45rem] mw-md:px-2">상품명</span>
+          <span className="font-bold text-[0.8rem] text-nowrap mw-md:text-[0.45rem] mw-md:px-2">가격</span>
+          <span className="font-bold text-[0.8rem] text-nowrap mw-md:text-[0.45rem] mw-md:px-2">카테고리</span>
+          <span className="font-bold text-[0.8rem] text-nowrap mw-md:text-[0.45rem] mw-md:px-2">판매자</span>
+          <span className="font-bold text-[0.8rem] text-nowrap mw-md:text-[0.45rem] mw-md:px-2">상세설명</span>
+
           <span
-            onClick={() => setClickedCategory('')}
-            className="text-center font-bold px-2 py-2 rounded-lg text-[0.8rem] bg-yellow-500 text-white hover:cursor-pointer hover:bg-yellow-600 transition-all duration-150 mw-md:text-[0.3rem]"
+            onClick={() => handleShowAll()}
+            className="text-center font-bold px-2 py-2 rounded-lg text-[0.8rem] bg-yellow-500 text-white hover:cursor-pointer hover:bg-yellow-600 transition-all duration-150 mw-md:hidden"
           >
             전체 상품 보기
           </span>
@@ -364,7 +349,84 @@ export default function PersonalStore() {
 
   const UsersOnSale = () => {
     if (user.sellinglist) {
-      const sortedProducts = user.sellinglist?.products.sort((a, b) => a.id - b.id);
+      if (searchingResult && searchingResult.length > 0) {
+        return searchingResult.map((val, idx) => (
+          <div
+            className={`w-full grid grid-cols-7 gap-8 py-4 px-5 justify-center items-center border border-solid border-gray-300
+          rounded-lg hover:bg-gray-200 transition-all duration-150 hover:cursor-pointer
+          ${selectedList.includes(val.id) ? ' bg-gradient-to-bl from-cyan-400 to-blue-600 font-bold text-white' : ''}`}
+            onClick={() => handleSellingListClick(val.id)}
+            key={val.id}
+          >
+            <span className="font-bold text-nowrap text-[0.8rem] mw-md:text-[0.45rem] mw-md:px-2">
+              {val.id ? val.id : '번호 없음'}-{val.status ? val.status : 'None'}
+            </span>
+
+            <span className="font-bold text-nowrap text-[0.8rem] text-ellipsis white-nowrap overflow-hidden mw-md:text-[0.45rem] mw-md:px-2">
+              {val.name ? val.name : 'None'}
+            </span>
+
+            <span className="font-bold text-nowrap text-[0.8rem] mw-md:text-[0.45rem] mw-md:px-2">
+              {val.price ? val.price.toLocaleString('ko-kr') : 'None'}원
+            </span>
+
+            <span className="font-bold text-nowrap text-[0.8rem] mw-md:text-[0.45rem] mw-md:px-2">
+              {val.category_name ? val.category_name : 'None'}
+            </span>
+
+            <span className="font-bold text-nowrap text-[0.8rem] mw-md:text-[0.45rem] mw-md:px-2">
+              {val.manufacturer ? val.manufacturer : 'None'}
+            </span>
+
+            <span className="text-[0.8rem] text-nowrap font-bold text-ellipsis white-nowrap overflow-hidden mw-md:text-[0.45rem] mw-md:px-2">
+              {val.description ? val.description : 'None'}
+            </span>
+          </div>
+        ));
+      } else {
+        const sortedProducts = user.sellinglist?.products.sort((a, b) => a.id - b.id);
+        return sortedProducts.map((val, idx) => (
+          <div
+            className={`w-full grid grid-cols-7 gap-8 py-4 px-5 justify-center items-center border border-solid border-gray-300
+          rounded-lg hover:bg-gray-200 transition-all duration-150 hover:cursor-pointer
+          ${selectedList.includes(val.id) ? ' bg-gradient-to-bl from-cyan-400 to-blue-600 font-bold text-white' : ''}`}
+            onClick={() => handleSellingListClick(val.id)}
+            key={val.id}
+          >
+            <span className="font-bold text-nowrap text-[0.8rem] mw-md:text-[0.45rem] mw-md:px-2">
+              {val.id ? val.id : '번호 없음'}-{val.status ? val.status : 'None'}
+            </span>
+
+            <span className="font-bold text-nowrap text-[0.8rem] text-ellipsis white-nowrap overflow-hidden mw-md:text-[0.45rem] mw-md:px-2">
+              {val.name ? val.name : 'None'}
+            </span>
+
+            <span className="font-bold text-nowrap text-[0.8rem] mw-md:text-[0.45rem] mw-md:px-2">
+              {val.price ? val.price.toLocaleString('ko-kr') : 'None'}원
+            </span>
+
+            <span className="font-bold text-nowrap text-[0.8rem] mw-md:text-[0.45rem] mw-md:px-2">
+              {val.category_name ? val.category_name : 'None'}
+            </span>
+
+            <span className="font-bold text-nowrap text-[0.8rem] mw-md:text-[0.45rem] mw-md:px-2">
+              {val.manufacturer ? val.manufacturer : 'None'}
+            </span>
+
+            <span className="text-[0.8rem] text-nowrap font-bold text-ellipsis white-nowrap overflow-hidden mw-md:text-[0.45rem] mw-md:px-2">
+              {val.description ? val.description : 'None'}
+            </span>
+          </div>
+        ));
+      }
+    } else {
+      return null;
+    }
+  };
+
+  const CategoriesOnSale = () => {
+    if (categoryItems && categoryItems.length > 0) {
+      const sortedProducts = categoryItems.sort((a, b) => a.id - b.id);
       return sortedProducts.map((val, idx) => (
         <div
           className={`w-[90%] grid grid-cols-7 p-2 justify-center items-center border border-solid border-gray-300 
@@ -373,72 +435,29 @@ export default function PersonalStore() {
           onClick={(e) => handleSellingListClick(val.id)}
           key={val.id}
         >
-          <span className="font-bold text-nowrap mw-md:text-[0.3rem]">
+          <span className="font-bold text-nowrap text-[0.8rem] mw-md:text-[0.3rem]">
             {val.id ? val.id : '번호 없음'}-{val.status ? val.status : 'None'}
           </span>
 
-          <span className="font-bold mw-md:text-[0.3rem]">{val.name ? val.name : 'None'}</span>
+          <span className="font-bold text-[0.8rem] text-ellipsis white-nowrap overflow-hidden mw-md:text-[0.3rem]">
+            {val.name ? val.name : 'None'}
+          </span>
 
-          <span className="font-bold mw-md:text-[0.3rem]">
+          <span className="font-bold text-[0.8rem] mw-md:text-[0.3rem]">
             {val.price ? val.price.toLocaleString('ko-kr') : 'None'}원
           </span>
 
-          <span className="font-bold mw-md:text-[0.3rem]">{val.category_name ? val.category_name : 'None'}</span>
+          <span className="font-bold text-[0.8rem] mw-md:text-[0.3rem]">
+            {val.category_name ? val.category_name : 'None'}
+          </span>
 
-          <span className="font-bold text-nowrap mw-md:text-[0.3rem]">
+          <span className="font-bold text-[0.8rem] text-nowrap mw-md:text-[0.3rem]">
             {val.manufacturer ? val.manufacturer : 'None'}
           </span>
 
-          <span className="inline-block font-bold text-ellipsis overflow-hidden whitespace-nowrap mw-md:text-[0.3rem]">
+          <span className="inline-block text-[0.8rem] font-bold text-ellipsis overflow-hidden whitespace-nowrap mw-md:text-[0.3rem]">
             {val.description ? val.description : 'None'}
           </span>
-        </div>
-      ));
-    } else {
-      return null;
-    }
-  };
-
-  const CategoriesOnSale = () => {
-    let Result;
-
-    if (categoryItems) {
-      const sortedProducts = categoryItems.sort((a, b) => a.id - b.id);
-      return sortedProducts.map((val, idx) => (
-        <div
-          className={`w-[90%] h-[25%] p-3 flex justify-around items-center border border-solid border-gray-300 
-          rounded-lg hover:bg-blue-400 transition-all duration-300 hover:cursor-pointer 
-          ${selectedList.includes(val.id) ? ' bg-blue-500 font-bold text-white' : ''}`}
-          onClick={(e) => handleSellingListClick(val.id)}
-        >
-          <div className="w-full flex items-center justify-around">
-            <div className="w-[5%] ml-3 flex justify-center">
-              <span className="font-bold text-nowrap">
-                {val.id ? val.id : '번호 없음'}-{val.status ? val.status : 'None'}
-              </span>
-            </div>
-            <div className="w-[65%] flex justify-around -ml-10">
-              <div className="w-1/4 ml-3 flex justify-center">
-                <span className="font-bold">{val.name ? val.name : 'None'}</span>
-              </div>
-              <div className="w-1/4 -ml-7 flex justify-center">
-                <span className="font-bold">{val.price ? val.price.toLocaleString('ko-kr') : 'None'}</span>
-              </div>
-              <div className="w-1/4 -ml-5 flex justify-center">
-                <span className="font-bold">{val.category_name ? val.category_name : 'None'}</span>
-              </div>
-              <div className="w-1/4 flex justify-center">
-                <span className="font-bold text-nowrap">{val.manufacturer ? val.manufacturer : 'None'}</span>
-              </div>
-            </div>
-            <div className="w-[25%]">
-              <div className="w-full flex items-center">
-                <span className="inline-block font-bold text-ellipsis overflow-hidden whitespace-nowrap">
-                  {val.description ? val.description : 'None'}
-                </span>
-              </div>
-            </div>
-          </div>
         </div>
       ));
     } else {
@@ -480,16 +499,30 @@ export default function PersonalStore() {
     return result;
   };
 
+  const handleSearchKeyword = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const formData = new FormData();
+    formData.append('keyword', searchKeyword);
+    ProductApi.getProductByName(token, formData, navigate).then((response) => {
+      if (response && response.data) {
+        setSearchingResult(response.data);
+      }
+    });
+  };
+
   return (
-    <div className={`w-full h-full mt-10 flex justify-center items-center border border-gray-300 rounded-lg`}>
+    <div
+      className={`w-full h-full p-10 flex mw-md:-ml-64 mw-md:-mt-10 justify-center items-center mw-md:border-none border border-gray-300 rounded-lg`}
+    >
       <div
-        className={`w-[90%] h-full flex items-center ${activeOption === '상품 추가' ? ' justify-around' : ''} ${
-          activeOption === '상품 수정' ? ' justify-center' : ''
-        }`}
+        className={`mw-md:-ml-14 w-[90%] h-full flex items-center ${
+          activeOption === '상품 추가' ? ' justify-around' : ''
+        } ${activeOption === '상품 수정' ? ' justify-center' : ''}`}
       >
         <div
           id="mystore_left_content"
-          className={`w-1/2 h-[90%] mr-3 flex flex-col items-center ${activeOption ? '' : ' hidden'}`}
+          className={`w-1/2 h-[90%] mr-3 flex flex-col items-center ${activeOption ? '' : ' hidden'} mw-md:hidden`}
         >
           {activeOption === '상품 추가' && (
             <div className="w-full h-full p-5 ml-10 flex flex-col items-center">
@@ -555,7 +588,9 @@ export default function PersonalStore() {
         </div>
         <div
           id="mystore_right_content_or_maincontent"
-          className={`${activeOption === '상품 추가' ? 'w-1/2 ' : 'w-full '} h-full flex flex-col`}
+          className={`${
+            activeOption === '상품 추가' ? 'w-1/2 ' : ''
+          } p-5 mx-auto flex flex-col mw-md:-mt-10 mw-md:ml-10`}
         >
           {activeOption === '상품 추가' && (
             <>
@@ -768,45 +803,37 @@ export default function PersonalStore() {
           {!activeOption && (
             <>
               {/*등록한 상품들 검색 상자*/}
-              <div className="w-full h-[10%] miw-lg:mt-2 mw-md:ml-3 flex justify-center items-center border border-transparent rounded-lg ">
-                <div
-                  id="search-box"
-                  className="w-[80%] flex justify-center items-center mw-md:w-full mw-md:h-1/2 mw-md:p-3 mw-md:ml-3"
-                >
-                  <form method="get" className="w-full flex justify-center">
+              <div className="mb-10 mw-md:mb-3 mw-md:ml-10 mw-md:mt-0 flex justify-center items-center border border-transparent rounded-lg">
+                <div id="search-box" className="flex justify-center items-center mr-5 mw-md:h-1/2 mw-md:ml-3">
+                  <form
+                    method="get"
+                    className="mw-md:w-[80px] flex justify-center"
+                    onSubmit={(e) => e.preventDefault()}
+                  >
                     <input
                       type="text"
                       placeholder="Enter your search term"
-                      className="mw-md:p-0 mw-md:w-full mw-md:focus:pl-2 mw-md:-ml-10 mw-md:placeholder:pl-2 w-[40%] py-2 px-4 rounded-l-md outline-4 border border-gray-400 border-solid focus:outline-none"
+                      className="w-[350px] focus:w-[400px] mw-md:w-auto mw-md:pl-3 mw-md:-ml-10 text-[0.7rem] mw-md:text-[0.6rem] px-5 rounded-l-md outline-4 border border-gray-400 border-solid focus:border-gray-500 focus:outline-none"
+                      value={searchKeyword}
+                      onChange={(e) => setSearchKeyword(e.target.value)}
                     />
                     <button
                       type="submit"
-                      className="mw-md:flex mw-md:items-center mw-md:p-1 py-1 px-4 bg-sky-400 text-white rounded-r-md border border-solid hover:bg-sky-600"
+                      className="mw-md:flex mw-md:items-center mw-md:p-1 px-2 bg-sky-400 text-white rounded-r-md border border-solid hover:bg-sky-600"
+                      onClick={(e) => handleSearchKeyword(e)}
                     >
                       <span class="material-symbols-outlined text-center mt-1">search</span>
                     </button>
                   </form>
                 </div>
               </div>
-
-              <div className="w-full h-full flex flex-col justify-center">
-                {/*슬라이드쇼*/}
-                <div className="miw-lg:p-5 miw-lg:my-2 w-full h-[35%] flex justify-between items-center">
-                  <div className="flex justify-center">
-                    <button id="prevBtn" className="ml-5 p-3 opacity-[0.6]" onClick={toPrev}>
-                      &#10094;
-                    </button>
-                  </div>
-
-                  <SlideShow />
-                  <div className="">
-                    <button id="nextBtn" className="mr-5 p-3 opacity-[0.6]" onClick={toNext}>
-                      &#10095;
-                    </button>
-                  </div>
-                </div>
+              {/*슬라이드쇼*/}
+              <div className="">
+                <SlideShow />
+              </div>
+              <div className="flex flex-col justify-center mw-md:ml-1">
                 {/*등록된 물품 리스트*/}
-                <div className="miw-lg:my-4 w-full flex flex-col justify-center items-center transition-all duration-300">
+                <div className="my-4 flex flex-col justify-center items-center transition-all duration-300">
                   {user['sellinglist'] && user['sellinglist']['products'].length > 0 ? (
                     <>
                       <SampleTable />
@@ -818,54 +845,57 @@ export default function PersonalStore() {
                     </div>
                   )}
                 </div>
-                <div
-                  className={`w-full flex items-center mt-2 ${manageProduct ? 'pt-2' : ''} ${
-                    clickedCategory ? '' : 'justify-center'
-                  }`}
-                >
+                {/*상품 버튼들*/}
+                <div className={`flex items-center mt-2 justify-center`}>
                   {manageProduct ? (
                     <>
                       <div className="p-2 flex justify-center items-end">
                         <div
                           onClick={() => handleButtons('상품 추가')}
-                          className="w-[60%] h-[30%] py-2 px-10 flex justify-center items-center border border-transparent rounded-lg bg-green-600 hover:cursor-pointer hover:bg-green-700 transition-all duration-300"
+                          className="py-2 px-5 flex justify-center items-center border border-transparent rounded-lg bg-green-600 hover:cursor-pointer hover:bg-green-700 transition-all duration-300"
                         >
-                          <span className="text-white text-nowrap font-semibold mw-md:text-[0.6rem]">상품 추가</span>
+                          <span className="text-white text-nowrap font-semibold text-[0.8rem] mw-md:text-[0.6rem]">
+                            상품 추가
+                          </span>
                         </div>
                       </div>
                       <div className="p-2 flex justify-center items-end">
                         <div
                           onClick={(e) => handleUpdatebtn(e)}
-                          className="w-[60%] h-[30%] py-2 px-10 flex justify-center items-center border border-transparent rounded-lg bg-blue-500 hover:cursor-pointer hover:bg-blue-600 transition-all duration-300"
+                          className="py-2 px-5 flex justify-center items-center border border-transparent rounded-lg bg-blue-500 hover:cursor-pointer hover:bg-blue-600 transition-all duration-300"
                         >
-                          <span className="text-white font-semibold mw-md:text-[0.6rem] text-nowrap">상품 수정</span>
+                          <span className="text-white font-semibold text-[0.8rem] mw-md:text-[0.6rem] text-nowrap">
+                            상품 수정
+                          </span>
                         </div>
                       </div>
                       <div className="p-2 flex justify-center items-end">
                         <div
                           onClick={() => handleCancelSelling()}
-                          className="w-[60%] h-[30%] py-2 px-10 flex justify-center items-center border border-transparent rounded-lg bg-red-500 hover:cursor-pointer hover:bg-red-600  transition-all duration-300"
+                          className="py-2 px-5 flex justify-center items-center border border-transparent rounded-lg bg-red-500 hover:cursor-pointer hover:bg-red-600  transition-all duration-300"
                         >
-                          <span className="text-white font-semibold mw-md:text-[0.6rem] text-nowrap">판매 취소</span>
+                          <span className="text-white font-semibold text-[0.8rem] mw-md:text-[0.6rem] text-nowrap">
+                            판매 취소
+                          </span>
                         </div>
                       </div>
                       <div className="p-2 flex justify-center items-end">
                         <div
                           onClick={() => setManageProduct(!manageProduct)}
-                          className="w-[60%] h-[30%] py-2 px-10 flex justify-center items-center border border-transparent rounded-lg bg-yellow-500 hover:cursor-pointer hover:bg-yellow-600  transition-all duration-300"
+                          className="py-2 px-5 flex justify-center items-center border border-transparent rounded-lg bg-yellow-500 hover:cursor-pointer hover:bg-yellow-600  transition-all duration-300"
                         >
-                          <span className="text-white font-semibold mw-md:text-[0.6rem] text-nowrap">이전으로</span>
+                          <span className="text-white font-semibold text-[0.8rem] mw-md:text-[0.6rem] text-nowrap">
+                            이전으로
+                          </span>
                         </div>
                       </div>
                     </>
                   ) : (
                     <div
-                      className={`w-[60%] h-full ml-5 flex items-center ${
-                        clickedCategory ? ' justify-around' : ' justify-center'
-                      }`}
+                      className={`ml-10 flex items-center ${clickedCategory ? ' justify-around' : ' justify-center'}`}
                     >
                       {clickedCategory && (
-                        <div className="text-sm">
+                        <div className={`${manageProduct ? 'hidden ' : ''} text-sm text-nowrap mr-10`}>
                           <span>
                             카테고리 <b>&lt;{clickedCategory}&gt;</b>에서 판매 중인 상품 <b>{categoryItems.length}</b>
                             개를 찾았습니다
@@ -874,11 +904,9 @@ export default function PersonalStore() {
                       )}
                       <div
                         onClick={() => setManageProduct(!manageProduct)}
-                        className={`${
-                          clickedCategory ? 'w-1/4 -ml-6 ' : 'w-1/4 '
-                        } miw-lg:p-3 miw-lg:my-5 flex mw-md:p-1 mw-md:my-1 justify-center items-center border border-transparent rounded-lg bg-green-600 hover:cursor-pointer hover:bg-green-700`}
+                        className={`-ml-10 flex mw-md:p-1 mw-md:my-1 justify-center items-center border border-transparent rounded-lg bg-green-600 hover:cursor-pointer hover:bg-green-700`}
                       >
-                        <span className="text-white text-xl text-nowrap font-semibold mw-md:text-[0.45rem]">
+                        <span className="text-[0.9rem] mw-md:text-[0.6rem] mw-md:px-5 mw-md:py-2 p-3 text-white text-nowrap font-bold">
                           상품 관리
                         </span>
                       </div>

@@ -44,6 +44,12 @@ export class ProductController {
     return this.productService.isUsersProduct(user, productId);
   }
 
+  @UseGuards(AuthGuard())
+  @Post('/my-store/searching')
+  async getProductByName(@Body('keyword') keyword: string) {
+    return this.productService.getProductByName(keyword);
+  }
+
   @Post('/guest/viewed')
   async guestWatchedProduct(
     @Body('productId', ParseIntPipe) productId: number,

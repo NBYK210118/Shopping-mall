@@ -120,10 +120,10 @@ const updatelikeProduct = async (token, likes, navigate) => {
   }
 };
 
-// 상세 페이지에서의 좋아요 버튼 클릭 시 동작
-const howManyLikes = async (token, formData, navigate) => {
+// PersonalStore에서 검색하기
+const getProductByName = async (token, formdata, navigate) => {
   try {
-    const data = await http.post(`/like/product`, formData, {
+    const data = await http.post('/product/my-store/searching', formdata, {
       headers: { Authorization: `Bearer ${token}` },
     });
     return data;
@@ -289,6 +289,7 @@ const ProductApi = {
   guestViewed,
   userViewed,
   userRecentWatched,
+  getProductByName,
 };
 
 export default ProductApi;

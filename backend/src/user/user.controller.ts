@@ -17,6 +17,7 @@ import { Request, Response } from 'express';
 import { GetUser } from './get-user.decorator';
 import { ProfileDto } from './dto/profile.dto';
 import AddProductDto from './dto/addProduct.dto';
+import { UserProfileDto } from './dto/user.dto';
 
 @Controller('user')
 export class UserController {
@@ -98,7 +99,7 @@ export class UserController {
 
   @UseGuards(AuthGuard())
   @Post('/my-profile/update')
-  async updateProfile(@GetUser() user: User, @Body() data: ProfileDto) {
+  async updateProfile(@GetUser() user: User, @Body() data: UserProfileDto) {
     const result = await this.userService.updateProfile(user, data);
     return result;
   }

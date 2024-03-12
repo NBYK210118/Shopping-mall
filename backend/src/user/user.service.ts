@@ -11,6 +11,7 @@ import { signInDto, signUpDto } from './dto/sign.dto';
 import { UserProfileDto } from './dto/user.dto';
 import AddProductDto from './dto/addProduct.dto';
 import { Category } from 'src/product/product.model';
+import { ProfileDto } from './dto/profile.dto';
 
 @Injectable()
 export class UserService {
@@ -155,35 +156,64 @@ export class UserService {
   }
 
   async updateProfile(user: User, data: UserProfileDto) {
-    const { firstName, lastName, email, address, store } = data;
+    const { firstName, lastName, email, address, store, phoneNumber } = data;
 
-    const user_info = await this.emailUser(user.email);
     const alreadyExistStore = await this.prisma.store.findUnique({
       where: { name: store },
     });
 
-    if (user_info.storeId === null && !alreadyExistStore) {
-      const store_data = await this.prisma.store.create({
-        data: { name: store, User: { connect: { id: user_info.id } } },
-      });
-      await this.prisma.storeUser.create({
-        data: { storeId: store_data.id, userId: user_info.id },
-      });
-    } else {
-      const store_name = alreadyExistStore.name;
-
-      const updated_store = await this.prisma.store.update({
-        where: { name: store_name },
+    // 존재하고 있는 회사명이 아닐 때
+    if (!alreadyExistStore) {
+      const created_new_store = await this.prisma.store.create({
         data: { name: store },
       });
+      if (user.storeId === null) {
+        await this.prisma.store.update({
+          where: { id: created_new_store.id },
+          data: { users: { connect: { id: user.id } } },
+        });
+        await this.prisma.storeUser.create({
+          data: { storeId: created_new_store.id, userId: user.id },
+        });
+      } else {
+        await this.prisma.storeUser.update({
+          where: {
+            userId_storeId: { userId: user.id, storeId: user.storeId },
+          },
+          data: { storeId: created_new_store.id },
+        });
+      }
+    } else {
+      // 존재하고 있는 회사명일 때
+      // 유저가 이미 속해있었던 회사인지 확인
+      const userAlreadyIn = await this.prisma.storeUser.findFirst({
+        where: { userId: user.id, store: { name: store } },
+      });
 
-      const storeuser = await this.prisma.storeUser.findFirst({
-        where: { userId: user_info.id },
+      const userAlreadyHasStore = await this.prisma.store.findFirst({
+        where: { users: { some: { userId: user.id } } },
       });
-      await this.prisma.storeUser.update({
-        where: { id: storeuser.id },
-        data: { storeId: updated_store.id },
-      });
+
+      if (userAlreadyHasStore) {
+        await this.prisma.store.update({
+          where: { id: userAlreadyHasStore.id },
+          data: { users: { disconnect: { id: user.id } } },
+        });
+      }
+
+      if (!userAlreadyIn) {
+        const updated_store = await this.prisma.store.update({
+          where: { name: store },
+          data: { users: { connect: { id: user.id } } },
+        });
+
+        await this.prisma.storeUser.update({
+          where: {
+            userId_storeId: { userId: user.id, storeId: updated_store.id },
+          },
+          data: { storeId: updated_store.id },
+        });
+      }
     }
 
     await this.prisma.user.update({
@@ -192,7 +222,7 @@ export class UserService {
     });
     await this.prisma.profile.update({
       where: { userId: user.id },
-      data: { address },
+      data: { address, phoneNumber },
     });
 
     const result = await this.emailUser(user.email);
