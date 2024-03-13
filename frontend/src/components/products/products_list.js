@@ -78,7 +78,6 @@ export function Products() {
 
   const Items = () => {
     if (currentProducts !== undefined && currentProducts.length > 0) {
-      console.log(currentProducts);
       return currentProducts.map((val, idx) => (
         <div
           id="product_item"
@@ -123,9 +122,7 @@ export function Products() {
     <div id="products_main" className="w-full h-full flex justify-center mt-10">
       <div id="products_container" className="w-full h-full">
         <div className="mx-auto px-4">
-          <div className="miw-md:flex flex-wrap items-end mw-md:grid mw-md:grid-cols-2 mw-md:overflow-y-scroll">
-            {currentProducts && <Items />}
-          </div>
+          <div className="flex flex-wrap items-end mw-md:grid mw-md:grid-cols-2">{currentProducts && <Items />}</div>
         </div>
       </div>
     </div>

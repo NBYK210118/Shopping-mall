@@ -205,10 +205,10 @@ export const ProductDetail = () => {
                   : `https://source.unsplash.com/random/200x200?product`
               }
               alt=""
-              className="miw-lg:w-[30%] miw-lg:h-[420px] mw-md:w-[65%] mw-md:h-auto rounded"
+              className="w-[30%] h-[420px] mw-md:w-[65%] mw-md:h-auto rounded"
             />
-            <div className="miw-lg:w-1/2 mw-md:w-1/2 mw-md:h-auto flex flex-col justify-around p-4 bg-gray-200 rounded">
-              <span className="miw-lg:text-[0.8rem] mw-md:text-[0.7rem] mw-md:mb-0 ml-1 text-blue-400 hover:underline hover:cursor-pointer">
+            <div className="w-1/2 mw-md:w-1/2 mw-md:h-auto flex flex-col justify-around p-4 bg-gray-200 rounded">
+              <span className="text-[0.8rem] mw-md:text-[0.7rem] mw-md:mb-4 mw-md:-ml-[1px] ml-1 text-blue-400 hover:underline hover:cursor-pointer">
                 {currentProduct.manufacturer ? `${currentProduct.manufacturer}` : 'Failed to load manufacturer'}
               </span>
               <div className="flex items-center -mt-5 mw-md:flex-wrap mw-md:flex-col mw-md:items-start">
@@ -328,7 +328,7 @@ export const ProductDetail = () => {
     <>
       <div
         id={`product_detail_container_${productId}`}
-        className="w-[90%] mw-md:w-full h-full mt-10 border border-gray-300 mw-lg:mr-24"
+        className="w-[90%] mw-md:w-full h-full mt-10 border border-gray-300 mw-md:ml-0 mw-md:border-none"
       >
         <ItemInfo />
         <div id="product_reviews" className="w-3/5 h-2/5 mw-md:w-[85%] mw-md:ml-9  flex flex-col mt-10 mx-auto">

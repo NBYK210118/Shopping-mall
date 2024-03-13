@@ -1,20 +1,20 @@
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../auth.context';
 import { Images } from '../../images_list';
-import { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import DataService from '../../data_services';
 import ProductApi from '../products/product_api';
 import { Navigation } from 'swiper/modules';
 import { Swiper, SwiperSlide } from 'swiper/react';
+import Skeleton from 'react-loading-skeleton';
+import StoreSearchBar from './search_keyword';
 
 export default function PersonalStore() {
-  const { token, user, setUser, clickedSellingProduct } = useAuth(); // AuthProvider 로 부터 제공받는 변수들
+  const { token, user, setUser, clickedSellingProduct, loading, setLoading } = useAuth();
   const navigate = useNavigate();
   const [productSize, setProductSize] = useState(0);
   const [productName, setProductName] = useState('');
   const [productDetail, setProductDetail] = useState('');
-  const [productSecDetail, setProductSecDetail] = useState('');
-  const [productThirdDetail, setProductThirdDetail] = useState('');
   const [productPrice, setProductPrice] = useState('');
   const [productMaker, setProductMaker] = useState('');
   const [categoryInput, setCategoryInput] = useState('');
@@ -42,7 +42,7 @@ export default function PersonalStore() {
   const fileInputRef = useRef(null);
   const [activeOption, setActiveOption] = useState(null);
   const [manageProduct, setManageProduct] = useState(false);
-  const [searchKeyword, setSearchKeyword] = useState('');
+  const [keyword, setKeyword] = useState('');
   const [searchingResult, setSearchingResult] = useState(null);
   const priceInputRef = useRef();
 
@@ -51,7 +51,7 @@ export default function PersonalStore() {
     setActiveOption(null);
     setSelectedList([]);
     setSellistIndex(null);
-    setCurrentProduct({});
+    setCurrentProduct(null);
   };
 
   // MainContent 에서 내가 판매 중인 상품을 클릭했을 때 my-store로 이동해오면서 선택되었던 상품 ID가 useContext를 통해 PersonalStore로 전파된다
@@ -114,7 +114,7 @@ export default function PersonalStore() {
         setProductDetail(currentProduct['description']);
         setProductPrice(currentProduct['price']);
         setProductMaker(currentProduct['manufacturer']);
-        setCategoryInput(currentProduct['category_names']);
+        setCategoryInput(currentProduct['category_name']);
         setStatusInput(currentProduct['status']);
         setInventory(currentProduct['inventory']);
       }
@@ -147,24 +147,22 @@ export default function PersonalStore() {
     }
   };
 
-  const handleUpdatebtn = (e) => {
+  const handleUpdatebtn = async (e) => {
     // 선택한 상품에 대해서 업데이트 페이지로 넘어가면서 input 태그들에 해당 상품 정보 입력해놓기
     if (sellistIndex) {
       setActiveOption(e.currentTarget.firstChild.textContent);
-      ProductApi.findProduct(token, sellistIndex, navigate).then((response) => {
-        console.log('will be updated product: ', response);
-        localStorage.setItem('product', JSON.stringify(response.data));
-        setImageUrl(response.data['images'][0]['imgUrl']);
-        setProductName(response.data['name']);
-        setProductDetail(response.data['description']);
-        setProductPrice(response.data['price']);
-        setProductMaker(response.data['manufacturer']);
-        setCategoryInput(response.data['category_names']);
-        setStatusInput(response.data['status']);
-        setInventory(response.data['inventory']);
-        setCurrentProduct(response.data);
-      });
-      console.log('after findProduct: ', selectedList);
+      const response = await ProductApi.findProduct(token, sellistIndex, navigate);
+      console.log('will be updated product: ', response.data.category_name);
+      localStorage.setItem('product', JSON.stringify(response.data));
+      setImageUrl(response.data['images'][0]['imgUrl']);
+      setProductName(response.data['name']);
+      setProductDetail(response.data['description']);
+      setProductPrice(response.data['price']);
+      setProductMaker(response.data['manufacturer']);
+      setCategoryInput(response.data['category_name']);
+      setStatusInput(response.data['status']);
+      setInventory(response.data['inventory']);
+      setCurrentProduct(response.data);
       getProductsWhileUpdate();
     } else {
       alert('상품을 선택해주세요');
@@ -191,7 +189,6 @@ export default function PersonalStore() {
 
     try {
       DataService.updateProduct(token, formData, sellistIndex, navigate).then((response) => {
-        console.log(response.status);
         if (response.data) {
           setUser(response.data);
           localStorage.setItem('user', JSON.stringify(response.data));
@@ -292,7 +289,7 @@ export default function PersonalStore() {
     formData.append('image', imageUrl);
     formData.append('image_size', productSize);
     formData.append('name', productName);
-    formData.append('detail', `${productDetail} ${productSecDetail} ${productThirdDetail}`);
+    formData.append('detail', `${productDetail}`);
     formData.append('price', productPrice);
     formData.append('manufacturer', productMaker);
     formData.append('category', categoryInput);
@@ -309,42 +306,47 @@ export default function PersonalStore() {
     });
   };
 
+  const handleSearchKeyword = (keyword, setSearchKeyword) => {
+    const formData = new FormData();
+    formData.append('keyword', keyword);
+    ProductApi.getProductByName(token, formData, navigate).then((response) => {
+      if (response && response.data) {
+        setSearchingResult(response.data);
+      }
+      setSearchKeyword('');
+    });
+  };
+
   // 전체 상품 보기 버튼 기능
   const handleShowAll = () => {
     setClickedCategory('');
     setSearchingResult(null);
-    setSearchKeyword(null);
+    setKeyword(null);
   };
 
   const SampleTable = () => {
     return (
-      <>
-        <div className="w-full mw-md:w-[80vw] items-center grid grid-cols-7 mw-md:gap-8 p-1 px-5 mw-md:px-5 border-x border-y rounded-lg">
-          <span className="font-bold text-[0.8rem] text-nowrap mw-md:text-[0.45rem] mw-md:px-2">상품번호</span>
-          <span className="font-bold text-[0.8rem] text-nowrap mw-md:text-[0.45rem] mw-md:px-2">상품명</span>
-          <span className="font-bold text-[0.8rem] text-nowrap mw-md:text-[0.45rem] mw-md:px-2">가격</span>
-          <span className="font-bold text-[0.8rem] text-nowrap mw-md:text-[0.45rem] mw-md:px-2">카테고리</span>
-          <span className="font-bold text-[0.8rem] text-nowrap mw-md:text-[0.45rem] mw-md:px-2">판매자</span>
-          <span className="font-bold text-[0.8rem] text-nowrap mw-md:text-[0.45rem] mw-md:px-2">상세설명</span>
-
-          <span
-            onClick={() => handleShowAll()}
-            className="text-center font-bold px-2 py-2 rounded-lg text-[0.8rem] bg-yellow-500 text-white hover:cursor-pointer hover:bg-yellow-600 transition-all duration-150 mw-md:hidden"
-          >
-            전체 상품 보기
-          </span>
-        </div>
-      </>
+      <div className="w-full grid grid-cols-7 mw-md:gap-3 p-1 px-5 border-x border-y">
+        <span className="font-bold text-[0.8rem] text-nowrap mw-md:text-[0.48rem] mw-md:px-2">상품번호</span>
+        <span className="font-bold text-[0.8rem] text-nowrap mw-md:text-[0.48rem] mw-md:px-2">상품명</span>
+        <span className="font-bold text-[0.8rem] text-nowrap mw-md:text-[0.48rem] mw-md:px-2">가격</span>
+        <span className="font-bold text-[0.8rem] text-nowrap mw-md:text-[0.48rem] mw-md:px-2">카테고리</span>
+        <span className="font-bold text-[0.8rem] text-nowrap mw-md:text-[0.48rem] mw-md:px-2">판매자</span>
+        <span className="font-bold text-[0.8rem] text-nowrap mw-md:text-[0.48rem] mw-md:px-2">상세설명</span>
+        <span className="font-bold text-[0.8rem] text-nowrap mw-md:text-[0.48rem] mw-md:px-2">상품사진</span>
+      </div>
     );
   };
 
   //슬라이드 쇼의 카테고리를 클릭하면 해당 유저의 판매 물품들 중 클릭한 카테고리에 해당하는 상품들만 출력돼야함
   const handleCategoryClick = (category) => {
+    setLoading(true);
     ProductApi.categoriesItem(token, category, navigate).then((response) => {
       console.log('클릭한 카테고리에 해당하는 상품들: ', response.data);
       setCategoryItems(response.data);
       setClickedCategory(category);
     });
+    setLoading(false);
   };
 
   const UsersOnSale = () => {
@@ -352,70 +354,73 @@ export default function PersonalStore() {
       if (searchingResult && searchingResult.length > 0) {
         return searchingResult.map((val, idx) => (
           <div
-            className={`w-full grid grid-cols-7 gap-8 py-4 px-5 justify-center items-center border border-solid border-gray-300
-          rounded-lg hover:bg-gray-200 transition-all duration-150 hover:cursor-pointer
+            className={`w-full grid grid-cols-7 mw-md:gap-3 p-4 justify-center items-center border border-solid border-gray-300
+            rounded-lg hover:bg-gray-200 transition-all duration-150 hover:cursor-pointer
           ${selectedList.includes(val.id) ? ' bg-gradient-to-bl from-cyan-400 to-blue-600 font-bold text-white' : ''}`}
             onClick={() => handleSellingListClick(val.id)}
             key={val.id}
           >
-            <span className="font-bold text-nowrap text-[0.8rem] mw-md:text-[0.45rem] mw-md:px-2">
+            <span className="font-bold text-nowrap text-[0.8rem] mw-md:text-[0.55rem] mw-md:px-2">
               {val.id ? val.id : '번호 없음'}-{val.status ? val.status : 'None'}
             </span>
 
-            <span className="font-bold text-nowrap text-[0.8rem] text-ellipsis white-nowrap overflow-hidden mw-md:text-[0.45rem] mw-md:px-2">
+            <span className="font-bold text-nowrap text-[0.8rem] mw-md:text-[0.48rem] mw-md:px-2 text-ellipsis overflow-hidden whitespace-nowrap">
               {val.name ? val.name : 'None'}
             </span>
 
-            <span className="font-bold text-nowrap text-[0.8rem] mw-md:text-[0.45rem] mw-md:px-2">
+            <span className="font-bold text-nowrap text-[0.8rem] mw-md:text-[0.48rem] mw-md:px-2">
               {val.price ? val.price.toLocaleString('ko-kr') : 'None'}원
             </span>
 
-            <span className="font-bold text-nowrap text-[0.8rem] mw-md:text-[0.45rem] mw-md:px-2">
+            <span className="font-bold text-nowrap text-[0.8rem] mw-md:text-[0.48rem] mw-md:px-2">
               {val.category_name ? val.category_name : 'None'}
             </span>
 
-            <span className="font-bold text-nowrap text-[0.8rem] mw-md:text-[0.45rem] mw-md:px-2">
+            <span className="font-bold text-nowrap text-[0.8rem] mw-md:text-[0.48rem] mw-md:px-2">
               {val.manufacturer ? val.manufacturer : 'None'}
             </span>
 
-            <span className="text-[0.8rem] text-nowrap font-bold text-ellipsis white-nowrap overflow-hidden mw-md:text-[0.45rem] mw-md:px-2">
+            <span className="text-[0.8rem] text-nowrap font-bold text-ellipsis white-nowrap overflow-hidden mw-md:text-[0.48rem] mw-md:px-2">
               {val.description ? val.description : 'None'}
             </span>
+            <img src={val.images[0].imgUrl} alt="" className="w-[50px] mw-md:w-auto" />
           </div>
         ));
       } else {
+        console.log(user.sellinglist.products[0].id);
         const sortedProducts = user.sellinglist?.products.sort((a, b) => a.id - b.id);
         return sortedProducts.map((val, idx) => (
           <div
-            className={`w-full grid grid-cols-7 gap-8 py-4 px-5 justify-center items-center border border-solid border-gray-300
-          rounded-lg hover:bg-gray-200 transition-all duration-150 hover:cursor-pointer
+            className={`w-full grid grid-cols-7 mw-md:gap-6 p-4 justify-center items-center border border-solid border-gray-300
+           hover:bg-gray-200 transition-all duration-150 hover:cursor-pointer
           ${selectedList.includes(val.id) ? ' bg-gradient-to-bl from-cyan-400 to-blue-600 font-bold text-white' : ''}`}
             onClick={() => handleSellingListClick(val.id)}
             key={val.id}
           >
-            <span className="font-bold text-nowrap text-[0.8rem] mw-md:text-[0.45rem] mw-md:px-2">
+            <span className="font-bold text-nowrap text-[0.8rem] mw-md:text-[0.48rem] mw-md:px-2">
               {val.id ? val.id : '번호 없음'}-{val.status ? val.status : 'None'}
             </span>
 
-            <span className="font-bold text-nowrap text-[0.8rem] text-ellipsis white-nowrap overflow-hidden mw-md:text-[0.45rem] mw-md:px-2">
+            <span className="font-bold whitespace-nowrap text-[0.8rem] mw-md:text-[0.48rem] mw-md:px-2">
               {val.name ? val.name : 'None'}
             </span>
 
-            <span className="font-bold text-nowrap text-[0.8rem] mw-md:text-[0.45rem] mw-md:px-2">
+            <span className="font-bold text-nowrap text-[0.8rem] mw-md:text-[0.48rem] mw-md:px-2">
               {val.price ? val.price.toLocaleString('ko-kr') : 'None'}원
             </span>
 
-            <span className="font-bold text-nowrap text-[0.8rem] mw-md:text-[0.45rem] mw-md:px-2">
+            <span className="font-bold text-nowrap text-[0.8rem] mw-md:text-[0.48rem] mw-md:px-2">
               {val.category_name ? val.category_name : 'None'}
             </span>
 
-            <span className="font-bold text-nowrap text-[0.8rem] mw-md:text-[0.45rem] mw-md:px-2">
+            <span className="font-bold text-nowrap text-[0.8rem] mw-md:text-[0.48rem] mw-md:px-2">
               {val.manufacturer ? val.manufacturer : 'None'}
             </span>
 
-            <span className="text-[0.8rem] text-nowrap font-bold text-ellipsis white-nowrap overflow-hidden mw-md:text-[0.45rem] mw-md:px-2">
+            <span className="text-[0.8rem] whitespace-nowrap font-bold overflow-hidden mw-md:text-[0.48rem] mw-md:px-2">
               {val.description ? val.description : 'None'}
             </span>
+            <img src={val.images[0].imgUrl} alt="" className="w-[50px] mw-md:w-auto" />
           </div>
         ));
       }
@@ -429,35 +434,37 @@ export default function PersonalStore() {
       const sortedProducts = categoryItems.sort((a, b) => a.id - b.id);
       return sortedProducts.map((val, idx) => (
         <div
-          className={`w-[90%] grid grid-cols-7 p-2 justify-center items-center border border-solid border-gray-300 
-          rounded-lg hover:bg-gray-200 transition-all duration-150 hover:cursor-pointer 
+          className={`w-full grid grid-cols-7 mw-md:gap-3 p-4 justify-center items-center border border-solid border-gray-300
+            rounded-lg hover:bg-gray-200 transition-all duration-150 hover:cursor-pointer
           ${selectedList.includes(val.id) ? ' bg-gradient-to-bl from-cyan-400 to-blue-600 font-bold text-white' : ''}`}
-          onClick={(e) => handleSellingListClick(val.id)}
+          onClick={() => handleSellingListClick(val.id)}
           key={val.id}
         >
-          <span className="font-bold text-nowrap text-[0.8rem] mw-md:text-[0.3rem]">
+          <span className="font-bold text-nowrap text-[0.8rem] mw-md:text-[0.55rem] mw-md:px-2">
             {val.id ? val.id : '번호 없음'}-{val.status ? val.status : 'None'}
           </span>
 
-          <span className="font-bold text-[0.8rem] text-ellipsis white-nowrap overflow-hidden mw-md:text-[0.3rem]">
+          <span className="font-bold text-nowrap text-[0.8rem] mw-md:text-[0.55rem] mw-md:px-2">
             {val.name ? val.name : 'None'}
           </span>
 
-          <span className="font-bold text-[0.8rem] mw-md:text-[0.3rem]">
+          <span className="font-bold text-nowrap text-[0.8rem] mw-md:text-[0.55rem] mw-md:px-2">
             {val.price ? val.price.toLocaleString('ko-kr') : 'None'}원
           </span>
 
-          <span className="font-bold text-[0.8rem] mw-md:text-[0.3rem]">
+          <span className="font-bold text-nowrap text-[0.8rem] mw-md:text-[0.55rem] mw-md:px-2">
             {val.category_name ? val.category_name : 'None'}
           </span>
 
-          <span className="font-bold text-[0.8rem] text-nowrap mw-md:text-[0.3rem]">
+          <span className="font-bold text-nowrap text-[0.8rem] mw-md:text-[0.55rem] mw-md:px-2">
             {val.manufacturer ? val.manufacturer : 'None'}
           </span>
 
-          <span className="inline-block text-[0.8rem] font-bold text-ellipsis overflow-hidden whitespace-nowrap mw-md:text-[0.3rem]">
+          <span className="text-[0.8rem] text-nowrap font-bold text-ellipsis white-nowrap overflow-hidden mw-md:text-[0.55rem] mw-md:px-2">
             {val.description ? val.description : 'None'}
           </span>
+
+          <img src={val.images[0].imgUrl} alt="" className="w-[50px] mw-md:w-auto" />
         </div>
       ));
     } else {
@@ -469,25 +476,25 @@ export default function PersonalStore() {
     const result = productsList.map((val, idx) => (
       <div
         id="selected_items"
-        className={`w-full h-[25%] p-3 flex flex-col justify-center border rounded-lg 
+        className={`p-0 mb-8 flex flex-col justify-center border rounded-lg 
         hover:cursor-pointer hover:-translate-y-1 transition-all duration-300
         ${currentProduct?.name === val.name ? ' bg-gray-300' : ''}`}
         onClick={() => setCurrentProduct(val)}
       >
-        <div id="selected_item_1" className="w-full h-full flex justify-center items-center">
-          <div className="w-1/2 h-full flex items-center">
-            <img src={val['images'][0]['imgUrl']} alt="product_img" className="w-full h-full" />
+        <div id="selected_item_1" className="flex justify-center items-center">
+          <div className="flex items-center">
+            <img src={val['images'][0]['imgUrl']} alt="product_img" className="w-[150px] h-[120px] mw-md:h-[50px]" />
           </div>
-          <div className="w-1/2 h-full ml-3 flex flex-col justify-around items-center">
+          <div className="ml-3 flex flex-col justify-around items-center">
             <div
               id="product_name"
-              className="w-full inline-block text-sm text-ellipsis overflow-hidden whitespace-nowrap text-blue-500 hover:underline"
+              className="inline-block text-sm text-ellipsis overflow-hidden whitespace-nowrap text-blue-500 hover:underline"
             >
               <span className="font-semibold">{val.name ? val.name : 'None'}</span>
             </div>
             <div
               id="product_description"
-              className="w-full inline-block text-sm text-ellipsis overflow-hidden whitespace-nowrap text-blue-500 hover:underline"
+              className="inline-block text-sm text-ellipsis overflow-hidden whitespace-nowrap text-blue-500 hover:underline"
             >
               <span className="">{val.description ? val.description : 'None'}</span>
             </div>
@@ -499,435 +506,494 @@ export default function PersonalStore() {
     return result;
   };
 
-  const handleSearchKeyword = (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    const formData = new FormData();
-    formData.append('keyword', searchKeyword);
-    ProductApi.getProductByName(token, formData, navigate).then((response) => {
-      if (response && response.data) {
-        setSearchingResult(response.data);
-      }
-    });
+  const LoadingSkeleton = () => {
+    return (
+      <div
+        className="w-full p-4 border border-solid border-gray-300 flex flex-col
+      rounded-lg"
+      >
+        {Array(5).map((_, index) => (
+          <div key={index} className="p-2 flex flex-col justify-between w-full">
+            <Skeleton height={170} className="mb-2" />
+            <Skeleton count={2} />
+          </div>
+        ))}
+      </div>
+    );
   };
 
   return (
-    <div
-      className={`w-full h-full p-10 flex mw-md:-ml-64 mw-md:-mt-10 justify-center items-center mw-md:border-none border border-gray-300 rounded-lg`}
-    >
+    <>
       <div
-        className={`mw-md:-ml-14 w-[90%] h-full flex items-center ${
-          activeOption === '상품 추가' ? ' justify-around' : ''
-        } ${activeOption === '상품 수정' ? ' justify-center' : ''}`}
+        className={`w-full h-full p-10 mw-md:px-12 flex ${!activeOption ? 'mw-md:mt-0 mw-md:ml-56' : ''} ${
+          activeOption === '상품 수정' ? 'mw-md:ml-20' : ''
+        } ${
+          activeOption === '상품 추가' ? 'mw-md:mt-36 mw-md:ml-10' : ''
+        } mr-4 justify-center items-center mw-md:border-none border border-gray-300 rounded-lg`}
       >
         <div
-          id="mystore_left_content"
-          className={`w-1/2 h-[90%] mr-3 flex flex-col items-center ${activeOption ? '' : ' hidden'} mw-md:hidden`}
+          className={`mw-md:-ml-72 mw-md:-mt-9 flex items-center ${
+            activeOption === '상품 추가' ? 'mw-md:p-3 justify-around' : ''
+          } ${activeOption === '상품 수정' ? 'p-5 justify-center' : ''}`}
         >
-          {activeOption === '상품 추가' && (
-            <div className="w-full h-full p-5 ml-10 flex flex-col items-center">
-              <div className="mw-md:w-[90%] mw-md:h-1/3 w-[85%] h-[450px] mb-5 border border-gray-300 rounded-xl">
-                {imageUrl && <img src={imageUrl} alt="preview" className="w-full h-full" />}
-              </div>
-              <div className="w-full h-[10%] flex justify-around">
-                <div className="w-[25%] h-full flex items-end">
+          <div
+            id="mystore_left_content"
+            className={`mr-3 flex flex-col justify-center items-center ${activeOption ? '' : ' hidden'} ${
+              activeOption === '상품 수정' ? 'mw-md:ml-56' : ''
+            } ${activeOption === '상품 추가' ? '-mt-20 mw-md:ml-20 mw-md:mr-32' : ''}`}
+          >
+            {activeOption === '상품 추가' && (
+              <div className="p-5 ml-10 mw-md:ml-44 mw-md:-mt-10 mw-md:mb-40 flex flex-col justify-center items-center">
+                {imageUrl ? (
+                  <img
+                    src={imageUrl}
+                    alt="preview"
+                    className="mb-5 border border-gray-300 rounded-xl mw-md:w-[140px] mw-md:h-[200px] w-[300px] h-[400px] object-cover"
+                  />
+                ) : (
                   <div
-                    className="mw-md:w-[35px] mw-md:flex mw-md:justify-around mw-md:items-center w-full h-full miw-md:flex miw-md:justify-center miw-md:items-center border border-transparent rounded-xl text-white bg-blue-500 hover:cursor-pointer hover:bg-blue-600"
+                    className={`flex justify-center items-center mw-md:w-[140px] mw-md:h-[200px] w-[300px] h-[400px] mb-5 border border-gray-300 rounded-xl bg-slate-100`}
+                  >
+                    <span className="mw-md:text-[0.6rem]">상품 이미지를 업로드해주세요</span>
+                  </div>
+                )}
+
+                <div className="flex justify-around">
+                  <div
+                    className="p-2 mr-7 cursor-pointer flex justify-center items-center border border-transparent rounded-xl text-white bg-blue-500 hover:bg-blue-600"
                     onClick={() => handleClick()}
                   >
-                    <input
-                      type="file"
-                      ref={fileInputRef}
-                      style={{ display: 'none' }}
-                      onChange={(e) => handleFileChange(e)}
-                    />
-                    <span className="p-2 mw-md:flex mw-md:items-center font-bold text-[1.2rem] mw-md:text-[0.6rem] ">
-                      Upload
-                    </span>
-                  </div>
-                </div>
-                <div className="mw-md:w-[35px] w-[25%] h-full flex items-end">
-                  <div
-                    className="w-full h-full flex justify-center items-center border border-transparent rounded-xl text-white bg-yellow-500 hover:cursor-pointer hover:bg-yellow-600"
-                    onClick={() => handleBeforeButton()}
-                  >
-                    <span className="p-2 mw-md:flex mw-md:items-center text-[1.2rem] font-bold mw-md:text-[0.6rem]">
-                      Before
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
-          {activeOption === '상품 수정' && (
-            <div className="flex flex-col items-center justify-center w-full h-full">
-              <div className="w-4/5 h-4/5 mb-5 border border-gray-300 rounded-xl overflow-hidden">
-                {imageUrl && <img src={imageUrl} alt="preview" className="object-cover w-full h-full" />}
-              </div>
-              <div className="flex items-center justify-center w-full h-1/6 ml-10">
-                <div className="w-1/3 h-full flex items-center">
-                  <span
-                    className="flex items-center justify-center p-3 cursor-pointer text-white bg-blue-500 rounded-xl hover:bg-blue-600 focus:outline-none transition-all duration-300"
-                    onClick={() => fileInputRef.current.click()}
-                  >
-                    <span className="font-bold text-xl">Upload</span>
                     <input type="file" ref={fileInputRef} className="hidden" onChange={(e) => handleFileChange(e)} />
-                  </span>
-                </div>
-                <div className="w-1/3 h-full flex items-center">
+                    <span className="font-bold text-[1.2rem] mw-md:text-[0.65rem]">Upload</span>
+                  </div>
                   <span
-                    className="flex items-center justify-center p-3 cursor-pointer text-white bg-yellow-500 rounded-xl hover:bg-yellow-600 focus:outline-none transition-all duration-300"
+                    className="p-2 text-[1.2rem] font-bold mw-md:text-[0.65rem] cursor-pointer flex justify-center items-center border border-transparent rounded-xl text-white bg-yellow-500 hover:bg-yellow-600"
                     onClick={handleBeforeButton}
                   >
-                    <span className="font-bold text-xl">Before</span>
+                    Before
                   </span>
                 </div>
               </div>
-            </div>
-          )}
-        </div>
-        <div
-          id="mystore_right_content_or_maincontent"
-          className={`${
-            activeOption === '상품 추가' ? 'w-1/2 ' : ''
-          } p-5 mx-auto flex flex-col mw-md:-mt-10 mw-md:ml-10`}
-        >
-          {activeOption === '상품 추가' && (
-            <>
-              <div className="max-w-4xl mx-20 py-14">
-                <div className="bg-white rounded px-8 mb-4 -mt-10">
-                  <div className="mb-4">
-                    <label className="block text-gray-700 text-sm font-bold mb-2" for="product_name">
-                      상품명
-                    </label>
-                    <input
-                      className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline border-gray-400 hover:border-gray-500"
-                      id="product_name"
-                      type="text"
-                      placeholder="Enter your product name"
-                      value={productName}
-                      onChange={(e) => setProductName(e.currentTarget.value)}
-                    />
-                  </div>
-                  <div className="mb-4">
-                    <label className="block text-gray-700 text-sm font-bold mb-2" for="product_detail">
-                      상세설명
-                    </label>
-                    <textarea
-                      className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline border-gray-400 hover:border-gray-500"
-                      id="product_detail"
-                      placeholder="Enter the detail of the product"
-                      value={productDetail}
-                      onChange={(e) => setProductDetail(e.currentTarget.value)}
-                    ></textarea>
-                  </div>
-                  <div className="mb-4">
-                    <label className="block text-gray-700 text-sm font-bold mb-2" for="product_price">
-                      가격
-                    </label>
-                    <input
-                      className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline border-gray-400 hover:border-gray-500"
-                      id="product_price"
-                      type="text"
-                      placeholder="Enter the price"
-                      ref={priceInputRef}
-                      onChange={(e) => handlePriceComma(e)}
-                    />
-                  </div>
-                  <div className="mb-4">
-                    <label className="block text-gray-700 text-sm font-bold mb-2" for="product_maker">
-                      제조사/원산지
-                    </label>
-                    <input
-                      className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline border-gray-400 hover:border-gray-500"
-                      id="product_maker"
-                      type="text"
-                      placeholder="Enter the manufacturer"
-                      value={productMaker}
-                      onChange={(e) => setProductMaker(e.currentTarget.value)}
-                    />
-                  </div>
-                  <div className="mb-4">
-                    <label className="block text-gray-700 text-sm font-bold mb-2" for="categories">
-                      카테고리
-                    </label>
-                    <select
-                      class="block appearance-none w-full bg-white border border-gray-400 hover:border-gray-500 px-4 py-2 pr-8 rounded shadow leading-tight focus:outline-none focus:shadow-outline"
-                      id="categories"
-                      value={categoryInput}
-                      onChange={(e) => setCategoryInput(e.currentTarget.value)}
-                    >
-                      <option>Fashion</option>
-                      <option>Furniture</option>
-                      <option>Foods</option>
-                      <option>Electronics</option>
-                    </select>
-                  </div>
-                  <div className="mb-4">
-                    <label className="block text-gray-700 text-sm font-bold mb-2" for="inventory">
-                      재고 수량
-                    </label>
-                    <input
-                      className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline border-gray-400 hover:border-gray-500"
-                      id="inventory"
-                      type="text"
-                      placeholder="Enter the inventory quantity"
-                      value={inventory}
-                      onChange={(e) => setInventory(e.currentTarget.value)}
-                    />
-                  </div>
-                  <div className="mb-4">
-                    <label className="block text-gray-700 text-sm font-bold mb-2" for="status">
-                      판매 여부
-                    </label>
-                    <select
-                      className="block appearance-none w-full bg-white border border-gray-400 hover:border-gray-700 hover:bg-gray-200 cursor-pointer px-4 py-2 pr-8 rounded shadow leading-tight focus:outline-none focus:shadow-outline"
-                      id="status"
-                      value={statusInput}
-                      onChange={(e) => setStatusInput(e.currentTarget.value)}
-                    >
-                      <option>판매중</option>
-                      <option>보류</option>
-                    </select>
-                  </div>
-                  <div className="flex items-center justify-center">
-                    <button
-                      className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline transition-all duration-300"
-                      type="button"
-                      onClick={() => handleAddProduct()}
-                    >
-                      <span className="font-bold mw-md:[0.9rem]">제출</span>
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </>
-          )}
-          {activeOption === '상품 수정' && (
-            <>
-              <div className="max-w-4xl mx-20 py-14">
-                <div className="bg-white rounded px-8 mb-4 -mt-10">
-                  <div className="mb-4">
-                    <label className="block text-gray-700 text-sm font-bold mb-2" for="product_name">
-                      상품명
-                    </label>
-                    <input
-                      className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline border-gray-400 hover:border-gray-500"
-                      id="product_name"
-                      type="text"
-                      placeholder="Enter your product name"
-                    />
-                  </div>
-                  <div className="mb-4">
-                    <label className="block text-gray-700 text-sm font-bold mb-2" for="product_detail">
-                      상세설명
-                    </label>
-                    <textarea
-                      className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline border-gray-400 hover:border-gray-500"
-                      id="product_detail"
-                      placeholder="Enter the detail of the product"
-                    ></textarea>
-                  </div>
-                  <div className="mb-4">
-                    <label className="block text-gray-700 text-sm font-bold mb-2" for="product_price">
-                      가격
-                    </label>
-                    <input
-                      className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline border-gray-400 hover:border-gray-500"
-                      id="product_price"
-                      type="text"
-                      placeholder="Enter the price"
-                    />
-                  </div>
-                  <div className="mb-4">
-                    <label className="block text-gray-700 text-sm font-bold mb-2" for="product_maker">
-                      제조사/원산지
-                    </label>
-                    <input
-                      className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline border-gray-400 hover:border-gray-500"
-                      id="product_maker"
-                      type="text"
-                      placeholder="Enter the manufacturer"
-                    />
-                  </div>
-                  <div className="mb-4">
-                    <label className="block text-gray-700 text-sm font-bold mb-2" for="categories">
-                      카테고리
-                    </label>
-                    <select
-                      class="block appearance-none w-full bg-white border border-gray-400 hover:border-gray-500 px-4 py-2 pr-8 rounded shadow leading-tight focus:outline-none focus:shadow-outline"
-                      id="categories"
-                    >
-                      <option>Fashion</option>
-                      <option>Furniture</option>
-                      <option>Foods</option>
-                      <option>Electronics</option>
-                    </select>
-                  </div>
-                  <div className="mb-4">
-                    <label className="block text-gray-700 text-sm font-bold mb-2" for="inventory">
-                      재고 수량
-                    </label>
-                    <input
-                      className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline border-gray-400 hover:border-gray-500"
-                      id="inventory"
-                      type="text"
-                      placeholder="Enter the inventory quantity"
-                    />
-                  </div>
-                  <div className="mb-4">
-                    <label className="block text-gray-700 text-sm font-bold mb-2" for="status">
-                      판매 여부
-                    </label>
-                    <select
-                      className="block appearance-none w-full bg-white border border-gray-400 hover:border-gray-700 hover:bg-gray-200 cursor-pointer px-4 py-2 pr-8 rounded shadow leading-tight focus:outline-none focus:shadow-outline"
-                      id="status"
-                    >
-                      <option>판매중</option>
-                      <option>보류</option>
-                    </select>
-                  </div>
-                  <div className="flex items-center justify-center">
-                    <button
-                      className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline transition-all duration-300"
-                      type="button"
-                      onClick={(e) => handleUpdateProduct(e)}
-                    >
-                      <span className="font-bold mw-md:[0.9rem]">제출</span>
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </>
-          )}
-          {!activeOption && (
-            <>
-              {/*등록한 상품들 검색 상자*/}
-              <div className="mb-10 mw-md:mb-3 mw-md:ml-10 mw-md:mt-0 flex justify-center items-center border border-transparent rounded-lg">
-                <div id="search-box" className="flex justify-center items-center mr-5 mw-md:h-1/2 mw-md:ml-3">
-                  <form
-                    method="get"
-                    className="mw-md:w-[80px] flex justify-center"
-                    onSubmit={(e) => e.preventDefault()}
-                  >
-                    <input
-                      type="text"
-                      placeholder="Enter your search term"
-                      className="w-[350px] focus:w-[400px] mw-md:w-auto mw-md:pl-3 mw-md:-ml-10 text-[0.7rem] mw-md:text-[0.6rem] px-5 rounded-l-md outline-4 border border-gray-400 border-solid focus:border-gray-500 focus:outline-none"
-                      value={searchKeyword}
-                      onChange={(e) => setSearchKeyword(e.target.value)}
-                    />
-                    <button
-                      type="submit"
-                      className="mw-md:flex mw-md:items-center mw-md:p-1 px-2 bg-sky-400 text-white rounded-r-md border border-solid hover:bg-sky-600"
-                      onClick={(e) => handleSearchKeyword(e)}
-                    >
-                      <span class="material-symbols-outlined text-center mt-1">search</span>
-                    </button>
-                  </form>
-                </div>
-              </div>
-              {/*슬라이드쇼*/}
-              <div className="">
-                <SlideShow />
-              </div>
-              <div className="flex flex-col justify-center mw-md:ml-1">
-                {/*등록된 물품 리스트*/}
-                <div className="my-4 flex flex-col justify-center items-center transition-all duration-300">
-                  {user['sellinglist'] && user['sellinglist']['products'].length > 0 ? (
-                    <>
-                      <SampleTable />
-                      {clickedCategory ? <CategoriesOnSale /> : <UsersOnSale />}
-                    </>
-                  ) : (
-                    <div className="p-5 w-full h-full flex justify-center items-center bg-black/15">
-                      <span className="font-bold">판매 중인 상품이 없습니다</span>
-                    </div>
-                  )}
-                </div>
-                {/*상품 버튼들*/}
-                <div className={`flex items-center mt-2 justify-center`}>
-                  {manageProduct ? (
-                    <>
-                      <div className="p-2 flex justify-center items-end">
-                        <div
-                          onClick={() => handleButtons('상품 추가')}
-                          className="py-2 px-5 flex justify-center items-center border border-transparent rounded-lg bg-green-600 hover:cursor-pointer hover:bg-green-700 transition-all duration-300"
-                        >
-                          <span className="text-white text-nowrap font-semibold text-[0.8rem] mw-md:text-[0.6rem]">
-                            상품 추가
-                          </span>
-                        </div>
-                      </div>
-                      <div className="p-2 flex justify-center items-end">
-                        <div
-                          onClick={(e) => handleUpdatebtn(e)}
-                          className="py-2 px-5 flex justify-center items-center border border-transparent rounded-lg bg-blue-500 hover:cursor-pointer hover:bg-blue-600 transition-all duration-300"
-                        >
-                          <span className="text-white font-semibold text-[0.8rem] mw-md:text-[0.6rem] text-nowrap">
-                            상품 수정
-                          </span>
-                        </div>
-                      </div>
-                      <div className="p-2 flex justify-center items-end">
-                        <div
-                          onClick={() => handleCancelSelling()}
-                          className="py-2 px-5 flex justify-center items-center border border-transparent rounded-lg bg-red-500 hover:cursor-pointer hover:bg-red-600  transition-all duration-300"
-                        >
-                          <span className="text-white font-semibold text-[0.8rem] mw-md:text-[0.6rem] text-nowrap">
-                            판매 취소
-                          </span>
-                        </div>
-                      </div>
-                      <div className="p-2 flex justify-center items-end">
-                        <div
-                          onClick={() => setManageProduct(!manageProduct)}
-                          className="py-2 px-5 flex justify-center items-center border border-transparent rounded-lg bg-yellow-500 hover:cursor-pointer hover:bg-yellow-600  transition-all duration-300"
-                        >
-                          <span className="text-white font-semibold text-[0.8rem] mw-md:text-[0.6rem] text-nowrap">
-                            이전으로
-                          </span>
-                        </div>
-                      </div>
-                    </>
+            )}
+            {activeOption === '상품 수정' && (
+              <div className="p-5 ml-10 mw-md:mb-40 flex flex-col">
+                <div className="h-[400px] mw-md:w-[140px] mw-md:h-[200px] mb-5 border border-gray-300 rounded-xl overflow-hidden">
+                  {imageUrl ? (
+                    <img src={imageUrl} alt="preview" className="w-full h-full" />
                   ) : (
                     <div
-                      className={`ml-10 flex items-center ${clickedCategory ? ' justify-around' : ' justify-center'}`}
+                      className={`flex justify-center items-center mw-md:w-[140px] mw-md:h-[200px] w-[300px] h-[400px] mb-5 border border-gray-300 rounded-xl bg-slate-100`}
                     >
-                      {clickedCategory && (
-                        <div className={`${manageProduct ? 'hidden ' : ''} text-sm text-nowrap mr-10`}>
-                          <span>
-                            카테고리 <b>&lt;{clickedCategory}&gt;</b>에서 판매 중인 상품 <b>{categoryItems.length}</b>
-                            개를 찾았습니다
-                          </span>
-                        </div>
-                      )}
-                      <div
-                        onClick={() => setManageProduct(!manageProduct)}
-                        className={`-ml-10 flex mw-md:p-1 mw-md:my-1 justify-center items-center border border-transparent rounded-lg bg-green-600 hover:cursor-pointer hover:bg-green-700`}
-                      >
-                        <span className="text-[0.9rem] mw-md:text-[0.6rem] mw-md:px-5 mw-md:py-2 p-3 text-white text-nowrap font-bold">
-                          상품 관리
-                        </span>
-                      </div>
+                      <span className="mw-md:text-[0.6rem]">상품 이미지를 업로드해주세요</span>
                     </div>
                   )}
                 </div>
+                <div className="flex justify-around items-center mw-md:mb-10">
+                  <div className="flex items-center mr-5">
+                    <span
+                      className="flex items-center justify-center p-3 cursor-pointer text-white bg-blue-500 rounded-xl hover:bg-blue-600 focus:outline-none transition-all duration-300"
+                      onClick={() => fileInputRef.current.click()}
+                    >
+                      <span className="font-bold text-xl mw-md:text-[0.65rem]">Upload</span>
+                      <input type="file" ref={fileInputRef} className="hidden" onChange={(e) => handleFileChange(e)} />
+                    </span>
+                  </div>
+                  <div className="flex items-center">
+                    <span
+                      className="flex items-center justify-center p-3 cursor-pointer text-white bg-yellow-500 rounded-xl hover:bg-yellow-600 focus:outline-none transition-all duration-300"
+                      onClick={handleBeforeButton}
+                    >
+                      <span className="font-bold text-xl mw-md:text-[0.65rem]">Before</span>
+                    </span>
+                  </div>
+                </div>
+                {activeOption === '상품 수정' && (
+                  <div
+                    className={`miw-md:hidden flex flex-col mb-10 ${
+                      productsList.length > 1 ? ' ' : 'justify-start mt-2 '
+                    } items-center border border-gray-300 rounded-lg mw-md:border-none`}
+                  >
+                    <SelectedProductsList />
+                  </div>
+                )}
               </div>
-            </>
-          )}
+            )}
+          </div>
+          <div
+            id="mystore_right_content_or_maincontent"
+            className={`p-5 mx-auto flex flex-col -mt-10 ${activeOption === '상품 수정' ? 'mw-md:ml-0' : ''}
+            ${activeOption === '상품 추가' ? 'mw-md:p-0 mw-md:-ml-32 mw-md:mr-20' : ''}`}
+          >
+            {activeOption === '상품 추가' && (
+              <>
+                <div className="max-w-4xl mx-20 py-14 mw-md:max-w-xl mw-md:mx-0">
+                  <div className="bg-white rounded px-8 mb-4 -mt-10 mw-md:-mt-20">
+                    <div className="mb-4 mw-md:mb-2">
+                      <label
+                        className="block text-gray-700 text-sm font-bold mb-2 mw-md:text-[0.7rem] mw-md:text-nowrap"
+                        for="product_name"
+                      >
+                        상품명
+                      </label>
+                      <input
+                        className="shadow appearance-none border rounded w-full mw-md:w-auto py-2 px-3 mw-md:text-[0.5rem] text-gray-700 leading-tight focus:outline-none focus:shadow-outline border-gray-400 hover:border-gray-500"
+                        id="product_name"
+                        type="text"
+                        placeholder="Enter your product name"
+                        value={productName}
+                        onChange={(e) => setProductName(e.currentTarget.value)}
+                      />
+                    </div>
+                    <div className="mb-4 mw-md:mb-2">
+                      <label
+                        className="block text-gray-700 text-sm font-bold mb-2 mw-md:text-[0.7rem] mw-md:text-nowrap"
+                        for="product_detail"
+                      >
+                        상세설명
+                      </label>
+                      <textarea
+                        className="shadow appearance-none border rounded w-full mw-md:w-auto mw-md:text-[0.5rem] py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline border-gray-400 hover:border-gray-500"
+                        id="product_detail"
+                        placeholder="Enter the detail of the product"
+                        value={productDetail}
+                        onChange={(e) => setProductDetail(e.currentTarget.value)}
+                      ></textarea>
+                    </div>
+                    <div className="mb-4 mw-md:mb-2">
+                      <label
+                        className="block text-gray-700 text-sm font-bold mb-2 mw-md:text-[0.7rem] mw-md:text-nowrap"
+                        for="product_price"
+                      >
+                        가격
+                      </label>
+                      <input
+                        className="shadow appearance-none border rounded w-full mw-md:w-auto mw-md:text-[0.5rem] py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline border-gray-400 hover:border-gray-500"
+                        id="product_price"
+                        type="text"
+                        placeholder="Enter the price"
+                        ref={priceInputRef}
+                        onChange={(e) => handlePriceComma(e)}
+                      />
+                    </div>
+                    <div className="mb-4 mw-md:mb-2">
+                      <label
+                        className="block text-gray-700 text-sm font-bold mb-2 mw-md:text-[0.7rem] mw-md:text-nowrap"
+                        for="product_maker"
+                      >
+                        제조사/원산지
+                      </label>
+                      <input
+                        className="shadow appearance-none border rounded w-full mw-md:w-auto mw-md:text-[0.5rem] py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline border-gray-400 hover:border-gray-500"
+                        id="product_maker"
+                        type="text"
+                        placeholder="Enter the manufacturer"
+                        value={productMaker}
+                        onChange={(e) => setProductMaker(e.currentTarget.value)}
+                      />
+                    </div>
+                    <div className="mb-4 mw-md:mb-2">
+                      <label
+                        className="block text-gray-700 text-sm font-bold mb-2 mw-md:text-[0.7rem] mw-md:text-nowrap"
+                        for="categories"
+                      >
+                        카테고리
+                      </label>
+                      <select
+                        class="block appearance-none w-full mw-md:w-auto mw-md:text-[0.55rem] bg-white border border-gray-400 hover:border-gray-500 px-4 py-2 pr-8 rounded shadow leading-tight focus:outline-none focus:shadow-outline"
+                        id="categories"
+                        value={categoryInput}
+                        onChange={(e) => setCategoryInput(e.currentTarget.value)}
+                      >
+                        <option value="의류">의류</option>
+                        <option value="가구">가구</option>
+                        <option value="식품">식품</option>
+                        <option value="전자제품">전자제품</option>
+                        <option value="스포츠">스포츠</option>
+                        <option value="게임">게임</option>
+                        <option value="도서">도서</option>
+                        <option value="장난감">장난감</option>
+                      </select>
+                    </div>
+                    <div className="mb-4 mw-md:mb-2">
+                      <label
+                        className="block text-gray-700 text-sm font-bold mb-2 mw-md:text-[0.7rem] mw-md:text-nowrap"
+                        for="inventory"
+                      >
+                        재고 수량
+                      </label>
+                      <input
+                        className="shadow appearance-none border rounded w-full mw-md:w-auto mw-md:text-[0.5rem] py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline border-gray-400 hover:border-gray-500"
+                        id="inventory"
+                        type="text"
+                        placeholder="Enter the inventory quantity"
+                        value={inventory}
+                        onChange={(e) => setInventory(e.currentTarget.value)}
+                      />
+                    </div>
+                    <div className="mb-4 mw-md:mb-3">
+                      <label
+                        className="block text-gray-700 text-sm font-bold mb-2 mw-md:text-[0.7rem] mw-md:text-nowrap"
+                        for="status"
+                      >
+                        판매 여부
+                      </label>
+                      <select
+                        className="block appearance-none w-full mw-md:w-auto mw-md:text-[0.5rem] bg-white border border-gray-400 hover:border-gray-700 hover:bg-gray-200 cursor-pointer px-4 py-2 pr-8 rounded shadow leading-tight focus:outline-none focus:shadow-outline"
+                        id="status"
+                        value={statusInput}
+                        onChange={(e) => setStatusInput(e.currentTarget.value)}
+                      >
+                        <option className="">판매중</option>
+                        <option className="">보류</option>
+                      </select>
+                    </div>
+                    <div className="flex items-center justify-center mw-md:-ml-14">
+                      <button
+                        className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 mw-md:py-1 rounded focus:outline-none focus:shadow-outline transition-all duration-300"
+                        type="button"
+                        onClick={() => handleAddProduct()}
+                      >
+                        <span className="font-bold mw-md:text-[0.6rem] text-nowrap">제출</span>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </>
+            )}
+            {activeOption === '상품 수정' && (
+              <>
+                <div className="max-w-4xl mx-20 py-14 mw-md:max-w-xl mw-md:-ml-8 mw-md:-mt-12">
+                  <div className="bg-white rounded px-8 mb-4 -mt-10 mw-md:-mt-20">
+                    <div className="mb-4">
+                      <label className="block text-gray-700 text-sm font-bold mb-2" for="product_name">
+                        상품명
+                      </label>
+                      <input
+                        className="shadow appearance-none border rounded w-auto mw-md:text-[0.5rem] px-4 py-2 text-gray-700 leading-tight focus:outline-none focus:shadow-outline border-gray-400 hover:border-gray-500"
+                        id="product_name"
+                        type="text"
+                        placeholder="Enter your product name"
+                        onChange={(e) => setProductName(e.currentTarget.value)}
+                        value={productName}
+                      />
+                    </div>
+                    <div className="mb-4">
+                      <label className="block text-gray-700 text-sm font-bold mb-2" for="product_detail">
+                        상세설명
+                      </label>
+                      <textarea
+                        className="shadow appearance-none border rounded w-auto mw-md:text-[0.5rem] px-4 py-2 text-gray-700 leading-tight focus:outline-none focus:shadow-outline border-gray-400 hover:border-gray-500"
+                        id="product_detail"
+                        placeholder="Enter the detail of the product"
+                        onChange={(e) => setProductDetail(e.currentTarget.value)}
+                        value={productDetail}
+                      ></textarea>
+                    </div>
+                    <div className="mb-4">
+                      <label className="block text-gray-700 text-sm font-bold mb-2" for="product_price">
+                        가격
+                      </label>
+                      <input
+                        className="shadow appearance-none border rounded w-auto mw-md:text-[0.5rem] px-4 py-2 text-gray-700 leading-tight focus:outline-none focus:shadow-outline border-gray-400 hover:border-gray-500"
+                        id="product_price"
+                        type="text"
+                        placeholder="Enter the price"
+                        ref={priceInputRef}
+                        onChange={(e) => handlePriceComma(e)}
+                        value={productPrice}
+                      />
+                    </div>
+                    <div className="mb-4">
+                      <label className="block text-gray-700 text-sm font-bold mb-2" for="product_maker">
+                        판매자
+                      </label>
+                      <input
+                        className="shadow appearance-none border rounded w-auto mw-md:text-[0.5rem] px-4 py-2 text-gray-700 leading-tight focus:outline-none focus:shadow-outline border-gray-400 hover:border-gray-500"
+                        id="product_maker"
+                        type="text"
+                        placeholder="Enter the manufacturer"
+                        onChange={(e) => setProductMaker(e.currentTarget.value)}
+                        value={productMaker}
+                      />
+                    </div>
+                    <div className="mb-4">
+                      <label className="block text-gray-700 text-sm font-bold mb-2" for="categories">
+                        카테고리
+                      </label>
+                      <select
+                        class="block appearance-none w-auto mw-md:text-[0.5rem] bg-white border border-gray-400 hover:border-gray-500 px-4 py-2 rounded shadow leading-tight focus:outline-none focus:shadow-outline"
+                        id="categories"
+                        onChange={(e) => setCategoryInput(e.target.value)}
+                        value={categoryInput}
+                      >
+                        <option value="의류">의류</option>
+                        <option value="가구">가구</option>
+                        <option value="식품">식품</option>
+                        <option value="전자제품">전자제품</option>
+                        <option value="스포츠">스포츠</option>
+                        <option value="게임">게임</option>
+                        <option value="도서">도서</option>
+                        <option value="장난감">장난감</option>
+                      </select>
+                    </div>
+                    <div className="mb-4">
+                      <label className="block text-gray-700 text-sm font-bold mb-2" for="inventory">
+                        재고 수량
+                      </label>
+                      <input
+                        className="shadow appearance-none border rounded w-auto mw-md:text-[0.5rem] px-4 py-2 text-gray-700 leading-tight focus:outline-none focus:shadow-outline border-gray-400 hover:border-gray-500"
+                        id="inventory"
+                        type="text"
+                        placeholder="Enter the inventory quantity"
+                        onChange={(e) => setInventory(e.currentTarget.value)}
+                        value={inventory}
+                      />
+                    </div>
+                    <div className="mb-4">
+                      <label className="block text-gray-700 text-sm font-bold mb-2" for="status">
+                        판매 여부
+                      </label>
+                      <select
+                        className="block appearance-none w-auto mw-md:text-[0.5rem] bg-white border border-gray-400 hover:border-gray-700 hover:bg-gray-200 cursor-pointer py-2 px-4 pr-8 rounded shadow leading-tight focus:outline-none focus:shadow-outline"
+                        id="status"
+                        onChange={(e) => setStatusInput(e.currentTarget.value)}
+                        value={statusInput}
+                      >
+                        <option>판매중</option>
+                        <option>보류</option>
+                      </select>
+                    </div>
+                    <div className="flex items-center justify-center -ml-32 mw-md:-ml-16">
+                      <button
+                        className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-5 rounded focus:outline-none focus:shadow-outline transition-all duration-300"
+                        type="button"
+                        onClick={(e) => handleUpdateProduct(e)}
+                      >
+                        <span className="font-bold mw-md:text-[0.7rem] text-nowrap">제출</span>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </>
+            )}
+            {!activeOption && (
+              <>
+                {/*등록한 상품들 검색 상자*/}
+                <StoreSearchBar setKeyword={handleSearchKeyword} />
+                {/*슬라이드쇼*/}
+                <div className="ml-10 mw-md:ml-4">
+                  <SlideShow />
+                </div>
+                <div className="flex flex-col justify-center mw-md:ml-1">
+                  {/*등록된 물품 리스트*/}
+                  <div className="my-4 flex flex-col justify-center items-center transition-all duration-300">
+                    {user['sellinglist'] && user['sellinglist']['products'].length > 0 ? (
+                      <>
+                        <SampleTable />
+                        {clickedCategory ? loading ? <LoadingSkeleton /> : <CategoriesOnSale /> : <UsersOnSale />}
+                      </>
+                    ) : (
+                      <div className="p-5 w-full h-full flex justify-center items-center bg-black/15">
+                        <span className="font-bold">판매 중인 상품이 없습니다</span>
+                      </div>
+                    )}
+                  </div>
+                  {/*상품 버튼들*/}
+                  <div className={`flex items-center mt-2 justify-center ${!manageProduct ? 'mw-md:-mt-2' : ''}`}>
+                    {manageProduct ? (
+                      <>
+                        <div className="p-2 flex justify-center items-end">
+                          <div
+                            onClick={() => handleButtons('상품 추가')}
+                            className="py-2 px-5 mw-md:px-2 flex justify-center items-center border border-transparent rounded-lg bg-green-600 hover:cursor-pointer hover:bg-green-700 transition-all duration-300"
+                          >
+                            <span className="text-white text-nowrap font-semibold text-[0.8rem] mw-md:text-[0.5rem]">
+                              상품 추가
+                            </span>
+                          </div>
+                        </div>
+                        <div className="p-2 flex justify-center items-end">
+                          <div
+                            onClick={(e) => handleUpdatebtn(e)}
+                            className="py-2 px-5 mw-md:px-2 flex justify-center items-center border border-transparent rounded-lg bg-blue-500 hover:cursor-pointer hover:bg-blue-600 transition-all duration-300"
+                          >
+                            <span className="text-white font-semibold text-[0.8rem] mw-md:text-[0.5rem] text-nowrap">
+                              상품 수정
+                            </span>
+                          </div>
+                        </div>
+                        <div className="p-2 flex justify-center items-end">
+                          <div
+                            onClick={() => handleCancelSelling()}
+                            className="py-2 px-5 mw-md:px-2 flex justify-center items-center border border-transparent rounded-lg bg-red-500 hover:cursor-pointer hover:bg-red-600  transition-all duration-300"
+                          >
+                            <span className="text-white font-semibold text-[0.8rem] mw-md:text-[0.5rem] text-nowrap">
+                              판매 취소
+                            </span>
+                          </div>
+                        </div>
+                        <div className="p-2 flex justify-center items-end">
+                          <div
+                            onClick={() => setManageProduct(!manageProduct)}
+                            className="py-2 px-5 mw-md:px-2 flex justify-center items-center border border-transparent rounded-lg bg-yellow-500 hover:cursor-pointer hover:bg-yellow-600  transition-all duration-300"
+                          >
+                            <span className="text-white font-semibold text-[0.8rem] mw-md:text-[0.5rem] text-nowrap">
+                              이전으로
+                            </span>
+                          </div>
+                        </div>
+                      </>
+                    ) : (
+                      <div
+                        className={`ml-10 flex mw-md:flex-col items-center ${
+                          clickedCategory ? ' justify-around' : ' justify-center'
+                        }`}
+                      >
+                        {clickedCategory && (
+                          <div
+                            className={`${
+                              manageProduct ? 'hidden ' : ''
+                            } text-sm text-nowrap mr-14 mw-md:text-[0.5rem]`}
+                          >
+                            <span>
+                              카테고리 <b>&lt;{clickedCategory}&gt;</b>에서 판매 중인 상품 <b>{categoryItems.length}</b>
+                              개를 찾았습니다
+                            </span>
+                          </div>
+                        )}
+                        <div className="w-full flex justify-around mw-md:-ml-10">
+                          <span
+                            onClick={() => setManageProduct(!manageProduct)}
+                            className="text-[0.9rem] mw-md:text-[0.6rem] mw-md:mr-10 mr-5 mw-md:px-5 mw-md:py-[0.45rem] p-3 text-white text-nowrap font-bold border border-transparent rounded-lg bg-green-600 hover:cursor-pointer hover:bg-green-700"
+                          >
+                            상품 관리
+                          </span>
+
+                          <span
+                            onClick={() => handleShowAll()}
+                            className="text-center font-bold p-3 rounded-lg text-[0.9rem] mw-md:ml-5 mw-md:text-[0.6rem] mw-md:px-5 mw-md:py-[0.45rem] mw-md:text-nowrap bg-yellow-500 text-white hover:cursor-pointer hover:bg-yellow-600 transition-all duration-150"
+                          >
+                            전체 상품 보기
+                          </span>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </>
+            )}
+          </div>
         </div>
       </div>
       {activeOption === '상품 수정' && (
         <div
-          className={`w-auto h-full flex flex-col ${
-            productsList.length > 1 ? 'justify-around ' : 'justify-start mt-2 '
-          } items-center border border-gray-300 rounded-lg 
-      ${activeOption === '상품 수정' ? ' justify-center' : ''}`}
+          className={`flex flex-col mb-10 mw-md:hidden ${
+            productsList.length > 1 ? ' ' : 'justify-start mt-2 '
+          } items-center border border-gray-300 rounded-lg `}
         >
           <SelectedProductsList />
         </div>
       )}
-    </div>
+    </>
   );
 }

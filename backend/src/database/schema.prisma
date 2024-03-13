@@ -64,10 +64,9 @@ model Order {
 model Store {
   id            Int          @id @default(autoincrement())
   name          String       @unique
-  users         StoreUser[]
+  users         User[]
   orders        Order[]
   selling_list  SellingList?
-  User          User[]
   sellingListId Int?
 }
 
@@ -79,8 +78,6 @@ model User {
   password       String
   orders         Order[]
   profile        Profile?
-  store          Store?          @relation(fields: [storeId], references: [id])
-  storeId        Int?            @unique
   wishlist       WishList?
   wishlistId     Int?            @unique
   sellinglist    SellingList?
@@ -89,7 +86,8 @@ model User {
   reviews        Review[]
   createdAt      DateTime        @default(now())
   updatedAt      DateTime        @updatedAt
-  StoreUser      StoreUser[]
+  store Store? @relation(fields: [storeId], references: [id])
+  storeId Int? @unique
   viewedProducts ViewedProduct[]
 }
 
@@ -106,6 +104,7 @@ model Product {
   description     String
   manufacturer    String
   category_name   String
+  discountPrice Int?
   category        Category        @relation(fields: [categoryId], references: [id])
   categoryId      Int
   status          String?
@@ -171,17 +170,6 @@ model ViewedProduct {
   user     User      @relation(fields: [userId], references: [id])
   products Product[]
   userId   Int       @unique
-}
-
-model StoreUser {
-  id      Int        @id @default(autoincrement())
-  user    User       @relation(fields: [userId], references: [id])
-  userId  Int
-  store   Store      @relation(fields: [storeId], references: [id])
-  storeId Int
-  role    StoreRoles @unique @default(Common)
-
-  @@unique([userId, storeId])
 }
 
 model ProductImage {

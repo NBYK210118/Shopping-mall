@@ -23,6 +23,8 @@ export default function UserProfile() {
   );
   const navigate = useNavigate();
 
+  console.log(user);
+
   const handleSelectFile = (e) => {
     e.preventDefault();
     setNickChange(!nickChange);
@@ -92,7 +94,7 @@ export default function UserProfile() {
   return (
     <>
       <>
-        <div className="flex mw-md:flex-wrap justify-around w-full h-full mt-10 p-10 mw-md:p-0 bg-gray-100 ">
+        <div className="flex mw-md:flex-wrap justify-around mt-10 p-10 mw-md:p-0 mw-md:-ml-10 mw-md:mt-16 bg-gray-100 ">
           {/* left Panel */}
           <div className="flex flex-col bg-white shadow-md rounded-lg overflow-hidden mw-md:-mt-14 mw-md:shadow-lg border border-gray-200">
             <div className="flex items-center justify-between p-10 border-b mb-5 mw-md:flex-wrap mw-md:-ml-6">
@@ -105,7 +107,7 @@ export default function UserProfile() {
                       className="max-w-[160px] mw-md:max-w-[100px] mw-md:h-[80px] rounded-full"
                     />
                   ) : (
-                    <span className="material-symbols-outlined text-7xl mw-md:text-[0.8rem]">account_circle</span>
+                    <span className="material-symbols-outlined text-7xl">account_circle</span>
                   )}
                 </div>
                 <div className="ml-3 mw-md:ml-3 mw-md:mr-4">
@@ -141,9 +143,9 @@ export default function UserProfile() {
                   변경사항 저장
                 </button>
               ) : (
-                <div className="w-full flex justify-end">
+                <div className="flex justify-end">
                   <button
-                    className={`text-sm bg-blue-500 hover:bg-blue-600 text-white mw-md:text-[0.7rem] mw-md:p-1 mw-md:text-nowrap font-bold py-2 px-4 rounded transition duration-300`}
+                    className={`text-sm bg-blue-500 hover:bg-blue-600 text-white mw-md:text-[0.7rem] mw-md:p-1 mw-md:ml-20 mw-md:text-nowrap font-bold py-2 px-4 rounded transition duration-300`}
                     onClick={(e) => handleSelectFile(e)}
                   >
                     프로필 바꾸기
@@ -152,7 +154,7 @@ export default function UserProfile() {
               )}
             </div>
             {/* Editable User Information */}
-            <div className="p-6 space-y-4 mw-md:p-2">
+            <div className="p-6 space-y-4 mw-md:p-2 mw-md:mb-5">
               {editClick ? (
                 // Show input fields when in edit mode
                 <form className="space-y-4">

@@ -22,6 +22,8 @@ export default function UserWishlist() {
     });
   };
 
+  const handleGoProductDetail = () => {};
+
   useEffect(() => {
     const getUserWishList = () => {
       ProductApi.fetchUserWishList(token, user.id, navigate).then((response) => {
@@ -67,21 +69,21 @@ export default function UserWishlist() {
         return (
           <div
             id="wishlist-item"
-            className="flex flex-col items-center padding-[12px] rounded-[4px] mt-3"
+            className="flex flex-col items-center border rounded-[4px] mt-3"
             style={{ flex: '0 1 calc(20% - 16px);' }}
           >
             <img
               src={val.images ? val.images[0].imgUrl : `https://source.unsplash.com/random/200x200?product`}
               alt="Product Image"
-              className="h-[200px] min-w-[220px] max-w-[180px] max-h-[250px] mb-[8px] transition-all duration-150 hover:-translate-y-1 cursor-pointer"
-              // onClick={() => handleGoProductDetail()}
+              className="h-[200px] mw-md:h-[100px] max-w-[150px] mw-md:max-w-[60px] object-cover transition-all duration-150 hover:-translate-y-1 cursor-pointer"
+              onClick={() => navigate(`/products/${val.id}`)}
             />
             <div id="product-info" className="text-center">
-              <h3 className=" font-bold">{val.name}</h3>
-              <p className="mx-0 my-[4px]">{val.price.toLocaleString('ko-kr')}원</p>
+              <h3 className="font-bold mw-md:text-xs">{val.name}</h3>
+              <p className="mx-0 my-[4px] mw-md:text-[0.65rem]">{val.price.toLocaleString('ko-kr')}원</p>
               <button
                 type="button"
-                className="flex items-center mb-1 py-[6px] px-[16px] border-none rounded-[4px] bg-[#0044ccd5] text-white cursor-pointer"
+                className="flex items-center mb-1 py-[6px] px-[16px] mw-md:px-3 mw-md:py-1 mw-md:text-[0.7rem] border-none rounded-[4px] bg-[#0044ccd5] text-white cursor-pointer"
                 onClick={(e) => toggleHeart(e, val.id)}
               >
                 Like
@@ -97,9 +99,9 @@ export default function UserWishlist() {
     } else {
       return (
         <div className="w-full h-full flex flex-col justify-center items-center">
-          <span className="miw-lg:text-[1.5rem] ">No liked Products yet.</span>
+          <span className="text-[1.5rem] ">No liked Products yet.</span>
           <span
-            className="underline cursor-pointer miw-lg:text-[1rem] text-blue-500 hover:text-blue-600"
+            className="underline cursor-pointer text-[1rem] text-blue-500 hover:text-blue-600"
             onClick={() => navigate('/home')}
           >
             상품들을 구경하고 마음에 드는 상품을 골라보세요!
@@ -112,9 +114,12 @@ export default function UserWishlist() {
   return (
     <div
       id="wishlist_container"
-      className="w-full h-full miw-lg:mt-10 flex flex-wrap justify-center items-center border border-gray-300 rounded-lg gap-[16px]"
+      className="w-full h-full mt-6 p-5 mw-md:p-0 mw-md:-ml-10 justify-center items-center border border-gray-300 rounded-lg mw-md:border-none"
     >
-      <Items />
+      <h1 className="font-bold font-mono mt-1 ml-1"></h1>
+      <div className="grid grid-cols-4 mw-md:grid-cols-2 gap-8">
+        <Items />
+      </div>
     </div>
   );
 }

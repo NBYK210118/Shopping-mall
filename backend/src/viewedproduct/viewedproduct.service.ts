@@ -25,4 +25,15 @@ export class ViewedproductService {
     viewed_product.map((val) => val.products.map((val) => result.push(val)));
     return result;
   }
+
+  async mostViewedProducts(): Promise<Product[]> {
+    const result = await this.prisma.product.findMany({
+      orderBy: {
+        viewed_count: 'desc',
+      },
+      take: 4,
+      include: { images: true },
+    });
+    return result;
+  }
 }

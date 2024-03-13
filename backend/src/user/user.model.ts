@@ -12,8 +12,7 @@ export class User implements Prisma.UserCreateInput {
   orders?: Prisma.OrderCreateNestedManyWithoutUserInput;
   reviews?: Prisma.ReviewCreateNestedManyWithoutUserInput;
   profile?: Prisma.ProfileCreateNestedOneWithoutUserInput;
-  store?: Prisma.StoreCreateNestedOneWithoutUserInput;
-  StoreUser?: Prisma.StoreUserCreateNestedManyWithoutUserInput;
+  store?: Prisma.StoreCreateNestedOneWithoutUsersInput;
   createdAt?: string | Date;
   updatedAt?: string | Date;
   likedProducts?: Prisma.UserProductCreateNestedManyWithoutUserInput;

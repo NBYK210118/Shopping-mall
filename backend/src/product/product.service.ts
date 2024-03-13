@@ -44,6 +44,7 @@ export class ProductService {
         sellingListId: user.sellinglistId,
         AND: { category_name: category },
       },
+      include: { images: true },
     });
     return result;
   }
@@ -60,6 +61,7 @@ export class ProductService {
   async getProductByName(keyword: string): Promise<Product | Product[]> {
     const found = await this.prisma.product.findMany({
       where: { name: { contains: keyword } },
+      include: { images: true },
     });
 
     if (!found) {

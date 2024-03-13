@@ -59,7 +59,7 @@ const SignIn = () => {
       {loading ? <Loading /> : null}
       {isOpenModal && (
         <div id="modal-container" className="fixed inset-0 bg-black/50 z-50 flex justify-around items-center">
-          <div id="modal" className="w-[22%] h-[55%] mw-md:w-[62%] p-3 bg-white rounded-lg shadow-custom">
+          <div id="modal" className="w-[22%] h-[55%] mw-md:w-[62%] mw-md:h-[55%] p-3 bg-white rounded-lg shadow-custom">
             <div className="flex justify-end cursor-pointer p-2 mb-1" onClick={handleSignIn}>
               <span className="text-lg font-[600]">
                 <FontAwesomeIcon icon={faXmark} />

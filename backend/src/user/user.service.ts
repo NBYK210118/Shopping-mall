@@ -43,11 +43,28 @@ export class UserService {
     const user = await this.prisma.user.findFirst({
       where: { email },
       include: {
-        sellinglist: { include: { products: true, store: true } },
+        sellinglist: {
+          include: {
+            products: {
+              select: {
+                id: true,
+                category_name: true,
+                status: true,
+                price: true,
+                name: true,
+                images: true,
+                manufacturer: true,
+                description: true,
+              },
+            },
+            store: true,
+          },
+        },
         profile: true,
         orders: true,
         store: true,
-        StoreUser: true,
+        likedProducts: true,
+        viewedProducts: true,
         wishlist: true,
         reviews: true,
       },
@@ -104,7 +121,6 @@ export class UserService {
         profile: true,
         store: true,
         wishlist: true,
-        StoreUser: true,
       },
     });
     return signup_result;
@@ -167,51 +183,20 @@ export class UserService {
       const created_new_store = await this.prisma.store.create({
         data: { name: store },
       });
-      if (user.storeId === null) {
+
+      if (!user.storeId) {
         await this.prisma.store.update({
           where: { id: created_new_store.id },
           data: { users: { connect: { id: user.id } } },
         });
-        await this.prisma.storeUser.create({
-          data: { storeId: created_new_store.id, userId: user.id },
-        });
       } else {
-        await this.prisma.storeUser.update({
-          where: {
-            userId_storeId: { userId: user.id, storeId: user.storeId },
-          },
-          data: { storeId: created_new_store.id },
-        });
-      }
-    } else {
-      // 존재하고 있는 회사명일 때
-      // 유저가 이미 속해있었던 회사인지 확인
-      const userAlreadyIn = await this.prisma.storeUser.findFirst({
-        where: { userId: user.id, store: { name: store } },
-      });
-
-      const userAlreadyHasStore = await this.prisma.store.findFirst({
-        where: { users: { some: { userId: user.id } } },
-      });
-
-      if (userAlreadyHasStore) {
         await this.prisma.store.update({
-          where: { id: userAlreadyHasStore.id },
+          where: { id: user.storeId },
           data: { users: { disconnect: { id: user.id } } },
         });
-      }
-
-      if (!userAlreadyIn) {
-        const updated_store = await this.prisma.store.update({
-          where: { name: store },
+        await this.prisma.store.update({
+          where: { id: created_new_store.id },
           data: { users: { connect: { id: user.id } } },
-        });
-
-        await this.prisma.storeUser.update({
-          where: {
-            userId_storeId: { userId: user.id, storeId: updated_store.id },
-          },
-          data: { storeId: updated_store.id },
         });
       }
     }
@@ -367,7 +352,7 @@ export class UserService {
     } = updateProductDto;
     const priceWithoutComma = price.replace(/,/g, '');
     const parsedIntPrice = parseInt(priceWithoutComma, 10);
-    console.log(category);
+    console.log('category: ', category);
     const product_image = await this.prisma.productImage.findFirst({
       where: { productId: Number(id) },
     });

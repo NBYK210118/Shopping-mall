@@ -31,6 +31,7 @@ export const AuthProvider = ({ children }) => {
             setToken(storedToken);
           } else if (response.status === 401) {
             alert('Unauthorized!');
+            localStorage.clear();
             navigate('/signin');
           } else if (response.status === 500) {
             alert('서버 에러!');

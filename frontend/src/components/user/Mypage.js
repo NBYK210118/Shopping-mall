@@ -80,7 +80,7 @@ const Mypage = () => {
     <div className="w-[75%] h-full flex justify-center">
       <div className="w-[95%] h-[70%] flex justify-center items-center">
         <div id="mypage_content" className="w-[90%] h-full flex">
-          <div className="group bg-blue-400 rounded-r-xl hover:bg-white h-[50%] mw-md:h-[50%] mt-10 p-1 fixed left-0 mw-md:left-2 top-20 mw-md:top-28 flex flex-col justify-evenly items-center transition-all duration-300 ">
+          <div className="group bg-blue-400 rounded-r-xl hover:bg-white h-[50%] mw-md:h-[10%] mt-10 p-1 fixed left-0 mw-md:left-0 top-20 mw-md:top-8 mw-md:flex-row flex flex-col justify-evenly items-center transition-all duration-300 ">
             <span className="font-bold text-white group-hover:hidden mw-md:text-[0.7rem]">Menu</span>
             <SideBar />
           </div>

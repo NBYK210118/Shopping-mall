@@ -13,4 +13,9 @@ export class ViewedproductController {
   async recentUserWatched(@GetUser() user: User): Promise<Product[]> {
     return this.viewedproductService.recentUserWatched(user);
   }
+
+  @Get('/recent-watched/every-products')
+  async mostViewdProducts(): Promise<Product[]> {
+    return this.viewedproductService.mostViewedProducts();
+  }
 }

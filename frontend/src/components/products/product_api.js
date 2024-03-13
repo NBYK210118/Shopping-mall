@@ -277,6 +277,24 @@ const userRecentWatched = async (token, navigate) => {
   }
 };
 
+// 조회수가 높은 상위 4개 상품들 불러오기
+const getMostInterested = async (navigate) => {
+  try {
+    const data = await http.get('viewedproduct/recent-watched/every-products');
+    return data;
+  } catch (error) {
+    if (error.response.status === 400) {
+      alert('잘못된 요청');
+      localStorage.clear();
+      navigate('');
+    } else if (error.response.status === 500) {
+      alert('서버 에러!');
+      localStorage.clear();
+      navigate('');
+    }
+  }
+};
+
 const ProductApi = {
   findProduct,
   categoriesItem,
@@ -290,6 +308,7 @@ const ProductApi = {
   userViewed,
   userRecentWatched,
   getProductByName,
+  getMostInterested,
 };
 
 export default ProductApi;

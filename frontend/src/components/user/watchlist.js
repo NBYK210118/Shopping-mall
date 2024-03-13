@@ -31,8 +31,13 @@ export const Watchlist = () => {
       );
     } else {
       const result = watchedProducts.map((val, idx) => (
-        <div className="flex flex-col mt-5 p-5 border border-solid border-gray-300 rounded cursor-pointer transition-all duration-150 hover:-translate-y-1 hover:bg-slate-100">
-          <img src={val.images[0].imgUrl} alt="" className="h-[200px] mw-md:h-[100px]" />
+        <div className="flex flex-col items-center border rounded-[4px] mt-3" style={{ flex: '0 1 calc(20% - 16px);' }}>
+          <img
+            src={val.images[0].imgUrl}
+            alt=""
+            className="h-[200px] mw-md:h-[100px] max-w-[150px] mw-md:max-w-[60px] object-cover transition-all duration-150 hover:-translate-y-1 cursor-pointer"
+            onClick={() => navigate(`/products/${val.id}`)}
+          />
           <span className="text-center my-3 font-bold mw-md:text-[0.7rem] mw-md:text-nowrap">{val.name}</span>
           <span className="text-center mw-md:text-[0.7rem] mw-md:text-nowrap">
             {val.price.toLocaleString('ko-kr')}원
@@ -40,16 +45,19 @@ export const Watchlist = () => {
         </div>
       ));
 
-      return <div className="grid grid-cols-4 mw-md:grid-cols-2 gap-4">{result}</div>;
+      return result;
     }
   };
 
   return (
     <div
       id="watchlist_container"
-      className="w-full h-full miw-lg:mt-10 flex flex-wrap justify-center items-center gap-[16px]"
+      className="w-full h-full my-7 justify-center items-center mw-md:-ml-10 border border-gray-300 rounded-lg p-1"
     >
-      <Items />
+      <h1 className="font-bold font-mono"></h1>
+      <div className="grid grid-cols-4 mw-md:grid-cols-2 gap-4">
+        <Items />
+      </div>
     </div>
   );
 };

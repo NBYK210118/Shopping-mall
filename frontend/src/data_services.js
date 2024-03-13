@@ -129,6 +129,7 @@ const addProduct = async (token, form, navigate) => {
   }
 };
 
+// 상품 정보 업데이트 하기
 const updateProduct = async (token, form, id, navigate) => {
   try {
     const data = await http.post(`/user/my-store/update-product/${id}`, form, {

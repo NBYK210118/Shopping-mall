@@ -79,7 +79,7 @@ function MainHeader() {
 
     const links = result.map((val, idx) => (
       <div key={idx} className="cursor-pointer rounded-lg block p-3 hover:bg-sky-300 transition-all duration-300">
-        <NavLink to={val.to} onClick={closeMenu} className="text-base font-semibold">
+        <NavLink to={val.to} onClick={closeMenu} className="text-base font-semibold text-white mw-md:text-black">
           {val.text}
         </NavLink>
       </div>
