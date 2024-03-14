@@ -17,10 +17,6 @@ export const AuthProvider = ({ children }) => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    console.log('clickedSellingProduct: ', clickedSellingProduct);
-  }, [clickedSellingProduct]);
-
-  useEffect(() => {
     if (token && user) {
       const storedUser = JSON.parse(localStorage.getItem('user'));
       const storedToken = localStorage.getItem('accessToken');

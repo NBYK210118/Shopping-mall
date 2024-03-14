@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Images } from './images_list';
 import { NavLink, Route, Routes, useNavigate } from 'react-router-dom';
 import SignIn from './components/signIn';
@@ -6,10 +6,9 @@ import MainContent from './components/main_content';
 import Mypage from './components/user/Mypage';
 import { Products } from './components/products/products_list';
 import SignUp from './components/user/signUp';
-import { AuthProvider, useAuth } from './auth.context';
-import Loading from './loading';
+import { useAuth } from './auth.context';
 import ProductDetail from './components/products/product_detail';
-import BuyNow from './components/buy_now';
+import BuyNow from './components/products/buy_now';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faBook,
@@ -21,17 +20,129 @@ import {
   faEye,
   faGamepad,
   faHeart,
-  faMoneyBill,
+  faHome,
+  faList,
   faMoneyBill1Wave,
   faShirt,
 } from '@fortawesome/free-solid-svg-icons';
+import Categories from './components/categories';
+
+function BottomBar() {
+  const { setCategory, navigate, setLoading } = useAuth();
+  const menuRef = useRef(null);
+  const [isVisible, setIsVisible] = useState(false);
+
+  const categories = [
+    { txt: '의류', icon: faShirt },
+    { txt: '전자제품', icon: faDesktop },
+    { txt: '식품', icon: faBowlFood },
+    { txt: '가구', icon: faChair },
+    { txt: '스포츠', icon: faDumbbell },
+    { txt: '게임', icon: faGamepad },
+    { txt: '도서', icon: faBook },
+    { txt: '장난감', icon: faCar },
+  ];
+
+  const handleClick = (category) => {
+    setLoading(true);
+    navigate(`/products/?category=${category}`);
+    setCategory(category);
+    localStorage.setItem('category', category);
+    window.location.reload();
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (menuRef.current && !menuRef.current.contains(event.target)) {
+        setIsVisible(false); // 메뉴 외부 클릭 시 메뉴 숨김
+      }
+    }
+
+    // 이벤트 리스너 등록
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      // 컴포넌트 언마운트 시 이벤트 리스너 제거
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [menuRef]);
+
+  // 메뉴 토글 함수
+  const toggleMenu = () => {
+    setIsVisible(!isVisible);
+  };
+
+  const BottomCategories = () => {
+    const result = categories.map((val) => (
+      <>
+        <li className="text-nowrap">
+          <span
+            className="rounded-t bg-gray-100 bg-opacity-80 font-bold hover:bg-gray-400 py-2 px-4 block"
+            onClick={() => handleClick(val.txt)}
+          >
+            <FontAwesomeIcon icon={val.icon} className="mr-2" />
+            {val.txt}
+          </span>
+        </li>
+      </>
+    ));
+    return (
+      <ul ref={menuRef} className={`absolute ${isVisible ? 'block' : 'hidden'} bottom-14 text-gray-700 pt-1`}>
+        {result}
+      </ul>
+    );
+  };
+
+  return (
+    <div className="hidden mw-md:flex mw-md:w-full mw-md:h-[70px] mw-md:fixed mw-md:bottom-0 mw-md:z-10 mw-md:justify-around mw-md:items-center mw-md:bg-gradient-to-r mw-md:from-sky-500 mw-md:to-indigo-500 mw-md:transition-all mw-md:duration-300">
+      <div className="flex flex-col">
+        <FontAwesomeIcon icon={faHome} className="p-1 text-white" onClick={() => navigate('/')} />
+        <span className="mw-md:text-[0.6rem] text-center font-bold text-white">홈</span>
+      </div>
+
+      <div className="flex flex-col" ref={menuRef} onClick={() => toggleMenu()}>
+        <BottomCategories />
+        <FontAwesomeIcon icon={faList} className="p-1 text-black/50" />
+        <span className="mw-md:text-[0.6rem] text-center font-bold text-white">카테고리</span>
+      </div>
+
+      <div className="flex flex-col" onClick={() => navigate('/user/wishlist')}>
+        <FontAwesomeIcon icon={faHeart} className="p-1 text-red-500" />
+        <span className="mw-md:text-[0.6rem] text-center font-bold text-white">좋아요</span>
+      </div>
+
+      <div className="flex flex-col">
+        <FontAwesomeIcon icon={faEye} className="p-1 text-slate-400" onClick={() => navigate('/user/watchlist')} />
+        <span className="mw-md:text-[0.6rem] text-center font-bold text-white">조회목록</span>
+      </div>
+
+      <div className="flex flex-col">
+        <FontAwesomeIcon
+          icon={faMoneyBill1Wave}
+          className="p-1 text-green-500"
+          onClick={() => navigate('/user/my-store')}
+        />
+        <span className="mw-md:text-[0.6rem] font-bold text-white">판매목록</span>
+      </div>
+    </div>
+  );
+}
 
 function MainHeader() {
   const [isMenuOpen, setMenuOpen] = useState(false);
-  const { token, category, setCategory, setLoading } = useAuth();
+  const { token, category, setLoading, setCategory } = useAuth();
   const navigate = useNavigate();
   const [openSearchBox, setOpenSearchBox] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+
+  const handleCategoryClick = (category) => {
+    setLoading(true);
+    navigate(`/products/?category=${category}`);
+    setCategory(category);
+    localStorage.setItem('category', category);
+    window.location.reload();
+    setLoading(false);
+  };
 
   const goHome = () => {
     navigate('/');
@@ -92,48 +203,6 @@ function MainHeader() {
     return links;
   };
 
-  const categories = [
-    { txt: '의류', icon: faShirt },
-    { txt: '전자제품', icon: faDesktop },
-    { txt: '식품', icon: faBowlFood },
-    { txt: '가구', icon: faChair },
-    { txt: '스포츠', icon: faDumbbell },
-    { txt: '게임', icon: faGamepad },
-    { txt: '도서', icon: faBook },
-    { txt: '장난감', icon: faCar },
-  ];
-
-  const handleCategoryClick = (category) => {
-    setLoading(true);
-    navigate(`/products/?category=${category}`);
-    setCategory(category);
-    localStorage.setItem('category', category);
-    window.location.reload();
-    setLoading(false);
-  };
-
-  const Categories = () => {
-    const result = categories.map((val) => (
-      <>
-        <li className="text-nowrap">
-          <span
-            className="rounded-t bg-gray-200 hover:bg-gray-400 py-2 px-4 block"
-            onClick={() => handleCategoryClick(val.txt)}
-          >
-            <FontAwesomeIcon icon={val.icon} className="mr-2" />
-            {val.txt}
-          </span>
-        </li>
-      </>
-    ));
-    return (
-      <div className="group border border-transparent rounded-lg flex p-3 hover:bg-sky-300 hover:cursor-pointer transition-all duration-300">
-        <span className="text-nowrap text-base text-white mw-md:text-black font-semibold">Categories</span>
-        <ul className="absolute hidden top-11 text-gray-700 pt-1 group-hover:block">{result}</ul>
-      </div>
-    );
-  };
-
   useEffect(() => {
     const handleScroll = () => {
       if (window.scrollY > 70) {
@@ -180,7 +249,7 @@ function MainHeader() {
           onClick={handleMenuClick}
         >
           <Menus />
-          <Categories />
+          <Categories onCategory={handleCategoryClick} />
           {token ? (
             <>
               <div className="border border-transparent rounded-lg flex p-3 hover:bg-sky-300 hover:cursor-pointer transition-all duration-300">
@@ -268,19 +337,8 @@ function MainHeader() {
 }
 
 function App() {
-  const { loading, setLoading, navigate } = useAuth();
-
-  useEffect(() => {
-    setLoading(true);
-    const timer = setTimeout(() => {
-      setLoading(false);
-    }, 2000);
-    return () => clearTimeout(timer);
-  }, []);
-
   return (
     <div className={`w-full h-full overflow-hidden`} id="main">
-      {loading && <Loading />}
       <MainHeader />
       <div className="w-full h-full flex justify-center items-center mt-12">
         <Routes>
@@ -294,21 +352,7 @@ function App() {
           <Route path="/products/:productId" element={<ProductDetail />}></Route>
         </Routes>
       </div>
-      <div className="hidden mw-md:flex mw-md:w-full mw-md:h-[70px] mw-md:fixed mw-md:bottom-0 mw-md:z-10 mw-md:justify-around mw-md:items-center mw-md:bg-gradient-to-r mw-md:from-sky-500 mw-md:to-indigo-500 mw-md:transition-all mw-md:duration-300">
-        <div className="flex flex-col" onClick={() => navigate('/user/wishlist')}>
-          <FontAwesomeIcon icon={faHeart} className="text-red-500" />
-          <span className="mw-md:text-xs font-bold text-white">좋아요</span>
-        </div>
-
-        <div className="flex flex-col">
-          <FontAwesomeIcon icon={faEye} className="text-white" onClick={() => navigate('/user/watchlist')} />
-          <span className="mw-md:text-xs font-bold text-white">조회목록</span>
-        </div>
-        <div className="flex flex-col">
-          <FontAwesomeIcon icon={faMoneyBill1Wave} className="text-white" onClick={() => navigate('/user/my-store')} />
-          <span className="mw-md:text-xs font-bold text-white">판매목록</span>
-        </div>
-      </div>
+      <BottomBar />
     </div>
   );
 }

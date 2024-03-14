@@ -114,61 +114,66 @@ export default function MainContent() {
       );
     } else {
       const slidesPerViewSetting = Math.max(1, salesProducts.length) >= 4 ? 3 : Math.max(1, salesProducts.length);
-      console.log(salesProducts);
-      return (
-        <Swiper
-          className={`max-w-[600px] mw-md:max-w-[330px] mw-md:max-h-[200px]`}
-          spaceBetween={10}
-          modules={[Navigation]}
-          navigation={true}
-          breakpoints={{
-            375: {
-              slidesPerView: 3,
-              spaceBetween: 20,
-            },
-            640: {
-              slidesPerView: 3,
-              spaceBetween: 20,
-            },
-            768: {
-              slidesPerView: 3,
-              spaceBetween: 30,
-            },
-            1024: {
-              slidesPerView: slidesPerViewSetting,
-              spaceBetween: 40,
-            },
-          }}
-        >
-          {salesProducts.map((item, index) => (
-            <SwiperSlide key={index}>
-              <div
-                className="p-2 flex flex-col justify-between cursor-pointer"
-                onClick={() => handleMoveToMystore(item.id)}
-              >
-                <div
-                  className={`${
-                    salesProducts.length <= 4 ? 'max-w-[120px]' : ''
-                  } bg-white rounded-lg shadow overflow-hidden hover:-translate-y-1 transition-transform duration-200`}
-                >
-                  <img
-                    src={item.images[0].imgUrl}
-                    alt={`Item ${index + 1}`}
-                    className="w-full max-h-[120px] h-[120px] object-cover"
-                    style={{ height: '170px' }}
-                  />
-                  <div className="p-1 text-md">
-                    <h3 className="font-bold mw-md:text-sm mw-md:text-nowrap">{item.name}</h3>
-                    <p className="text-xs text-gray-600 text-ellipsis overflow-hidden whitespace-nowrap mw-md:text-[0.49rem]">
-                      {item.price.toLocaleString('ko-kr')}원 {item.description}
-                    </p>
+      return loading
+        ? Array(4).map((_, idx) => (
+            <div>
+              <Skeleton height={120} count={5} />
+            </div>
+          ))
+        : salesProducts && (
+            <Swiper
+              className={`max-w-[600px] mw-md:max-w-[330px] mw-md:max-h-[200px]`}
+              spaceBetween={10}
+              modules={[Navigation]}
+              navigation={true}
+              breakpoints={{
+                375: {
+                  slidesPerView: 3,
+                  spaceBetween: 20,
+                },
+                640: {
+                  slidesPerView: 3,
+                  spaceBetween: 20,
+                },
+                768: {
+                  slidesPerView: 3,
+                  spaceBetween: 30,
+                },
+                1024: {
+                  slidesPerView: slidesPerViewSetting,
+                  spaceBetween: 40,
+                },
+              }}
+            >
+              {salesProducts.map((item, index) => (
+                <SwiperSlide key={index}>
+                  <div
+                    className="p-2 flex flex-col justify-between cursor-pointer"
+                    onClick={() => handleMoveToMystore(item.id)}
+                  >
+                    <div
+                      className={`${
+                        salesProducts.length <= 4 ? 'max-w-[120px]' : 'max-w-[150px]'
+                      } bg-white rounded-lg shadow overflow-hidden hover:-translate-y-1 transition-transform duration-200`}
+                    >
+                      <img
+                        src={item.images[0].imgUrl}
+                        alt={`Item ${index + 1}`}
+                        className="w-full max-h-[120px] h-[120px] object-cover"
+                        style={{ height: '170px' }}
+                      />
+                      <div className="p-1 text-md">
+                        <h3 className="font-bold mw-md:text-sm mw-md:text-nowrap">{item.name}</h3>
+                        <p className="text-xs text-gray-600 text-ellipsis overflow-hidden whitespace-nowrap mw-md:text-[0.49rem]">
+                          {item.price.toLocaleString('ko-kr')}원 {item.description}
+                        </p>
+                      </div>
+                    </div>
                   </div>
-                </div>
-              </div>
-            </SwiperSlide>
-          ))}
-        </Swiper>
-      );
+                </SwiperSlide>
+              ))}
+            </Swiper>
+          );
     }
   };
 
@@ -193,59 +198,65 @@ export default function MainContent() {
       );
     } else {
       const slidesPerViewSetting = Math.max(1, likedProducts.length) >= 4 ? 3 : Math.max(1, likedProducts.length);
-      return (
-        <Swiper
-          className={`max-w-[600px] mw-md:max-w-[330px] mw-md:max-h-[200px]`}
-          spaceBetween={10}
-          modules={[Navigation]}
-          navigation={true}
-          breakpoints={{
-            375: {
-              slidesPerView: slidesPerViewSetting,
-              spaceBetween: 20,
-            },
-            640: {
-              slidesPerView: 3,
-              spaceBetween: 20,
-            },
-            768: {
-              slidesPerView: 3,
-              spaceBetween: 30,
-            },
-            1024: {
-              slidesPerView: slidesPerViewSetting,
-              spaceBetween: 40,
-            },
-          }}
-        >
-          {likedProducts &&
-            likedProducts.map((item, index) => (
-              <SwiperSlide key={index}>
-                <Link to="/user/wishlist">
-                  <div className={`p-2 flex flex-col justify-between cursor-pointer`}>
-                    <div
-                      className={`${
-                        likedProducts.length <= 4 ? 'max-w-[120px]' : ''
-                      } bg-white rounded-lg shadow overflow-hidden hover:-translate-y-1 transition-transform duration-200`}
-                    >
-                      <img
-                        src={item.images[0]?.imgUrl}
-                        alt={`Item ${index + 1}`}
-                        className={`w-full max-h-[120px] h-[120px] object-cover`}
-                      />
-                      <div className="p-1 text-md">
-                        <h3 className="font-bold mw-md:text-sm mw-md:text-nowrap">{item.name}</h3>
-                        <p className="text-xs text-gray-600 text-ellipsis overflow-hidden whitespace-nowrap mw-md:text-[0.49rem]">
-                          {item.price.toLocaleString('ko-kr')}원 {item.description}
-                        </p>
+      return loading
+        ? Array(4).map((_, idx) => (
+            <div>
+              <Skeleton height={120} count={5} />
+            </div>
+          ))
+        : likedProducts && (
+            <Swiper
+              className={`max-w-[600px] mw-md:max-w-[330px] mw-md:max-h-[200px]`}
+              spaceBetween={10}
+              modules={[Navigation]}
+              navigation={true}
+              breakpoints={{
+                375: {
+                  slidesPerView: slidesPerViewSetting,
+                  spaceBetween: 20,
+                },
+                640: {
+                  slidesPerView: 3,
+                  spaceBetween: 20,
+                },
+                768: {
+                  slidesPerView: 3,
+                  spaceBetween: 30,
+                },
+                1024: {
+                  slidesPerView: slidesPerViewSetting,
+                  spaceBetween: 40,
+                },
+              }}
+            >
+              {likedProducts &&
+                likedProducts.map((item, index) => (
+                  <SwiperSlide key={index}>
+                    <Link to="/user/wishlist">
+                      <div className={`p-2 flex flex-col justify-between cursor-pointer`}>
+                        <div
+                          className={`${
+                            likedProducts.length <= 4 ? 'max-w-[120px]' : 'max-w-[150px]'
+                          } bg-white rounded-lg shadow overflow-hidden hover:-translate-y-1 transition-transform duration-200`}
+                        >
+                          <img
+                            src={item.images[0]?.imgUrl}
+                            alt={`Item ${index + 1}`}
+                            className={`w-full max-h-[120px] h-[120px] object-cover`}
+                          />
+                          <div className="p-1 text-md">
+                            <h3 className="font-bold mw-md:text-sm mw-md:text-nowrap">{item.name}</h3>
+                            <p className="text-xs text-gray-600 text-ellipsis overflow-hidden whitespace-nowrap mw-md:text-[0.49rem]">
+                              {item.price.toLocaleString('ko-kr')}원 {item.description}
+                            </p>
+                          </div>
+                        </div>
                       </div>
-                    </div>
-                  </div>
-                </Link>
-              </SwiperSlide>
-            ))}
-        </Swiper>
-      );
+                    </Link>
+                  </SwiperSlide>
+                ))}
+            </Swiper>
+          );
     }
   };
 
@@ -268,60 +279,66 @@ export default function MainContent() {
     } else {
       // 데이터가 있을 때의 렌더링 로직
       const slidesPerViewSetting = Math.max(1, watchedProducts.length) >= 4 ? 3 : Math.max(1, watchedProducts.length);
-      return (
-        <Swiper
-          className={`max-w-[600px] mw-md:max-w-[330px] mw-md:max-h-[200px]`}
-          spaceBetween={10}
-          modules={[Navigation]}
-          navigation={true}
-          breakpoints={{
-            375: {
-              slidesPerView: slidesPerViewSetting,
-              spaceBetween: 20,
-            },
-            640: {
-              slidesPerView: 2,
-              spaceBetween: 20,
-            },
-            768: {
-              slidesPerView: 2,
-              spaceBetween: 30,
-            },
-            1024: {
-              slidesPerView: slidesPerViewSetting,
-              spaceBetween: 40,
-            },
-          }}
-        >
-          {watchedProducts.map((item, index) => (
-            <SwiperSlide key={index}>
-              <div
-                className="p-2 flex flex-col justify-between cursor-pointer"
-                onClick={() => handleMoveToMystore(item.id)}
-              >
-                <div
-                  className={`${
-                    salesProducts.length <= 4 ? 'max-w-[120px]' : ''
-                  } bg-white rounded-lg shadow overflow-hidden hover:-translate-y-1 transition-transform duration-200`}
-                >
-                  <img
-                    src={item.images[0].imgUrl}
-                    alt={`Item ${index + 1}`}
-                    className="w-full max-h-[120px] h-[120px] object-cover"
-                    style={{ height: '170px' }}
-                  />
-                  <div className="p-1 text-md">
-                    <h3 className="font-bold mw-md:text-sm mw-md:text-nowrap">{item.name}</h3>
-                    <p className="text-xs text-gray-600 text-ellipsis overflow-hidden whitespace-nowrap mw-md:text-[0.49rem]">
-                      {item.price.toLocaleString('ko-kr')}원 {item.description}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </SwiperSlide>
-          ))}
-        </Swiper>
-      );
+      return loading
+        ? Array(4).map((_, idx) => (
+            <div>
+              <Skeleton height={120} count={5} />
+            </div>
+          ))
+        : watchedProducts && (
+            <Swiper
+              className={`max-w-[600px] mw-md:max-w-[330px] mw-md:max-h-[200px]`}
+              spaceBetween={10}
+              modules={[Navigation]}
+              navigation={true}
+              breakpoints={{
+                375: {
+                  slidesPerView: slidesPerViewSetting,
+                  spaceBetween: 20,
+                },
+                640: {
+                  slidesPerView: 2,
+                  spaceBetween: 20,
+                },
+                768: {
+                  slidesPerView: 2,
+                  spaceBetween: 30,
+                },
+                1024: {
+                  slidesPerView: slidesPerViewSetting,
+                  spaceBetween: 40,
+                },
+              }}
+            >
+              {watchedProducts &&
+                watchedProducts.map((item, index) => (
+                  <SwiperSlide key={index}>
+                    <div
+                      className="p-2 flex flex-col justify-between cursor-pointer"
+                      onClick={() => handleMoveToMystore(item.id)}
+                    >
+                      <div
+                        className={`${
+                          watchedProducts.length <= 4 ? 'max-w-[120px]' : 'max-w-[150px]'
+                        } bg-white rounded-lg shadow overflow-hidden hover:-translate-y-1 transition-transform duration-200`}
+                      >
+                        <img
+                          src={item.images[0].imgUrl}
+                          alt={`Item ${index + 1}`}
+                          className="w-full  max-h-[140px] h-[120px] object-cover"
+                        />
+                        <div className="p-1 text-md">
+                          <h3 className="font-bold mw-md:text-sm mw-md:text-nowrap">{item.name}</h3>
+                          <p className="text-xs text-gray-600 text-ellipsis overflow-hidden whitespace-nowrap mw-md:text-[0.49rem]">
+                            {item.price.toLocaleString('ko-kr')}원 {item.description}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </SwiperSlide>
+                ))}
+            </Swiper>
+          );
     }
   };
 
@@ -428,7 +445,7 @@ export default function MainContent() {
 
               {/* Advertising Space */}
               <div className="mx-5 mb-5 p-4">
-                <h3 className="text-xl font-semibold mb-3 mw-md:text-lg mw-md:text-nowrap">Featured Ads</h3>
+                <h3 className="text-xl text-center font-semibold mb-3 mw-md:text-lg mw-md:text-nowrap">Featured Ads</h3>
                 <div className="grid grid-cols-2 gap-4 mw-md:grid-cols-2">
                   {[...Array(4)].map((_, index) => (
                     <div className="flex flex-col items-center">
@@ -466,24 +483,24 @@ export default function MainContent() {
               </div>
 
               {/* Sales */}
-              <div className="mw-md:hidden flex flex-col justify-around items-center max-w-[1024px] mt-10 mx-auto border border-solid border-gray-300 p-2 rounded mw-md:justify-evenly">
-                <h1 className="shadow-md rounded p-3 bg-white text-center font-bold text-xl mw-md:text-lg">
+              <div className="mw-md:hidden flex flex-col justify-around items-center max-w-[1024px] mt-10 mx-auto border border-solid border-gray-300 p-2 rounded shadow">
+                <h1 className="shadow-md rounded p-3 bg-white text-center font-bold text-xl">
                   <FontAwesomeIcon icon={faHandSparkles} />
-                  판매 중인 상품
+                  마이 스토어
                 </h1>
                 {loading ? <LoadingSkeleton /> : <Sales />}
               </div>
               {/* Favorites */}
-              <div className="mw-md:hidden flex flex-col justify-around items-center max-w-[1024px] mt-10 mx-auto mw-md:justify-evenly border border-solid border-gray-300 p-2 rounded">
-                <h1 className="shadow-md rounded p-3 bg-white font-bold text-xl mw-md:text-lg">
+              <div className="mw-md:hidden flex flex-col justify-around items-center max-w-[1024px] mt-10 mx-auto border border-solid border-gray-300 p-2 rounded shadow">
+                <h1 className="shadow-md rounded p-3 bg-white font-bold text-xl">
                   {' '}
                   <FontAwesomeIcon icon={faHeart} className="text-red-500" /> 좋아요 리스트
                 </h1>
                 {loading ? <LoadingSkeleton /> : <LikedProducts />}
               </div>
               {/* WatchList */}
-              <div className="mw-md:hidden flex flex-col justify-around items-center max-w-[1024px] mt-10 mx-auto mw-md:justify-evenly border border-solid border-gray-300 p-2 rounded">
-                <h1 className="shadow-md rounded p-3 bg-white font-bold text-xl mw-md:text-lg">
+              <div className="mw-md:hidden flex flex-col justify-around items-center max-w-[1024px] mt-10 mx-auto border border-solid border-gray-300 p-2 rounded shadow">
+                <h1 className="shadow-md rounded p-3 bg-white font-bold text-xl">
                   {' '}
                   <FontAwesomeIcon icon={faEye} /> 최근 본 상품들
                 </h1>
@@ -493,71 +510,89 @@ export default function MainContent() {
           </div>
         </>
       ) : (
-        <div className="w-full h-full flex flex-wrap justify-between p-4 bg-gray-200 bg-opacity-10">
-          <div
-            id="main_left_content"
-            className="w-[35%] h-auto flex flex-col justify-center items-center max-w-[512px] mx-auto"
-          >
-            {/* Recommended Products */}
-            <div className="p-4 mb-6 mw-md:mb-2 mw-md:mr-0">
-              <h3 className="text-xl font-semibold mb-3 mw-md:text-sm">실시간 조회수 TOP4</h3>
-              <div className="grid grid-cols-2 gap-4">
-                {loading ? (
-                  <div>
-                    <Skeleton height={150} />
-                    <Skeleton count={5} />
-                  </div>
-                ) : (
-                  mostViewedProducts.map((val, index) => (
-                    <div key={index} className="flex flex-col items-center border border-solid border-gray-400 rounded">
-                      <img
-                        src={val.images[0].imgUrl}
-                        alt={`Product ${index + 1}`}
-                        className="object-cover w-[190px] h-[180px] mw-md:w-[150px] mw-md:h-[150px] mb-2 cursor-pointer"
-                        onClick={() => navigate(`/products/${val.id}`)}
-                      />
-                      <div className="flex">
-                        <FontAwesomeIcon icon={faEye} className="text-gray-400 mr-1 mw-md:text-sm" />
-                        <p className="text-xs mw-md:text-sm text-gray-500">{val.viewed_count} views</p>
-                      </div>
-                      <p className="mw-md:text-sm font-bold">{val.name}</p>
-                      <p className="mw-md:text-sm">{val.price.toLocaleString('ko-kr')}원</p>
+        <>
+          {showMessage && (
+            <div
+              className={`fixed mx-auto w-full bottom-0 mw-md:bottom-[70px] p-4 z-50 bg-gradient-to-tr bg-cyan-500 text-white text-center transition-all duration-1000 ${
+                slideOut ? '-translate-x-0' : 'translate-x-[100vw]'
+              }`}
+            >
+              <h2 className="text-2xl font-semibold mw-md:text-lg">
+                Welcome! [{user ? user['profile']['nickname'] : 'Guest'}]!
+              </h2>
+              <p>Check out what's new since your last visit.</p>
+            </div>
+          )}
+          <div className="w-full h-full flex flex-wrap justify-between p-4 bg-gray-200 bg-opacity-10">
+            <div
+              id="main_left_content"
+              className="w-[35%] h-auto flex flex-col justify-center items-center max-w-[512px] mx-auto"
+            >
+              {/* Recommended Products */}
+              <div className="p-4 mb-6 mw-md:mb-2 mw-md:mr-0">
+                <h3 className="text-xl font-semibold mb-3 mw-md:text-sm">실시간 조회수 TOP4</h3>
+                <div className="grid grid-cols-2 gap-4">
+                  {loading ? (
+                    <div>
+                      <Skeleton height={150} />
+                      <Skeleton count={5} />
                     </div>
-                  ))
-                )}
+                  ) : (
+                    mostViewedProducts &&
+                    mostViewedProducts.map((val, index) => (
+                      <div
+                        key={index}
+                        className="flex flex-col items-center border border-solid border-gray-400 rounded"
+                      >
+                        <img
+                          src={val.images[0].imgUrl}
+                          alt={`Product ${index + 1}`}
+                          className="object-cover w-[190px] h-[180px] mw-md:w-[150px] mw-md:h-[150px] mb-2 cursor-pointer"
+                          onClick={() => navigate(`/products/${val.id}`)}
+                        />
+                        <div className="flex">
+                          <FontAwesomeIcon icon={faEye} className="text-gray-400 mr-1 mw-md:text-sm" />
+                          <p className="text-xs mw-md:text-sm text-gray-500">{val.viewed_count} views</p>
+                        </div>
+                        <p className="mw-md:text-sm font-bold">{val.name}</p>
+                        <p className="mw-md:text-sm">{val.price.toLocaleString('ko-kr')}원</p>
+                      </div>
+                    ))
+                  )}
+                </div>
+              </div>
+
+              {/* Sales and Promotions */}
+              <div className="mb-2 p-4">
+                <h3 className="text-xl font-semibold mb-3 mw-md:text-nowrap mw-md:text-lg">On Sale Now</h3>
+                <div className="grid grid-cols-3 gap-4 ">
+                  {[...Array(6)].map((_, index) => (
+                    <div key={index} className="flex flex-col items-center">
+                      <img src="https://via.placeholder.com/150" alt={`Product ${index + 1}`} className="mb-2" />
+                      <p className="mw-md:text-sm">Product Name {index + 1}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Advertising Space */}
+              <div className="mx-5 mb-2 p-4">
+                <h3 className="text-xl font-semibold mb-3 mw-md:text-lg mw-md:text-nowrap">Featured Ads</h3>
+                <div className="grid grid-cols-2 gap-4">
+                  {[...Array(4)].map((_, index) => (
+                    <div className="flex flex-col items-center">
+                      <img src="https://via.placeholder.com/150" alt="Ad" className="mb-2" />
+                      <p className="mw-md:hidden">Ad Description</p>
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
-
-            {/* Sales and Promotions */}
-            <div className="mb-2 p-4">
-              <h3 className="text-xl font-semibold mb-3 mw-md:text-nowrap mw-md:text-lg">On Sale Now</h3>
-              <div className="grid grid-cols-3 gap-4 ">
-                {[...Array(6)].map((_, index) => (
-                  <div key={index} className="flex flex-col items-center">
-                    <img src="https://via.placeholder.com/150" alt={`Product ${index + 1}`} className="mb-2" />
-                    <p className="mw-md:text-sm">Product Name {index + 1}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Advertising Space */}
-            <div className="mx-5 mb-2 p-4">
-              <h3 className="text-xl font-semibold mb-3 mw-md:text-lg mw-md:text-nowrap">Featured Ads</h3>
-              <div className="grid grid-cols-2 gap-4">
-                {[...Array(4)].map((_, index) => (
-                  <div className="flex flex-col items-center">
-                    <img src="https://via.placeholder.com/150" alt="Ad" className="mb-2" />
-                    <p className="mw-md:hidden">Ad Description</p>
-                  </div>
-                ))}
-              </div>
+            <div id="main_right_content" className="w-1/2 h-auto max-w-[1024px] mt-5 mx-auto">
+              <AdBanner />
             </div>
           </div>
-          <div id="main_right_content" className="w-1/2 h-auto max-w-[1024px] mt-5 mx-auto">
-            <AdBanner />
-          </div>
-        </div>
+        </>
       )}
     </>
   );

@@ -120,7 +120,7 @@ export function Products() {
   };
 
   return (
-    <div id="products_main" className="w-full h-full flex justify-center mt-10">
+    <div id="products_main" className="w-full h-full flex justify-center mt-10 mw-md:mb-20">
       <div id="products_container" className="w-full h-full">
         <div className="mx-auto px-4">
           <div className="flex flex-wrap items-end mw-md:grid mw-md:grid-cols-2">

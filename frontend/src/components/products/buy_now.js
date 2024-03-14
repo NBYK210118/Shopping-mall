@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
-import { useAuth } from '../auth.context';
-import ProductApi from './products/product_api';
+import { useAuth } from '../../auth.context';
+import ProductApi from './product_api';
 import { useParams } from 'react-router-dom';
 
 export const BuyNow = () => {
