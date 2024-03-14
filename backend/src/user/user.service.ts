@@ -3,7 +3,7 @@ import {
   UnauthorizedException,
   UploadedFile,
 } from '@nestjs/common';
-import { Image, Product, Profile, User, WishList } from '@prisma/client';
+import { Image, Product, Profile, Store, User, WishList } from '@prisma/client';
 import { PrismaService } from 'src/database/prisma.service';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
@@ -178,25 +178,46 @@ export class UserService {
       where: { name: store },
     });
 
-    // 존재하고 있는 회사명이 아닐 때
-    if (!alreadyExistStore) {
-      const created_new_store = await this.prisma.store.create({
-        data: { name: store },
-      });
-
-      if (!user.storeId) {
+    if (user.storeId === null) {
+      if (alreadyExistStore) {
         await this.prisma.store.update({
-          where: { id: created_new_store.id },
+          where: { id: alreadyExistStore.id },
           data: { users: { connect: { id: user.id } } },
+        });
+        await this.prisma.user.update({
+          where: { id: user.id },
+          data: { store: { connect: { id: alreadyExistStore.id } } },
         });
       } else {
-        await this.prisma.store.update({
-          where: { id: user.storeId },
-          data: { users: { disconnect: { id: user.id } } },
+        const create_new_store = await this.prisma.store.create({
+          data: { name: store, users: { connect: { id: user.id } } },
         });
-        await this.prisma.store.update({
-          where: { id: created_new_store.id },
+        await this.prisma.user.update({
+          where: { id: user.id },
+          data: { store: { connect: { id: create_new_store.id } } },
+        });
+      }
+    } else {
+      await this.prisma.user.update({
+        where: { id: user.id },
+        data: { store: { disconnect: { id: user.storeId } } },
+      });
+      if (alreadyExistStore) {
+        const new_store = await this.prisma.store.update({
+          where: { id: alreadyExistStore.id },
           data: { users: { connect: { id: user.id } } },
+        });
+        await this.prisma.user.update({
+          where: { id: user.id },
+          data: { store: { connect: { id: new_store.id } } },
+        });
+      } else {
+        const create_new_store = await this.prisma.store.create({
+          data: { users: { connect: { id: user.id } }, name: store },
+        });
+        await this.prisma.user.update({
+          where: { id: user.id },
+          data: { store: { connect: { id: create_new_store.id } } },
         });
       }
     }
@@ -390,10 +411,42 @@ export class UserService {
     return products;
   }
 
-  async deleteProduct(user: User, list: number[]) {
-    await this.prisma.product.deleteMany({
-      where: { id: { in: list } },
-    });
+  async deleteProduct(user: User, checklist: string) {
+    const parsedChecklist = checklist.split(',').map((val) => parseInt(val));
+
+    if (parsedChecklist.length === 1) {
+      const img = await this.prisma.image.findFirst({
+        where: { products: { some: { id: parsedChecklist[0] } } },
+      });
+      await this.prisma.productImage.delete({
+        where: {
+          productId_imageId: { productId: parsedChecklist[0], imageId: img.id },
+        },
+      });
+      await this.prisma.image.delete({ where: { id: img.id } });
+      await this.prisma.product.delete({
+        where: { id: parsedChecklist[0] },
+      });
+    } else if (parsedChecklist.length > 1) {
+      for (const id of parsedChecklist) {
+        let img = await this.prisma.image.findFirst({
+          where: { products: { some: { id } } },
+        });
+        await this.prisma.productImage.delete({
+          where: {
+            productId_imageId: {
+              productId: id,
+              imageId: img.id,
+            },
+          },
+        });
+        await this.prisma.image.delete({ where: { id: img.id } });
+        await this.prisma.product.delete({
+          where: { id },
+        });
+      }
+    }
+
     const onUser = await this.emailUser(user.email);
     return onUser;
   }

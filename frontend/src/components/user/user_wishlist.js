@@ -101,7 +101,7 @@ export default function UserWishlist() {
         <div className="w-full h-full flex flex-col justify-center items-center">
           <span className="text-[1.5rem] ">No liked Products yet.</span>
           <span
-            className="underline cursor-pointer text-[1rem] text-blue-500 hover:text-blue-600"
+            className="underline cursor-pointer text-[1rem] text-blue-500 hover:text-blue-600 text-nowrap ml-32"
             onClick={() => navigate('/home')}
           >
             상품들을 구경하고 마음에 드는 상품을 골라보세요!

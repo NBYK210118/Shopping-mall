@@ -18,7 +18,11 @@ import {
   faChair,
   faDesktop,
   faDumbbell,
+  faEye,
   faGamepad,
+  faHeart,
+  faMoneyBill,
+  faMoneyBill1Wave,
   faShirt,
 } from '@fortawesome/free-solid-svg-icons';
 
@@ -264,7 +268,7 @@ function MainHeader() {
 }
 
 function App() {
-  const { loading, setLoading } = useAuth();
+  const { loading, setLoading, navigate } = useAuth();
 
   useEffect(() => {
     setLoading(true);
@@ -289,6 +293,21 @@ function App() {
           <Route path="/products/:productId/buy" element={<BuyNow />}></Route>
           <Route path="/products/:productId" element={<ProductDetail />}></Route>
         </Routes>
+      </div>
+      <div className="hidden mw-md:flex mw-md:w-full mw-md:h-[70px] mw-md:fixed mw-md:bottom-0 mw-md:z-10 mw-md:justify-around mw-md:items-center mw-md:bg-gradient-to-r mw-md:from-sky-500 mw-md:to-indigo-500 mw-md:transition-all mw-md:duration-300">
+        <div className="flex flex-col" onClick={() => navigate('/user/wishlist')}>
+          <FontAwesomeIcon icon={faHeart} className="text-red-500" />
+          <span className="mw-md:text-xs font-bold text-white">좋아요</span>
+        </div>
+
+        <div className="flex flex-col">
+          <FontAwesomeIcon icon={faEye} className="text-white" onClick={() => navigate('/user/watchlist')} />
+          <span className="mw-md:text-xs font-bold text-white">조회목록</span>
+        </div>
+        <div className="flex flex-col">
+          <FontAwesomeIcon icon={faMoneyBill1Wave} className="text-white" onClick={() => navigate('/user/my-store')} />
+          <span className="mw-md:text-xs font-bold text-white">판매목록</span>
+        </div>
       </div>
     </div>
   );

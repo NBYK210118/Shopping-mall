@@ -5,9 +5,10 @@ import { faHeart as faHeartRegular } from '@fortawesome/free-regular-svg-icons';
 import ProductApi from './product_api';
 import { useAuth } from '../../auth.context';
 import { Link, useSearchParams } from 'react-router-dom';
+import Skeleton from 'react-loading-skeleton';
 
 export function Products() {
-  const { token, user, setUser, category, setCategory, setLoading, navigate } = useAuth();
+  const { token, user, setUser, category, setCategory, loading, setLoading, navigate } = useAuth();
   const [currentProducts, setCurrentProducts] = useState([]);
   const [manageProductsLikes, setManageProductsLikes] = useState({});
   let [searchParams, setSearchParams] = useSearchParams();
@@ -122,7 +123,22 @@ export function Products() {
     <div id="products_main" className="w-full h-full flex justify-center mt-10">
       <div id="products_container" className="w-full h-full">
         <div className="mx-auto px-4">
-          <div className="flex flex-wrap items-end mw-md:grid mw-md:grid-cols-2">{currentProducts && <Items />}</div>
+          <div className="flex flex-wrap items-end mw-md:grid mw-md:grid-cols-2">
+            {loading ? (
+              <div>
+                <Skeleton height={170} />
+                <Skeleton count={5} />
+              </div>
+            ) : currentProducts.length > 0 ? (
+              <Items />
+            ) : (
+              <div className="w-[100vw] h-[100vh] mw-md:w-[92vw] mw-md:h-[100vh] bg-black flex justify-center items-center bg-opacity-10">
+                <span className="text-xl mw-md:text-sm">
+                  <b>&lt;{category}&gt;</b> 카테고리에 판매 중인 상품이 없습니다
+                </span>
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </div>

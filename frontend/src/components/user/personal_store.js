@@ -26,12 +26,6 @@ export default function PersonalStore() {
   const [currentProduct, setCurrentProduct] = useState({});
   const [categoryItems, setCategoryItems] = useState([]);
   const [clickedCategory, setClickedCategory] = useState('');
-  const [currentpage, setCurrentpage] = useState({
-    first: true,
-    second: false,
-    third: false,
-    fourth: false,
-  });
   const [currentClick, setCurrentClick] = useState({
     '상품 추가': false,
     '상품 수정': false,
@@ -45,6 +39,7 @@ export default function PersonalStore() {
   const [keyword, setKeyword] = useState('');
   const [searchingResult, setSearchingResult] = useState(null);
   const priceInputRef = useRef();
+  const productImgRef = useRef();
 
   // 이전 버튼 클릭 시 activeOption 비워주기
   const handleBeforeButton = () => {
@@ -65,15 +60,17 @@ export default function PersonalStore() {
 
   // 상품 목록에서 특정 상품을 선택했을 때 선택된 상품 리스트들을 state에 저장해주고, If, 선택된 상품들에 대한 번호가 리스트에 있다면 background color 지정해주기
   const handleSellingListClick = (idx) => {
-    if (!selectedList.includes(idx)) {
-      setSellistIndex(idx);
-      setSelectedList((prevState) => {
-        return [...prevState, idx];
-      });
-    } else {
-      setSelectedList((prevState) => {
-        return prevState.filter((val) => val !== idx);
-      });
+    if (selectedList) {
+      if (!selectedList.includes(idx)) {
+        setSellistIndex(idx);
+        setSelectedList((prevState) => {
+          return [...prevState, idx];
+        });
+      } else {
+        setSelectedList((prevState) => {
+          return prevState.filter((val) => val !== idx);
+        });
+      }
     }
   };
 
@@ -356,7 +353,11 @@ export default function PersonalStore() {
           <div
             className={`w-full grid grid-cols-7 mw-md:gap-3 p-4 justify-center items-center border border-solid border-gray-300
             rounded-lg hover:bg-gray-200 transition-all duration-150 hover:cursor-pointer
-          ${selectedList.includes(val.id) ? ' bg-gradient-to-bl from-cyan-400 to-blue-600 font-bold text-white' : ''}`}
+          ${
+            selectedList && selectedList.includes(val.id)
+              ? ' bg-gradient-to-bl from-cyan-400 to-blue-600 font-bold text-white'
+              : ''
+          }`}
             onClick={() => handleSellingListClick(val.id)}
             key={val.id}
           >
@@ -364,7 +365,7 @@ export default function PersonalStore() {
               {val.id ? val.id : '번호 없음'}-{val.status ? val.status : 'None'}
             </span>
 
-            <span className="font-bold text-nowrap text-[0.8rem] mw-md:text-[0.48rem] mw-md:px-2 text-ellipsis overflow-hidden whitespace-nowrap">
+            <span className="font-bold text-[0.8rem] mw-md:text-[0.48rem] mw-md:px-2 text-ellipsis overflow-hidden whitespace-nowrap">
               {val.name ? val.name : 'None'}
             </span>
 
@@ -380,7 +381,7 @@ export default function PersonalStore() {
               {val.manufacturer ? val.manufacturer : 'None'}
             </span>
 
-            <span className="text-[0.8rem] text-nowrap font-bold text-ellipsis white-nowrap overflow-hidden mw-md:text-[0.48rem] mw-md:px-2">
+            <span className="text-[0.8rem] font-bold text-ellipsis white-nowrap overflow-hidden mw-md:text-[0.48rem] mw-md:px-2">
               {val.description ? val.description : 'None'}
             </span>
             <img src={val.images[0].imgUrl} alt="" className="w-[50px] mw-md:w-auto" />
@@ -393,7 +394,11 @@ export default function PersonalStore() {
           <div
             className={`w-full grid grid-cols-7 mw-md:gap-6 p-4 justify-center items-center border border-solid border-gray-300
            hover:bg-gray-200 transition-all duration-150 hover:cursor-pointer
-          ${selectedList.includes(val.id) ? ' bg-gradient-to-bl from-cyan-400 to-blue-600 font-bold text-white' : ''}`}
+          ${
+            selectedList && selectedList.includes(val.id)
+              ? ' bg-gradient-to-bl from-cyan-400 to-blue-600 font-bold text-white'
+              : ''
+          }`}
             onClick={() => handleSellingListClick(val.id)}
             key={val.id}
           >
@@ -482,21 +487,20 @@ export default function PersonalStore() {
         onClick={() => setCurrentProduct(val)}
       >
         <div id="selected_item_1" className="flex justify-center items-center">
-          <div className="flex items-center">
-            <img src={val['images'][0]['imgUrl']} alt="product_img" className="w-[150px] h-[120px] mw-md:h-[50px]" />
+          <div className="flex items-center mb-2">
+            <img src={val['images'][0]['imgUrl']} alt="product_img" className="mw-md:h-[50px]" />
           </div>
           <div className="ml-3 flex flex-col justify-around items-center">
             <div
               id="product_name"
-              className="inline-block text-sm text-ellipsis overflow-hidden whitespace-nowrap text-blue-500 hover:underline"
+              className="text-sm text-ellipsis overflow-hidden whitespace-nowrap text-blue-500 hover:underline"
             >
               <span className="font-semibold">{val.name ? val.name : 'None'}</span>
             </div>
-            <div
-              id="product_description"
-              className="inline-block text-sm text-ellipsis overflow-hidden whitespace-nowrap text-blue-500 hover:underline"
-            >
-              <span className="">{val.description ? val.description : 'None'}</span>
+            <div id="product_description" className="text-sm text-blue-500 hover:underline">
+              <span className="text-ellipsis overflow-hidden whitespace-nowrap">
+                {val.description ? val.description : 'None'}
+              </span>
             </div>
           </div>
         </div>
@@ -504,6 +508,20 @@ export default function PersonalStore() {
     ));
 
     return result;
+  };
+
+  const handleProductImgDrop = (e) => {
+    e.preventDefault();
+    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+      const file = e.dataTransfer.files[0];
+
+      const reader = new FileReader();
+      reader.onload = () => {
+        console.log(reader.result);
+        setImageUrl(reader.result);
+      };
+      reader.readAsDataURL(file);
+    }
   };
 
   const LoadingSkeleton = () => {
@@ -551,11 +569,15 @@ export default function PersonalStore() {
                     className="mb-5 border border-gray-300 rounded-xl mw-md:w-[140px] mw-md:h-[200px] w-[300px] h-[400px] object-cover"
                   />
                 ) : (
-                  <div
-                    className={`flex justify-center items-center mw-md:w-[140px] mw-md:h-[200px] w-[300px] h-[400px] mb-5 border border-gray-300 rounded-xl bg-slate-100`}
-                  >
-                    <span className="mw-md:text-[0.6rem]">상품 이미지를 업로드해주세요</span>
-                  </div>
+                  <>
+                    <div
+                      className={`flex justify-center items-center mw-md:w-[140px] mw-md:h-[200px] w-[300px] h-[400px] mb-5 border border-gray-300 rounded-xl bg-slate-100`}
+                      onDragOver={(e) => e.preventDefault()}
+                      onDrop={(e) => handleProductImgDrop(e)}
+                    >
+                      <span className="mw-md:text-[0.6rem]">상품 이미지를 업로드해주세요</span>
+                    </div>
+                  </>
                 )}
 
                 <div className="flex justify-around">
@@ -583,6 +605,8 @@ export default function PersonalStore() {
                   ) : (
                     <div
                       className={`flex justify-center items-center mw-md:w-[140px] mw-md:h-[200px] w-[300px] h-[400px] mb-5 border border-gray-300 rounded-xl bg-slate-100`}
+                      onDragOver={(e) => e.preventDefault()}
+                      onDrop={(e) => handleProductImgDrop(e)}
                     >
                       <span className="mw-md:text-[0.6rem]">상품 이미지를 업로드해주세요</span>
                     </div>
@@ -743,8 +767,8 @@ export default function PersonalStore() {
                         value={statusInput}
                         onChange={(e) => setStatusInput(e.currentTarget.value)}
                       >
-                        <option className="">판매중</option>
-                        <option className="">보류</option>
+                        <option value="판매중">판매중</option>
+                        <option value="보류">보류</option>
                       </select>
                     </div>
                     <div className="flex items-center justify-center mw-md:-ml-14">
@@ -987,7 +1011,7 @@ export default function PersonalStore() {
       </div>
       {activeOption === '상품 수정' && (
         <div
-          className={`flex flex-col mb-10 mw-md:hidden ${
+          className={`flex flex-col mb-10 mw-md:hidden text-ellipsis overflow-hidden whitespace-nowrap ${
             productsList.length > 1 ? ' ' : 'justify-start mt-2 '
           } items-center border border-gray-300 rounded-lg `}
         >

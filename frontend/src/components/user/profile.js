@@ -3,27 +3,19 @@ import { Images } from '../../images_list';
 import { useAuth } from '../../auth.context';
 import DataService from '../../data_services';
 import { useNavigate } from 'react-router-dom';
+import ProfileInput from './profileInput';
 
 export default function UserProfile() {
   const { token, user, setUser, setLoading } = useAuth();
   const fileInputRef = useRef(null);
-  const [firstName, setFirstName] = useState(user?.firstName);
-  const [lastName, setLastName] = useState(user?.lastName);
-  const [email, setEmail] = useState(user['email']);
-  const [store, setStore] = useState(`${user['store'] ? user['store']['name'] : 'None'}`);
   const [nickname, setNickname] = useState(`${user['profile'] ? user['profile']['nickname'] : 'Not yet'}`);
-  const [address, setAddress] = useState(`${user['profile'] ? user['profile']['address'] : 'None'}`);
-  const [editClick, setEditClick] = useState(false);
+  const [email, setEmail] = useState(user['email']);
   const [nickChange, setNickChange] = useState(false);
   const [currentProfileImg, setCurrentProfileImg] = useState(null);
   const [profileImgSize, setProfileImgSize] = useState(0);
   const [imageUrl, setImageUrl] = useState(user['profile']['imageUrl']);
-  const [phoneNumber, setPhoneNumber] = useState(
-    user['profile']['phoneNumber'] ? user['profile']['phoneNumber'] : '입력해주세요'
-  );
-  const navigate = useNavigate();
 
-  console.log(user);
+  const navigate = useNavigate();
 
   const handleSelectFile = (e) => {
     e.preventDefault();
@@ -66,19 +58,7 @@ export default function UserProfile() {
     setNickname(response.data['profile']['nickname']);
   };
 
-  const handleProfileUpdate = async (e) => {
-    e.preventDefault();
-    const formData = new FormData();
-    formData.append('firstName', firstName);
-    formData.append('lastName', lastName);
-    formData.append('email', email);
-    formData.append('phoneNumber', phoneNumber);
-    formData.append('store', store);
-    formData.append('address', address);
-    for (let key of formData.entries()) {
-      console.log(`key[0]: ${key[0]}, key[1]:${key[1]}`);
-    }
-
+  const handleProfileUpdate = async (formData, setEditClick) => {
     setLoading(true);
     DataService.updateProfile(token, formData, navigate).then((response) => {
       if (response && response.data) {
@@ -104,7 +84,7 @@ export default function UserProfile() {
                     <img
                       src={imageUrl}
                       alt="profile_img"
-                      className="max-w-[160px] mw-md:max-w-[100px] mw-md:h-[80px] rounded-full"
+                      className="max-w-[160px] max-h-[120px] mw-md:max-w-[100px] mw-md:h-[80px] rounded-full"
                     />
                   ) : (
                     <span className="material-symbols-outlined text-7xl">account_circle</span>
@@ -154,98 +134,7 @@ export default function UserProfile() {
               )}
             </div>
             {/* Editable User Information */}
-            <div className="p-6 space-y-4 mw-md:p-2 mw-md:mb-5">
-              {editClick ? (
-                // Show input fields when in edit mode
-                <form className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <label className="text-gray-700 mw-md:text-[0.75rem]">First Name</label>
-                    <input
-                      className="border border-gray-300 rounded p-2 mw-md:text-[0.75rem]"
-                      type="text"
-                      value={firstName}
-                      onChange={(e) => setFirstName(e.target.value)}
-                    />
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <label className="text-gray-700 mw-md:text-[0.75rem]">Last Name</label>
-                    <input
-                      className="border border-gray-300 rounded p-2 mw-md:text-[0.75rem]"
-                      type="text"
-                      value={lastName}
-                      onChange={(e) => setLastName(e.target.value)}
-                    />
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <label className="text-gray-700 mw-md:text-[0.75rem]">Phone</label>
-                    <input
-                      className="border border-gray-300 rounded p-2 mw-md:text-[0.75rem]"
-                      type="text"
-                      value={phoneNumber}
-                      onChange={(e) => setPhoneNumber(e.target.value)}
-                    />
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <label className="text-gray-700 mw-md:text-[0.75rem]">Store</label>
-                    <input
-                      className="border border-gray-300 rounded p-2 mw-md:text-[0.75rem]"
-                      type="text"
-                      value={store}
-                      onChange={(e) => setStore(e.target.value)}
-                    />
-                  </div>
-
-                  <div className="flex items-center justify-between">
-                    <label className="text-gray-700 mw-md:text-[0.75rem]">Address</label>
-                    <input
-                      className="border border-gray-300 rounded p-2 mw-md:text-[0.75rem]"
-                      type="text"
-                      value={address}
-                      onChange={(e) => setAddress(e.target.value)}
-                    />
-                  </div>
-                  <button
-                    className="w-full bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-                    type="submit"
-                    onClick={(e) => handleProfileUpdate(e)}
-                  >
-                    Submit
-                  </button>
-                </form>
-              ) : (
-                // Display non-editable information when not in edit mode
-                <>
-                  <div className="flex items-center justify-between">
-                    <span className="font-bold text-gray-700 mw-md:text-[0.85rem]">First Name</span>
-                    <span className="text-gray-900 mw-md:text-[0.75rem]">{firstName}</span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="font-bold text-gray-700 mw-md:text-[0.85rem]">Last Name</span>
-                    <span className="text-gray-900 mw-md:text-[0.75rem]">{lastName}</span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="font-bold text-gray-700 mw-md:text-[0.85rem]">Phone</span>
-                    <span className="text-gray-900 mw-md:text-[0.75rem]">{phoneNumber}</span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="font-bold text-gray-700 mw-md:text-[0.85rem]">Store</span>
-                    <span className="text-gray-900 mw-md:text-[0.75rem]">{store}</span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="font-bold text-gray-700 mw-md:text-[0.85rem]">Address</span>
-                    <span className="text-gray-900 mw-md:text-[0.75rem]">{address}</span>
-                  </div>
-                </>
-              )}
-              <button
-                className={`w-full bg-green-500 hover:bg-green-600 text-white text-xl mw-md:text-sm font-bold py-2 px-4 rounded shadow-lg focus:outline-none focus:shadow-outline ${
-                  editClick ? 'hidden' : ''
-                }`}
-                onClick={() => setEditClick(!editClick)}
-              >
-                Edit
-              </button>
-            </div>
+            <ProfileInput onProfile={handleProfileUpdate} />
           </div>
           {/* Right Panel */}
           <div className="flex flex-col mw-md:hidden">

@@ -11,6 +11,8 @@ import Skeleton from 'react-loading-skeleton';
 import 'react-loading-skeleton/dist/skeleton.css';
 import ProductApi from './products/product_api';
 import { Link } from 'react-router-dom';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faEye, faHandSparkles, faHeart } from '@fortawesome/free-solid-svg-icons';
 
 export default function MainContent() {
   const { token, user, loading, setLoading, navigate, category, setCategory, setClickedSellingProduct } = useAuth();
@@ -33,44 +35,52 @@ export default function MainContent() {
     const slideDownTimeout = setTimeout(() => {
       setSlideOut(false);
     }, 3100);
+    const getSalesProducts = async () => {
+      const products = user['sellinglist']['products'];
+      const product_ids = products.map((val, idx) => {
+        return val.id;
+      });
+      const formData = new FormData();
+      formData.append('checklist', product_ids);
 
-    if (user && user['sellinglistId'] && user['wishlist']) {
-      const getSalesProducts = async () => {
-        const products = user['sellinglist']['products'];
-        const product_ids = products.map((val, idx) => {
-          return val.id;
-        });
-        const formData = new FormData();
-        formData.append('checklist', product_ids);
-
-        const response = await DataService.getProductsWhileUpdate(token, formData, navigate);
+      const response = await DataService.getProductsWhileUpdate(token, formData, navigate);
+      if (response && response.data) {
         setSalesProducts(response.data);
-      };
-      const getUserWishList = async () => {
-        const response = await ProductApi.fetchUserWishList(token, user.id, navigate);
-        if (response && response.data) {
-          setWishProducts(response.data.products);
-        }
-      };
-      const recentUserWatched = async () => {
-        const response = await ProductApi.userRecentWatched(token, navigate);
-        if (response && response.data) {
-          setWatchedProducts(response.data);
-        }
-      };
-      setLoading(true);
-      getSalesProducts();
-      getUserWishList();
-      recentUserWatched();
-      setLoading(false);
-    }
-
+      } else {
+        console.log('판매중인 상품 없음');
+      }
+    };
+    const getUserWishList = async () => {
+      const response = await ProductApi.fetchUserWishList(token, user.id, navigate);
+      if (response && response.data) {
+        setWishProducts(response.data.products);
+      } else {
+        console.log('wishlist 없음');
+      }
+    };
+    const recentUserWatched = async () => {
+      const response = await ProductApi.userRecentWatched(token, navigate);
+      if (response && response.data) {
+        setWatchedProducts(response.data);
+      } else {
+        console.log('watchlist 없음');
+      }
+    };
     const getMostViewedProducts = async () => {
       const response = await ProductApi.getMostInterested(navigate);
       if (response && response.data) {
         setMostViewedProducts(response.data);
       }
     };
+
+    if (user) {
+      setLoading(true);
+      getSalesProducts();
+      recentUserWatched();
+      getUserWishList();
+      setLoading(false);
+    }
+
     setLoading(true);
     getMostViewedProducts();
     setLoading(false);
@@ -92,8 +102,11 @@ export default function MainContent() {
       return (
         <div className="max-w-[800px] mw-md:max-w-[200px] mw-md:max-h-[200px] flex justify-center items-center">
           <div className="text-center p-4">
-            <p className="font-bold">판매 중인 상품이 없습니다.</p>
-            <p className="text-blue-500 hover:underline cursor-pointer" onClick={() => navigate('/user/my-store')}>
+            <p className="font-bold mw-md:text-sm">판매 중인 상품이 없습니다.</p>
+            <p
+              className="text-blue-500 mw-md:text-xs hover:underline cursor-pointer"
+              onClick={() => navigate('/user/my-store')}
+            >
               판매하실 상품을 등록해주세요.
             </p>
           </div>
@@ -101,6 +114,7 @@ export default function MainContent() {
       );
     } else {
       const slidesPerViewSetting = Math.max(1, salesProducts.length) >= 4 ? 3 : Math.max(1, salesProducts.length);
+      console.log(salesProducts);
       return (
         <Swiper
           className={`max-w-[600px] mw-md:max-w-[330px] mw-md:max-h-[200px]`}
@@ -158,7 +172,7 @@ export default function MainContent() {
     }
   };
 
-  const Cards = () => {
+  const LikedProducts = () => {
     const tmp = JSON.stringify(wishProducts);
     const likedProducts = JSON.parse(tmp);
 
@@ -167,9 +181,9 @@ export default function MainContent() {
       return (
         <div className="max-w-[800px] mw-md:max-w-[200px] mw-md:max-h-[200px] flex justify-center items-center">
           <div className="text-center p-4">
-            <p className="font-bold">좋아요를 누른 상품이 없습니다</p>
+            <p className="font-bold mw-md:text-sm">좋아요를 누른 상품이 없습니다</p>
             <p
-              className="text-blue-500 hover:underline cursor-pointer"
+              className="text-blue-500 hover:underline cursor-pointer mw-md:text-xs"
               onClick={() => navigate('/products/?category=의류')}
             >
               마음에 드는 상품을 찾아보세요!
@@ -241,9 +255,9 @@ export default function MainContent() {
       return (
         <div className="max-w-[800px] mw-md:max-w-[200px] mw-md:max-h-[200px] flex justify-center items-center">
           <div className="text-center p-4">
-            <p className="font-bold">조회하셨던 상품이 없습니다</p>
+            <p className="font-bold mw-md:text-sm">조회하셨던 상품이 없습니다</p>
             <p
-              className="text-blue-500 hover:underline cursor-pointer"
+              className="mw-md:text-xs text-blue-500 hover:underline cursor-pointer"
               onClick={() => navigate(`/products/?category=의류`)}
             >
               더 많은 상품을 둘러보세요!
@@ -315,7 +329,7 @@ export default function MainContent() {
     return (
       <>
         {/* Advertisement Banner */}
-        {Array(4).fill(
+        {Array(7).fill(
           <div className="flex justify-center items-center mt-5 mx-auto mw-md:justify-evenly w-full h-48 bg-gray-300">
             <img src="https://via.placeholder.com/1024x192" alt="Advertisement" className="max-w-full h-auto" />
           </div>
@@ -337,23 +351,15 @@ export default function MainContent() {
     );
   };
 
-  useEffect(() => {
-    console.log('mostViewedProducts: ', mostViewedProducts);
-  }, [mostViewedProducts]);
-
   return (
     <>
       {token ? (
         <>
           {showMessage && (
             <div
-              className={`fixed -bottom-24 mx-auto w-full p-4 z-50 bg-gradient-to-tr bg-cyan-500 text-white text-center transition-all duration-1000 ${
-                slideOut ? '-translate-y-full' : 'translate-y-10'
+              className={`fixed mx-auto w-full bottom-0 mw-md:bottom-[70px] p-4 z-50 bg-gradient-to-tr bg-cyan-500 text-white text-center transition-all duration-1000 ${
+                slideOut ? '-translate-x-0' : 'translate-x-[100vw]'
               }`}
-              style={{
-                transitionProperty: 'transform',
-                transitionDuration: '1000ms',
-              }}
             >
               <h2 className="text-2xl font-semibold mw-md:text-lg">
                 Welcome! [{user ? user['profile']['nickname'] : 'Username'}]!
@@ -362,7 +368,7 @@ export default function MainContent() {
             </div>
           )}
 
-          <div className="w-full h-full overflow-hidden flex flex-wrap justify-between p-4 bg-gray-200">
+          <div className="w-full h-full overflow-hidden flex flex-wrap justify-between p-4 bg-gray-200 bg-opacity-10 mw-md:mb-5">
             <div
               id="main_left_content"
               className="h-auto flex flex-col justify-center items-center max-w-[512px] mx-auto -mt-28 mw-md:mt-0"
@@ -383,13 +389,20 @@ export default function MainContent() {
                   <div className="grid grid-cols-2 gap-4 mw-md:grid-cols-2">
                     {mostViewedProducts &&
                       mostViewedProducts.map((val, index) => (
-                        <div key={index} className="flex flex-col items-center max-w-[200px]">
+                        <div
+                          key={index}
+                          className="flex flex-col items-center max-w-[200px] border border-solid border-sky-700 rounded transition-all duration-300 hover:-translate-y-1"
+                        >
                           <img
                             src={val.images[0].imgUrl}
                             alt={`Product ${index + 1}`}
                             className="object-cover w-[190px] h-[180px] mw-md:w-[150px] mw-md:h-[150px] mb-2 cursor-pointer"
                             onClick={() => navigate(`/products/${val.id}`)}
                           />
+                          <div className="flex items-center">
+                            <FontAwesomeIcon icon={faEye} className="text-gray-400 mr-1 mw-md:text-sm" />
+                            <p className="text-xs mw-md:text-sm text-gray-500">{val.viewed_count} views</p>
+                          </div>
                           <p className="mw-md:text-sm font-bold">{val.name}</p>
                           <p className="mw-md:text-sm">{val.price.toLocaleString('ko-kr')}원</p>
                         </div>
@@ -426,28 +439,54 @@ export default function MainContent() {
                 </div>
               </div>
             </div>
-            <div
-              id="main_right_content"
-              className="h-auto max-w-[1024px] mt-10 mw-md:mt-5 mx-auto mw-md:justify-evenly"
-            >
+            <div id="main_right_content" className="h-auto max-w-[1024px] mt-10 mw-md:mt-0 mw-md:mb-10 mx-auto">
               {/* Advertisement Banner */}
-              <div className="flex justify-center items-center mt-5 mx-auto mw-md:justify-evenly bg-gray-300">
-                <img src="https://via.placeholder.com/1024x192" alt="Advertisement" className="w-full" />
+              <div className="flex justify-center items-center my-5 mx-auto mw-md:justify-evenly bg-gray-300">
+                <img
+                  src="https://via.placeholder.com/1024x192"
+                  alt="Advertisement"
+                  className="w-full mw-md:h-[100px]"
+                />
+              </div>
+              {/* Advertisement Banner */}
+              <div className="flex justify-center items-center my-5 mx-auto mw-md:justify-evenly bg-gray-300">
+                <img
+                  src="https://via.placeholder.com/1024x192"
+                  alt="Advertisement"
+                  className="w-full mw-md:h-[100px]"
+                />
+              </div>
+              {/* Advertisement Banner */}
+              <div className="flex justify-center items-center my-5 mx-auto mw-md:justify-evenly bg-gray-300">
+                <img
+                  src="https://via.placeholder.com/1024x192"
+                  alt="Advertisement"
+                  className="w-full mw-md:h-[100px]"
+                />
               </div>
 
               {/* Sales */}
-              <div className="flex flex-col justify-around max-w-[1024px] mt-5 mx-auto mw-md:justify-evenly">
-                <h1 className="font-bold text-xl mw-md:text-sm">판매 중인 상품</h1>
+              <div className="mw-md:hidden flex flex-col justify-around items-center max-w-[1024px] mt-10 mx-auto border border-solid border-gray-300 p-2 rounded mw-md:justify-evenly">
+                <h1 className="shadow-md rounded p-3 bg-white text-center font-bold text-xl mw-md:text-lg">
+                  <FontAwesomeIcon icon={faHandSparkles} />
+                  판매 중인 상품
+                </h1>
                 {loading ? <LoadingSkeleton /> : <Sales />}
               </div>
               {/* Favorites */}
-              <div className="flex flex-col justify-around max-w-[1024px] mt-5 mx-auto mw-md:justify-evenly">
-                <h1 className="font-bold text-xl mw-md:text-sm">좋아요 리스트</h1>
-                {loading ? <LoadingSkeleton /> : <Cards />}
+              <div className="mw-md:hidden flex flex-col justify-around items-center max-w-[1024px] mt-10 mx-auto mw-md:justify-evenly border border-solid border-gray-300 p-2 rounded">
+                <h1 className="shadow-md rounded p-3 bg-white font-bold text-xl mw-md:text-lg">
+                  {' '}
+                  <FontAwesomeIcon icon={faHeart} className="text-red-500" /> 좋아요 리스트
+                </h1>
+                {loading ? <LoadingSkeleton /> : <LikedProducts />}
               </div>
               {/* WatchList */}
-              <div className="flex flex-col justify-around max-w-[1024px] mt-5 mx-auto mw-md:justify-evenly">
-                <h1 className="font-bold text-xl mw-md:text-sm">최근 본 상품들</h1>
+              <div className="mw-md:hidden flex flex-col justify-around items-center max-w-[1024px] mt-10 mx-auto mw-md:justify-evenly border border-solid border-gray-300 p-2 rounded">
+                <h1 className="shadow-md rounded p-3 bg-white font-bold text-xl mw-md:text-lg">
+                  {' '}
+                  <FontAwesomeIcon icon={faEye} /> 최근 본 상품들
+                </h1>
                 {loading ? <LoadingSkeleton /> : <WatchList />}
               </div>
             </div>
@@ -461,14 +500,31 @@ export default function MainContent() {
           >
             {/* Recommended Products */}
             <div className="p-4 mb-6 mw-md:mb-2 mw-md:mr-0">
-              <h3 className="text-xl font-semibold mb-3 mw-md:text-sm">인기 상품</h3>
-              <div className="grid grid-cols-3 gap-4">
-                {[...Array(6)].map((_, index) => (
-                  <div key={index} className="flex flex-col items-center">
-                    <img src="https://via.placeholder.com/150" alt={`Product ${index + 1}`} className="mb-2" />
-                    <p className="mw-md:text-sm">Product Name {index + 1}</p>
+              <h3 className="text-xl font-semibold mb-3 mw-md:text-sm">실시간 조회수 TOP4</h3>
+              <div className="grid grid-cols-2 gap-4">
+                {loading ? (
+                  <div>
+                    <Skeleton height={150} />
+                    <Skeleton count={5} />
                   </div>
-                ))}
+                ) : (
+                  mostViewedProducts.map((val, index) => (
+                    <div key={index} className="flex flex-col items-center border border-solid border-gray-400 rounded">
+                      <img
+                        src={val.images[0].imgUrl}
+                        alt={`Product ${index + 1}`}
+                        className="object-cover w-[190px] h-[180px] mw-md:w-[150px] mw-md:h-[150px] mb-2 cursor-pointer"
+                        onClick={() => navigate(`/products/${val.id}`)}
+                      />
+                      <div className="flex">
+                        <FontAwesomeIcon icon={faEye} className="text-gray-400 mr-1 mw-md:text-sm" />
+                        <p className="text-xs mw-md:text-sm text-gray-500">{val.viewed_count} views</p>
+                      </div>
+                      <p className="mw-md:text-sm font-bold">{val.name}</p>
+                      <p className="mw-md:text-sm">{val.price.toLocaleString('ko-kr')}원</p>
+                    </div>
+                  ))
+                )}
               </div>
             </div>
 

@@ -4,6 +4,7 @@ import {
   Delete,
   Get,
   Param,
+  ParseIntPipe,
   Post,
   Req,
   Res,
@@ -155,10 +156,7 @@ export class UserController {
 
   @UseGuards(AuthGuard())
   @Post('/my-store/delete-product')
-  async deleteProduct(
-    @GetUser() user: User,
-    @Body('checklist') list: number[],
-  ) {
-    return this.userService.deleteProduct(user, list);
+  async deleteProduct(@GetUser() user: User, @Body('checklist') checklist) {
+    return this.userService.deleteProduct(user, checklist);
   }
 }
