@@ -295,6 +295,47 @@ const getMostInterested = async (navigate) => {
   }
 };
 
+// 할인 중인 상품 4개 불러오기
+const getDiscountingProducts = async (navigate) => {
+  try {
+    const data = await http.get('/product/all/discounting');
+    return data;
+  } catch (error) {
+    if (error.response.status === 400) {
+      alert('잘못된 요청');
+      localStorage.clear();
+      navigate('');
+    } else if (error.response.status === 500) {
+      alert('서버 에러!');
+      localStorage.clear();
+      navigate('');
+    }
+  }
+};
+
+// 클릭한 페이지 또는 정렬 갯수에 따라 불러오는 상품들이 달라짐
+const getProductsBypage = async (token, currentPage, itemsPage, navigate) => {
+  try {
+    const data = await http.get(`/product/my-store/everypage/?page=${currentPage}&limit=${itemsPage}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    return data;
+  } catch (error) {
+    if (error.response.status === 401) {
+      localStorage.clear();
+      navigate('/signin');
+    } else if (error.response.status === 400) {
+      alert('잘못된 요청');
+      localStorage.clear();
+      navigate('');
+    } else if (error.response.status === 500) {
+      alert('서버 에러!');
+      localStorage.clear();
+      navigate('');
+    }
+  }
+};
+
 const ProductApi = {
   findProduct,
   categoriesItem,
@@ -309,6 +350,8 @@ const ProductApi = {
   userRecentWatched,
   getProductByName,
   getMostInterested,
+  getDiscountingProducts,
+  getProductsBypage,
 };
 
 export default ProductApi;

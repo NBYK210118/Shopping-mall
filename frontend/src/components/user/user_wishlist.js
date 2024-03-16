@@ -69,13 +69,13 @@ export default function UserWishlist() {
         return (
           <div
             id="wishlist-item"
-            className="flex flex-col items-center border rounded-[4px] mt-3"
+            className="flex flex-col items-center border rounded-[4px] mt-3 hover:transition-all duration-150 hover:-translate-y-1 cursor-pointer shadow"
             style={{ flex: '0 1 calc(20% - 16px);' }}
           >
             <img
               src={val.images ? val.images[0].imgUrl : `https://source.unsplash.com/random/200x200?product`}
               alt="Product Image"
-              className="h-[200px] mw-md:h-[100px] max-w-[150px] mw-md:max-w-[60px] object-cover transition-all duration-150 hover:-translate-y-1 cursor-pointer"
+              className="h-[200px] mw-md:h-[100px] max-w-[150px] mw-md:max-w-[60px] object-cover "
               onClick={() => navigate(`/products/${val.id}`)}
             />
             <div id="product-info" className="text-center">
@@ -99,9 +99,9 @@ export default function UserWishlist() {
     } else {
       return (
         <div className="w-full h-full flex flex-col justify-center items-center">
-          <span className="text-[1.5rem] ">No liked Products yet.</span>
+          <span className="text-[1.5rem] mw-md:text-lg">No liked Products yet.</span>
           <span
-            className="underline cursor-pointer text-[1rem] text-blue-500 hover:text-blue-600 text-nowrap ml-32"
+            className="underline cursor-pointer text-[1rem] text-blue-500 hover:text-blue-600 text-nowrap ml-32 text-xs"
             onClick={() => navigate('/home')}
           >
             상품들을 구경하고 마음에 드는 상품을 골라보세요!
@@ -114,7 +114,7 @@ export default function UserWishlist() {
   return (
     <div
       id="wishlist_container"
-      className="w-full h-full mt-6 p-5 mw-md:p-0 mw-md:-ml-10 justify-center items-center border border-gray-300 rounded-lg mw-md:border-none"
+      className="w-full h-full mt-6 p-5 mw-md:p-0 mw-md:-ml-10 justify-center items-center mw-md:border-none"
     >
       <h1 className="font-bold font-mono mt-1 ml-1"></h1>
       <div className="grid grid-cols-4 mw-md:grid-cols-2 gap-8">

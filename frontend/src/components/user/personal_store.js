@@ -9,18 +9,13 @@ import { Swiper, SwiperSlide } from 'swiper/react';
 import Skeleton from 'react-loading-skeleton';
 import StoreSearchBar from './search_keyword';
 import { ProductManageBtns } from './product_manage_btns';
+import { ProductInput } from '../products/productInput';
+import { DropDown } from './sortDropdown';
 
 export default function PersonalStore() {
   const { token, user, setUser, clickedSellingProduct, loading, setLoading } = useAuth();
   const navigate = useNavigate();
   const [productSize, setProductSize] = useState(0);
-  const [productName, setProductName] = useState('');
-  const [productDetail, setProductDetail] = useState('');
-  const [productPrice, setProductPrice] = useState('');
-  const [productMaker, setProductMaker] = useState('');
-  const [categoryInput, setCategoryInput] = useState('');
-  const [inventory, setInventory] = useState('');
-  const [statusInput, setStatusInput] = useState('판매중');
   const [sellistIndex, setSellistIndex] = useState('');
   const [selectedList, setSelectedList] = useState([]);
   const [productsList, setProductsList] = useState([]);
@@ -38,8 +33,38 @@ export default function PersonalStore() {
   const [activeOption, setActiveOption] = useState(null);
   const [keyword, setKeyword] = useState('');
   const [searchingResult, setSearchingResult] = useState(null);
-  const priceInputRef = useRef();
-  const productImgRef = useRef();
+  const [isDiscounting, setIsDiscountingPar] = useState(false);
+  const [sellinglist, setSellinglist] = useState(null);
+  const [selection, setSelection] = useState('10개 정렬');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPage, setTotalPage] = useState(null);
+
+  useEffect(() => {
+    if (!token) {
+      navigate('/signin');
+      alert('로그인이 필요합니다!');
+    }
+
+    // 초기 정렬 갯수 숫자만 추출해서 보내기
+    let result = selection.replace(/개 정렬/, '');
+
+    DataService.getSellinglist(token, result, navigate).then((response) => {
+      if (response && response.data) {
+        setSellinglist(response.data.sellinglist);
+        setTotalPage(response.data.totalPages);
+      }
+    });
+  }, []);
+
+  // MainContent 에서 내가 판매 중인 상품을 클릭했을 때 my-store로 이동해오면서 선택되었던 상품 ID가 useContext를 통해 PersonalStore로 전파된다
+  useEffect(() => {
+    if (clickedSellingProduct) {
+      console.log('clickedSellingProduct: ', clickedSellingProduct);
+      setSelectedList((prevState) => {
+        return [...prevState, clickedSellingProduct];
+      });
+    }
+  }, [clickedSellingProduct]);
 
   // 이전 버튼 클릭 시 activeOption 비워주기
   const handleBeforeButton = () => {
@@ -47,16 +72,36 @@ export default function PersonalStore() {
     setSelectedList([]);
     setSellistIndex(null);
     setCurrentProduct(null);
+    window.location.reload();
   };
 
-  // MainContent 에서 내가 판매 중인 상품을 클릭했을 때 my-store로 이동해오면서 선택되었던 상품 ID가 useContext를 통해 PersonalStore로 전파된다
-  useEffect(() => {
-    if (clickedSellingProduct) {
-      setSelectedList((prevState) => {
-        return [...prevState, clickedSellingProduct];
-      });
+  // 판매 리스트 정렬 메뉴 변경이나 현재 페이지가 바뀔 때
+  // useEffect(() => {
+  //   // 정렬 갯수 숫자만 추출해서 보내기
+  //   let result = selection.replace(/개 정렬/, '');
+  //   ProductApi.getProductsBypage(token, currentPage, result, navigate).then((response) => {
+  //     console.log('다음 페이지: ', response.data);
+  //     setSellinglist(response.data);
+  //   });
+  // }, [currentPage, selection]);
+
+  // 페이지네이션 컨트롤 렌더링
+  const Pages = () => {
+    let controls = [];
+    for (let i = 1; i <= totalPage; i++) {
+      controls.push(
+        <button
+          key={i}
+          onClick={() => setCurrentPage(i)}
+          disabled={currentPage === i}
+          className={`mt-2 text-sm cursor-pointer hover:underline bg-gray-100 px-2 py-1 rounded-full mr-2`}
+        >
+          {i}
+        </button>
+      );
     }
-  }, [clickedSellingProduct]);
+    return <div className="flex ">{controls}</div>;
+  };
 
   // 상품 목록에서 특정 상품을 선택했을 때 선택된 상품 리스트들을 state에 저장해주고, If, 선택된 상품들에 대한 번호가 리스트에 있다면 background color 지정해주기
   const handleSellingListClick = (idx) => {
@@ -79,44 +124,34 @@ export default function PersonalStore() {
     console.log(selectedList);
   }, [selectedList]);
 
-  // 가격 사이사이에 Comma 를 붙여주는 코드
-  const handlePriceComma = (e) => {
-    let price = e.target.value;
-    price = Number(price.replaceAll(',', ''));
-    if (isNaN(price)) {
-      priceInputRef.current.value = 0;
-    } else {
-      const formatValue = price.toLocaleString('ko-KR');
-      priceInputRef.current.value = formatValue;
-      setProductPrice(formatValue);
-    }
-  };
-
   // ActiveOption이 상품 수정 일 때, 우측에 있는 상품 리스트들 중 한 가지를 선택한다면 currentProduct 가 바뀌게 됨 -> 이 때, currentProduct 로 input 태그의 value들을 채워줌
   useEffect(() => {
     if (currentProduct) {
       if (currentProduct['images'] && currentProduct['name']) {
         setImageUrl(currentProduct['images'][0]['imgUrl']);
-        setProductName(currentProduct['name']);
-        setProductDetail(currentProduct['description']);
-        setProductPrice(currentProduct['price']);
-        setProductMaker(currentProduct['manufacturer']);
-        setCategoryInput(currentProduct['category_name']);
-        setStatusInput(currentProduct['status']);
-        setInventory(currentProduct['inventory']);
       }
     } else {
       setImageUrl('');
-      setProductName('');
-      setProductDetail('');
-      setProductPrice('');
-      setProductMaker('');
-      setCategoryInput('');
-      setStatusInput('');
-      setInventory(0);
     }
   }, [currentProduct]);
 
+  // 상품 수정 버튼 기능
+  const handleUpdatebtn = async (e) => {
+    // 선택한 상품에 대해서 업데이트 페이지로 넘어가면서 input 태그들에 해당 상품 정보 입력해놓기
+    if (sellistIndex) {
+      setActiveOption(e.currentTarget.firstChild.textContent);
+      const response = await ProductApi.findProduct(token, sellistIndex, navigate);
+      localStorage.setItem('product', JSON.stringify(response.data));
+      setImageUrl(response.data['images'][0]['imgUrl']);
+      setIsDiscountingPar(response.data.isDiscounting);
+      setCurrentProduct(response.data);
+      getProductsWhileUpdate();
+    } else {
+      alert('상품을 선택해주세요');
+    }
+  };
+
+  // 판매취소 버튼
   const handleCancelSelling = () => {
     // 선택된 상품들에 대해 삭제할 것인지 물어보기
     const isChecking = window.confirm('정말로 삭제하시겠습니까?');
@@ -134,29 +169,6 @@ export default function PersonalStore() {
     }
   };
 
-  // 상품 수정 버튼 기능
-  const handleUpdatebtn = async (e) => {
-    // 선택한 상품에 대해서 업데이트 페이지로 넘어가면서 input 태그들에 해당 상품 정보 입력해놓기
-    if (sellistIndex) {
-      setActiveOption(e.currentTarget.firstChild.textContent);
-      const response = await ProductApi.findProduct(token, sellistIndex, navigate);
-      console.log('will be updated product: ', response.data.category_name);
-      localStorage.setItem('product', JSON.stringify(response.data));
-      setImageUrl(response.data['images'][0]['imgUrl']);
-      setProductName(response.data['name']);
-      setProductDetail(response.data['description']);
-      setProductPrice(response.data['price']);
-      setProductMaker(response.data['manufacturer']);
-      setCategoryInput(response.data['category_name']);
-      setStatusInput(response.data['status']);
-      setInventory(response.data['inventory']);
-      setCurrentProduct(response.data);
-      getProductsWhileUpdate();
-    } else {
-      alert('상품을 선택해주세요');
-    }
-  };
-
   // 전체 상품 보기 버튼 기능
   const handleShowAll = () => {
     setClickedCategory('');
@@ -164,7 +176,7 @@ export default function PersonalStore() {
     setKeyword(null);
   };
 
-  // 상품 추가하기 버튼에만 쓸 기능이 되었음
+  // 상품 추가하기 버튼 기능
   const handleButtons = (option) => {
     setActiveOption(option);
     setImageUrl(null);
@@ -174,31 +186,32 @@ export default function PersonalStore() {
     }));
   };
 
+  // 상품 추가하기에서 Submit 버튼 클릭시 API 호출
+  const handleAddProduct = (formdata, isDiscounting) => {
+    formdata.append('image', imageUrl);
+    formdata.append('image_size', productSize);
+    DataService.addProduct(token, formdata, navigate).then((response) => {
+      if (response.data) {
+        localStorage.setItem('user', JSON.stringify(response.data));
+        setIsDiscountingPar(isDiscounting);
+        setUser(response.data);
+        alert('성공적으로 등록되었습니다!');
+        window.location.reload();
+      }
+    });
+  };
+
   // 상품 수정하기에서 Submit 버튼 클릭시 API 호출
-  const handleUpdateProduct = (e) => {
-    e.preventDefault();
-    const formData = new FormData();
-    formData.append('image', imageUrl);
-    formData.append('image_size', productSize);
-    formData.append('name', productName);
-    formData.append('detail', `${productDetail}`);
-    formData.append('price', productPrice);
-    formData.append('manufacturer', productMaker);
-    formData.append('category', categoryInput);
-    formData.append('inventory', inventory);
-    formData.append('status', statusInput);
-
-    for (let key of formData.entries()) {
-      console.log(`key[0]: ${key[0]}, key[1]: ${key[1]}`);
-    }
-
+  const handleUpdateProduct = (formdata, isDiscounting) => {
+    formdata.append('image', imageUrl);
+    formdata.append('image_size', productSize);
     try {
-      DataService.updateProduct(token, formData, sellistIndex, navigate).then((response) => {
+      DataService.updateProduct(token, formdata, sellistIndex, navigate).then((response) => {
         if (response.data) {
           setUser(response.data);
           localStorage.setItem('user', JSON.stringify(response.data));
+          setIsDiscountingPar(isDiscounting);
           alert('상품 정보가 성공적으로 업데이트 되었습니다');
-          navigate('');
         } else {
           alert('상품 정보 업데이트 실패!');
         }
@@ -277,7 +290,6 @@ export default function PersonalStore() {
   // 상품 업데이트 페이지로 넘어갈 때 다수의 상품들이 선택됐다면 그 상품들에 대한 정보를 불러오기
   const getProductsWhileUpdate = () => {
     if (selectedList) {
-      console.log('selectedList: ', selectedList);
       const formData = new FormData();
       formData.append('checklist', selectedList);
 
@@ -287,28 +299,6 @@ export default function PersonalStore() {
         console.log('선택된 상품 정보들: ', response.data);
       });
     }
-  };
-
-  const handleAddProduct = () => {
-    const formData = new FormData();
-    formData.append('image', imageUrl);
-    formData.append('image_size', productSize);
-    formData.append('name', productName);
-    formData.append('detail', `${productDetail}`);
-    formData.append('price', productPrice);
-    formData.append('manufacturer', productMaker);
-    formData.append('category', categoryInput);
-    formData.append('inventory', inventory);
-    formData.append('status', statusInput);
-
-    DataService.addProduct(token, formData, navigate).then((response) => {
-      if (response.data) {
-        localStorage.setItem('user', JSON.stringify(response.data));
-        setUser(response.data);
-        alert('성공적으로 등록되었습니다!');
-        window.location.reload();
-      }
-    });
   };
 
   const handleSearchKeyword = (keyword, setSearchKeyword) => {
@@ -324,7 +314,7 @@ export default function PersonalStore() {
 
   const SampleTable = () => {
     return (
-      <div className="w-full grid grid-cols-7 mw-md:gap-3 p-1 px-5 border-x border-y">
+      <div className="w-full grid grid-cols-8 mw-md:gap-3 p-1 px-5 border-x border-y">
         <span className="font-bold text-[0.8rem] text-nowrap mw-md:text-[0.48rem] mw-md:px-2">상품번호</span>
         <span className="font-bold text-[0.8rem] text-nowrap mw-md:text-[0.48rem] mw-md:px-2">상품명</span>
         <span className="font-bold text-[0.8rem] text-nowrap mw-md:text-[0.48rem] mw-md:px-2">가격</span>
@@ -332,6 +322,7 @@ export default function PersonalStore() {
         <span className="font-bold text-[0.8rem] text-nowrap mw-md:text-[0.48rem] mw-md:px-2">판매자</span>
         <span className="font-bold text-[0.8rem] text-nowrap mw-md:text-[0.48rem] mw-md:px-2">상세설명</span>
         <span className="font-bold text-[0.8rem] text-nowrap mw-md:text-[0.48rem] mw-md:px-2">상품사진</span>
+        <span className="font-bold text-[0.8rem] text-nowrap mw-md:text-[0.48rem] mw-md:px-2">할인중</span>
       </div>
     );
   };
@@ -348,7 +339,7 @@ export default function PersonalStore() {
   };
 
   const UsersOnSale = () => {
-    if (user.sellinglist) {
+    if (sellinglist) {
       if (searchingResult && searchingResult.length > 0) {
         return searchingResult.map((val, idx) => (
           <div
@@ -371,7 +362,7 @@ export default function PersonalStore() {
             </span>
 
             <span className="font-bold text-nowrap text-[0.8rem] mw-md:text-[0.48rem] mw-md:px-2">
-              {val.price ? val.price.toLocaleString('ko-kr') : 'None'}원
+              {val.discountPrice ? val.discountPrice.toLocaleString('ko-kr') : val.price.toLocaleString('ko-kr')}원
             </span>
 
             <span className="font-bold text-nowrap text-[0.8rem] mw-md:text-[0.48rem] mw-md:px-2">
@@ -386,13 +377,15 @@ export default function PersonalStore() {
               {val.description ? val.description : 'None'}
             </span>
             <img src={val.images[0].imgUrl} alt="" className="w-[50px] mw-md:w-auto" />
+            <span className="font-bold text-nowrap text-[0.8rem] mw-md:text-[0.48rem] mw-md:px-2">
+              {val.isDiscounting ? 'Yes' : 'No'}
+            </span>
           </div>
         ));
       } else {
-        const sortedProducts = user.sellinglist?.products.sort((a, b) => a.id - b.id);
-        return sortedProducts.map((val, idx) => (
+        return sellinglist.products.map((val, idx) => (
           <div
-            className={`w-full grid grid-cols-7 mw-md:gap-6 p-4 justify-center items-center border border-solid border-gray-300
+            className={`w-full grid grid-cols-8 mw-md:gap-3 p-4 justify-center items-center border border-solid border-gray-300
            hover:bg-gray-200 transition-all duration-150 hover:cursor-pointer
           ${
             selectedList && selectedList.includes(val.id)
@@ -406,12 +399,12 @@ export default function PersonalStore() {
               {val.id ? val.id : '번호 없음'}-{val.status ? val.status : 'None'}
             </span>
 
-            <span className="font-bold whitespace-nowrap text-[0.8rem] mw-md:text-[0.48rem] mw-md:px-2">
+            <span className="font-bold text-[0.8rem] mw-md:text-[0.48rem] mw-md:px-2 text-ellipsis overflow-hidden whitespace-nowrap">
               {val.name ? val.name : 'None'}
             </span>
 
             <span className="font-bold text-nowrap text-[0.8rem] mw-md:text-[0.48rem] mw-md:px-2">
-              {val.price ? val.price.toLocaleString('ko-kr') : 'None'}원
+              {val.discountPrice ? val.discountPrice.toLocaleString('ko-kr') : val.price.toLocaleString('ko-kr')}원
             </span>
 
             <span className="font-bold text-nowrap text-[0.8rem] mw-md:text-[0.48rem] mw-md:px-2">
@@ -422,10 +415,13 @@ export default function PersonalStore() {
               {val.manufacturer ? val.manufacturer : 'None'}
             </span>
 
-            <span className="text-[0.8rem] whitespace-nowrap font-bold overflow-hidden mw-md:text-[0.48rem] mw-md:px-2">
+            <span className="text-[0.8rem] text-ellipsis whitespace-nowrap font-bold overflow-hidden mw-md:text-[0.48rem] mw-md:px-2">
               {val.description ? val.description : 'None'}
             </span>
             <img src={val.images[0].imgUrl} alt="" className="w-[50px] mw-md:w-auto" />
+            <span className="font-bold text-nowrap text-[0.8rem] mw-md:text-[0.48rem] mw-md:px-2">
+              {val.isDiscounting ? 'Yes' : 'No'}
+            </span>
           </div>
         ));
       }
@@ -439,7 +435,7 @@ export default function PersonalStore() {
       const sortedProducts = categoryItems.sort((a, b) => a.id - b.id);
       return sortedProducts.map((val, idx) => (
         <div
-          className={`w-full grid grid-cols-7 mw-md:gap-3 p-4 justify-center items-center border border-solid border-gray-300
+          className={`w-full grid grid-cols-8 mw-md:gap-3 p-4 justify-center items-center border border-solid border-gray-300
             rounded-lg hover:bg-gray-200 transition-all duration-150 hover:cursor-pointer
           ${selectedList.includes(val.id) ? ' bg-gradient-to-bl from-cyan-400 to-blue-600 font-bold text-white' : ''}`}
           onClick={() => handleSellingListClick(val.id)}
@@ -449,12 +445,12 @@ export default function PersonalStore() {
             {val.id ? val.id : '번호 없음'}-{val.status ? val.status : 'None'}
           </span>
 
-          <span className="font-bold text-nowrap text-[0.8rem] mw-md:text-[0.55rem] mw-md:px-2">
+          <span className="font-bold text-nowrap text-[0.8rem] mw-md:text-[0.55rem] mw-md:px-2 text-ellipsis overflow-hidden whitespace-nowrap">
             {val.name ? val.name : 'None'}
           </span>
 
           <span className="font-bold text-nowrap text-[0.8rem] mw-md:text-[0.55rem] mw-md:px-2">
-            {val.price ? val.price.toLocaleString('ko-kr') : 'None'}원
+            {val.discountPrice ? val.discountPrice.toLocaleString('ko-kr') : val.price.toLocaleString('ko-kr')}원
           </span>
 
           <span className="font-bold text-nowrap text-[0.8rem] mw-md:text-[0.55rem] mw-md:px-2">
@@ -465,11 +461,14 @@ export default function PersonalStore() {
             {val.manufacturer ? val.manufacturer : 'None'}
           </span>
 
-          <span className="text-[0.8rem] text-nowrap font-bold text-ellipsis white-nowrap overflow-hidden mw-md:text-[0.55rem] mw-md:px-2">
+          <span className="text-[0.8rem] font-bold text-ellipsis white-nowrap overflow-hidden mw-md:text-[0.55rem] mw-md:px-2">
             {val.description ? val.description : 'None'}
           </span>
 
           <img src={val.images[0].imgUrl} alt="" className="w-[50px] mw-md:w-auto" />
+          <span className="font-bold text-nowrap text-[0.8rem] mw-md:text-[0.48rem] mw-md:px-2">
+            {val.isDiscounting ? 'Yes' : 'No'}
+          </span>
         </div>
       ));
     } else {
@@ -481,26 +480,29 @@ export default function PersonalStore() {
     const result = productsList.map((val, idx) => (
       <div
         id="selected_items"
-        className={`p-0 mb-8 flex flex-col justify-center border rounded-lg 
+        className={`mb-8 flex flex-col justify-center border rounded-lg 
         hover:cursor-pointer hover:-translate-y-1 transition-all duration-300
         ${currentProduct?.name === val.name ? ' bg-gray-300' : ''}`}
         onClick={() => setCurrentProduct(val)}
       >
-        <div id="selected_item_1" className="flex justify-center items-center">
+        <div id="selected_item_1" className="w-[200px] flex justify-center items-center">
           <div className="flex items-center mb-2">
-            <img src={val['images'][0]['imgUrl']} alt="product_img" className="mw-md:h-[50px]" />
+            <img
+              src={val.images[0].imgUrl}
+              alt="product_img"
+              className="max-w-[80px] max-h-[80px] ml-1 mt-1 object-cover mw-md:h-[50px]"
+              onChange={(e) => setImageUrl(e.target.value)}
+            />
           </div>
           <div className="ml-3 flex flex-col justify-around items-center">
-            <div
-              id="product_name"
-              className="text-sm text-ellipsis overflow-hidden whitespace-nowrap text-blue-500 hover:underline"
-            >
+            <div id="product_name" className="text-sm text-blue-500 hover:underline">
               <span className="font-semibold">{val.name ? val.name : 'None'}</span>
             </div>
-            <div id="product_description" className="text-sm text-blue-500 hover:underline">
-              <span className="text-ellipsis overflow-hidden whitespace-nowrap">
-                {val.description ? val.description : 'None'}
-              </span>
+            <div
+              id="product_description"
+              className="p-3 text-sm text-ellipsis overflow-hidden whitespace-nowrap text-blue-500 hover:underline"
+            >
+              <span className="">{val.description ? val.description : 'None'}</span>
             </div>
           </div>
         </div>
@@ -543,10 +545,10 @@ export default function PersonalStore() {
   return (
     <>
       <div
-        className={`w- h-full p-10 mw-md:px-12 mw-md:mb-10 flex ${!activeOption ? 'mw-md:mt-0 mw-md:ml-56' : ''} ${
-          activeOption === '상품 수정' ? 'mw-md:ml-20' : ''
+        className={`h-full p-10 mw-md:px-12 mw-md:mb-10 flex ${!activeOption ? 'mw-md:mt-0 mw-md:ml-56' : ''} ${
+          activeOption === '상품 수정' ? '-mt-10 mw-md:ml-20' : ''
         } ${
-          activeOption === '상품 추가' ? 'mw-md:mt-36 mw-md:ml-10' : ''
+          activeOption === '상품 추가' ? 'mw-md:mt-5 mw-md:ml-10' : ''
         } mr-4 justify-center items-center mw-md:border-none`}
       >
         <div
@@ -556,12 +558,17 @@ export default function PersonalStore() {
         >
           <div
             id="mystore_left_content"
-            className={`mr-3 flex flex-col justify-center items-center ${activeOption ? '' : ' hidden'} ${
-              activeOption === '상품 수정' ? 'mw-md:ml-56' : ''
-            } ${activeOption === '상품 추가' ? '-mt-20 mw-md:ml-20 mw-md:mr-32' : ''}`}
+            className={`mr-3 flex flex-col justify-center items-center ${isDiscounting ? '-mt-40' : ''} ${
+              activeOption ? '' : ' hidden'
+            } ${activeOption === '상품 수정' ? 'mw-md:ml-56' : ''} ${
+              activeOption === '상품 추가' ? '-mt-20 mw-md:ml-20 mw-md:mr-32' : ''
+            }
+            `}
           >
             {activeOption === '상품 추가' && (
-              <div className="p-5 ml-10 mw-md:ml-44 mw-md:-mt-10 mw-md:mb-40 flex flex-col justify-center items-center">
+              <div
+                className={`p-5 ml-10 mw-md:ml-44 mw-md:-mt-10 mw-md:mb-40 flex flex-col justify-center items-center`}
+              >
                 {imageUrl ? (
                   <img
                     src={imageUrl}
@@ -646,270 +653,33 @@ export default function PersonalStore() {
           <div
             id="mystore_right_content_or_maincontent"
             className={`p-5 mx-auto flex flex-col -mt-10 ${activeOption === '상품 수정' ? 'mw-md:ml-0' : ''}
-            ${activeOption === '상품 추가' ? 'mw-md:p-0 mw-md:-ml-32 mw-md:mr-20' : ''}`}
+            ${activeOption === '상품 추가' ? '-mt-20 mw-md:p-0 mw-md:-ml-32 mw-md:mr-20' : ''}`}
           >
             {activeOption === '상품 추가' && (
-              <div className="max-w-4xl mx-20 py-14 mw-md:max-w-xl mw-md:mx-0">
-                <div className="bg-white rounded px-8 mb-4 -mt-10 mw-md:-mt-20">
-                  <div className="mb-4 mw-md:mb-2">
-                    <label
-                      className="block text-gray-700 text-sm font-bold mb-2 mw-md:text-[0.7rem] mw-md:text-nowrap"
-                      for="product_name"
-                    >
-                      상품명
-                    </label>
-                    <input
-                      className="shadow appearance-none border rounded w-full mw-md:w-auto py-2 px-3 mw-md:text-[0.5rem] text-gray-700 leading-tight focus:outline-none focus:shadow-outline border-gray-400 hover:border-gray-500"
-                      id="product_name"
-                      type="text"
-                      placeholder="Enter your product name"
-                      value={productName}
-                      onChange={(e) => setProductName(e.currentTarget.value)}
-                    />
-                  </div>
-                  <div className="mb-4 mw-md:mb-2">
-                    <label
-                      className="block text-gray-700 text-sm font-bold mb-2 mw-md:text-[0.7rem] mw-md:text-nowrap"
-                      for="product_detail"
-                    >
-                      상세설명
-                    </label>
-                    <textarea
-                      className="shadow appearance-none border rounded w-full mw-md:w-auto mw-md:text-[0.5rem] py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline border-gray-400 hover:border-gray-500"
-                      id="product_detail"
-                      placeholder="Enter the detail of the product"
-                      value={productDetail}
-                      onChange={(e) => setProductDetail(e.currentTarget.value)}
-                    ></textarea>
-                  </div>
-                  <div className="mb-4 mw-md:mb-2">
-                    <label
-                      className="block text-gray-700 text-sm font-bold mb-2 mw-md:text-[0.7rem] mw-md:text-nowrap"
-                      for="product_price"
-                    >
-                      가격
-                    </label>
-                    <input
-                      className="shadow appearance-none border rounded w-full mw-md:w-auto mw-md:text-[0.5rem] py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline border-gray-400 hover:border-gray-500"
-                      id="product_price"
-                      type="text"
-                      placeholder="Enter the price"
-                      ref={priceInputRef}
-                      onChange={(e) => handlePriceComma(e)}
-                    />
-                  </div>
-                  <div className="mb-4 mw-md:mb-2">
-                    <label
-                      className="block text-gray-700 text-sm font-bold mb-2 mw-md:text-[0.7rem] mw-md:text-nowrap"
-                      for="product_maker"
-                    >
-                      제조사/원산지
-                    </label>
-                    <input
-                      className="shadow appearance-none border rounded w-full mw-md:w-auto mw-md:text-[0.5rem] py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline border-gray-400 hover:border-gray-500"
-                      id="product_maker"
-                      type="text"
-                      placeholder="Enter the manufacturer"
-                      value={productMaker}
-                      onChange={(e) => setProductMaker(e.currentTarget.value)}
-                    />
-                  </div>
-                  <div className="mb-4 mw-md:mb-2">
-                    <label
-                      className="block text-gray-700 text-sm font-bold mb-2 mw-md:text-[0.7rem] mw-md:text-nowrap"
-                      for="categories"
-                    >
-                      카테고리
-                    </label>
-                    <select
-                      class="block appearance-none w-full mw-md:w-auto mw-md:text-[0.55rem] bg-white border border-gray-400 hover:border-gray-500 px-4 py-2 pr-8 rounded shadow leading-tight focus:outline-none focus:shadow-outline"
-                      id="categories"
-                      value={categoryInput}
-                      onChange={(e) => setCategoryInput(e.currentTarget.value)}
-                    >
-                      <option value="의류">의류</option>
-                      <option value="가구">가구</option>
-                      <option value="식품">식품</option>
-                      <option value="전자제품">전자제품</option>
-                      <option value="스포츠">스포츠</option>
-                      <option value="게임">게임</option>
-                      <option value="도서">도서</option>
-                      <option value="장난감">장난감</option>
-                    </select>
-                  </div>
-                  <div className="mb-4 mw-md:mb-2">
-                    <label
-                      className="block text-gray-700 text-sm font-bold mb-2 mw-md:text-[0.7rem] mw-md:text-nowrap"
-                      for="inventory"
-                    >
-                      재고 수량
-                    </label>
-                    <input
-                      className="shadow appearance-none border rounded w-full mw-md:w-auto mw-md:text-[0.5rem] py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline border-gray-400 hover:border-gray-500"
-                      id="inventory"
-                      type="text"
-                      placeholder="Enter the inventory quantity"
-                      value={inventory}
-                      onChange={(e) => setInventory(e.currentTarget.value)}
-                    />
-                  </div>
-                  <div className="mb-4 mw-md:mb-3">
-                    <label
-                      className="block text-gray-700 text-sm font-bold mb-2 mw-md:text-[0.7rem] mw-md:text-nowrap"
-                      for="status"
-                    >
-                      판매 여부
-                    </label>
-                    <select
-                      className="block appearance-none w-full mw-md:w-auto mw-md:text-[0.5rem] bg-white border border-gray-400 hover:border-gray-700 hover:bg-gray-200 cursor-pointer px-4 py-2 pr-8 rounded shadow leading-tight focus:outline-none focus:shadow-outline"
-                      id="status"
-                      value={statusInput}
-                      onChange={(e) => setStatusInput(e.currentTarget.value)}
-                    >
-                      <option value="판매중">판매중</option>
-                      <option value="보류">보류</option>
-                    </select>
-                  </div>
-                  <div className="flex items-center justify-center mw-md:-ml-14">
-                    <button
-                      className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 mw-md:py-1 rounded focus:outline-none focus:shadow-outline transition-all duration-300"
-                      type="button"
-                      onClick={() => handleAddProduct()}
-                    >
-                      <span className="font-bold mw-md:text-[0.6rem] text-nowrap">제출</span>
-                    </button>
-                  </div>
-                </div>
-              </div>
+              <ProductInput
+                activeOption={activeOption}
+                onAdd={handleAddProduct}
+                onUpdate={handleUpdateProduct}
+                setIsDiscountingPar={setIsDiscountingPar}
+              />
             )}
             {activeOption === '상품 수정' && (
-              <>
-                <div className="max-w-4xl mx-20 py-14 mw-md:max-w-xl mw-md:-ml-8 mw-md:-mt-12">
-                  <div className="bg-white rounded px-8 mb-4 -mt-10 mw-md:-mt-20">
-                    <div className="mb-4">
-                      <label className="block text-gray-700 text-sm font-bold mb-2" for="product_name">
-                        상품명
-                      </label>
-                      <input
-                        className="shadow appearance-none border rounded w-auto mw-md:text-[0.5rem] px-4 py-2 text-gray-700 leading-tight focus:outline-none focus:shadow-outline border-gray-400 hover:border-gray-500"
-                        id="product_name"
-                        type="text"
-                        placeholder="Enter your product name"
-                        onChange={(e) => setProductName(e.currentTarget.value)}
-                        value={productName}
-                      />
-                    </div>
-                    <div className="mb-4">
-                      <label className="block text-gray-700 text-sm font-bold mb-2" for="product_detail">
-                        상세설명
-                      </label>
-                      <textarea
-                        className="shadow appearance-none border rounded w-auto mw-md:text-[0.5rem] px-4 py-2 text-gray-700 leading-tight focus:outline-none focus:shadow-outline border-gray-400 hover:border-gray-500"
-                        id="product_detail"
-                        placeholder="Enter the detail of the product"
-                        onChange={(e) => setProductDetail(e.currentTarget.value)}
-                        value={productDetail}
-                      ></textarea>
-                    </div>
-                    <div className="mb-4">
-                      <label className="block text-gray-700 text-sm font-bold mb-2" for="product_price">
-                        가격
-                      </label>
-                      <input
-                        className="shadow appearance-none border rounded w-auto mw-md:text-[0.5rem] px-4 py-2 text-gray-700 leading-tight focus:outline-none focus:shadow-outline border-gray-400 hover:border-gray-500"
-                        id="product_price"
-                        type="text"
-                        placeholder="Enter the price"
-                        ref={priceInputRef}
-                        onChange={(e) => handlePriceComma(e)}
-                        value={productPrice}
-                      />
-                    </div>
-                    <div className="mb-4">
-                      <label className="block text-gray-700 text-sm font-bold mb-2" for="product_maker">
-                        판매자
-                      </label>
-                      <input
-                        className="shadow appearance-none border rounded w-auto mw-md:text-[0.5rem] px-4 py-2 text-gray-700 leading-tight focus:outline-none focus:shadow-outline border-gray-400 hover:border-gray-500"
-                        id="product_maker"
-                        type="text"
-                        placeholder="Enter the manufacturer"
-                        onChange={(e) => setProductMaker(e.currentTarget.value)}
-                        value={productMaker}
-                      />
-                    </div>
-                    <div className="mb-4">
-                      <label className="block text-gray-700 text-sm font-bold mb-2" for="categories">
-                        카테고리
-                      </label>
-                      <select
-                        class="block appearance-none w-auto mw-md:text-[0.5rem] bg-white border border-gray-400 hover:border-gray-500 px-4 py-2 rounded shadow leading-tight focus:outline-none focus:shadow-outline"
-                        id="categories"
-                        onChange={(e) => setCategoryInput(e.target.value)}
-                        value={categoryInput}
-                      >
-                        <option value="의류">의류</option>
-                        <option value="가구">가구</option>
-                        <option value="식품">식품</option>
-                        <option value="전자제품">전자제품</option>
-                        <option value="스포츠">스포츠</option>
-                        <option value="게임">게임</option>
-                        <option value="도서">도서</option>
-                        <option value="장난감">장난감</option>
-                      </select>
-                    </div>
-                    <div className="mb-4">
-                      <label className="block text-gray-700 text-sm font-bold mb-2" for="inventory">
-                        재고 수량
-                      </label>
-                      <input
-                        className="shadow appearance-none border rounded w-auto mw-md:text-[0.5rem] px-4 py-2 text-gray-700 leading-tight focus:outline-none focus:shadow-outline border-gray-400 hover:border-gray-500"
-                        id="inventory"
-                        type="text"
-                        placeholder="Enter the inventory quantity"
-                        onChange={(e) => setInventory(e.currentTarget.value)}
-                        value={inventory}
-                      />
-                    </div>
-                    <div className="mb-4">
-                      <label className="block text-gray-700 text-sm font-bold mb-2" for="status">
-                        판매 여부
-                      </label>
-                      <select
-                        className="block appearance-none w-auto mw-md:text-[0.5rem] bg-white border border-gray-400 hover:border-gray-700 hover:bg-gray-200 cursor-pointer py-2 px-4 pr-8 rounded shadow leading-tight focus:outline-none focus:shadow-outline"
-                        id="status"
-                        onChange={(e) => setStatusInput(e.currentTarget.value)}
-                        value={statusInput}
-                      >
-                        <option>판매중</option>
-                        <option>보류</option>
-                      </select>
-                    </div>
-                    <div className="flex items-center justify-center -ml-32 mw-md:-ml-16">
-                      <button
-                        className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-5 rounded focus:outline-none focus:shadow-outline transition-all duration-300"
-                        type="button"
-                        onClick={(e) => handleUpdateProduct(e)}
-                      >
-                        <span className="font-bold mw-md:text-[0.7rem] text-nowrap">제출</span>
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </>
+              <ProductInput
+                activeOption={activeOption}
+                onAdd={handleAddProduct}
+                onUpdate={handleUpdateProduct}
+                sellistIndex={sellistIndex}
+                navigate={navigate}
+                token={token}
+                currentProduct={currentProduct}
+                setIsDiscountingPar={setIsDiscountingPar}
+              />
             )}
+
             {!activeOption && (
               <>
                 {/*등록한 상품들 검색 상자*/}
                 <StoreSearchBar setKeyword={handleSearchKeyword} />
-                <ProductManageBtns
-                  handleCancelSelling={handleCancelSelling}
-                  handleUpdatebtn={handleUpdatebtn}
-                  handleShowAll={handleShowAll}
-                  handleButtons={handleButtons}
-                  clickedCategory={clickedCategory}
-                  categoryItems={categoryItems}
-                />
 
                 {/*슬라이드쇼*/}
                 <div className="ml-10 mw-md:ml-4">
@@ -920,8 +690,22 @@ export default function PersonalStore() {
                   <div className="my-4 flex flex-col justify-center items-center transition-all duration-300">
                     {user && user['sellinglist']['products'].length > 0 ? (
                       <>
+                        {/* 상품 관리 버튼과 물품 리스트 정렬 메뉴 */}
+                        <div className="relative w-full flex justify-between items-center mb-2">
+                          <ProductManageBtns
+                            handleCancelSelling={handleCancelSelling}
+                            handleUpdatebtn={handleUpdatebtn}
+                            handleShowAll={handleShowAll}
+                            handleButtons={handleButtons}
+                            token={token}
+                            clickedCategory={clickedCategory}
+                            categoryItems={categoryItems}
+                          />
+                          <DropDown selection={selection} setSelection={setSelection} />
+                        </div>
                         <SampleTable />
                         {clickedCategory ? loading ? <LoadingSkeleton /> : <CategoriesOnSale /> : <UsersOnSale />}
+                        <Pages />
                       </>
                     ) : (
                       <div className="p-5 w-full h-full flex justify-center items-center bg-black/15">
@@ -937,9 +721,9 @@ export default function PersonalStore() {
       </div>
       {activeOption === '상품 수정' && (
         <div
-          className={`flex flex-col mb-10 mw-md:hidden text-ellipsis overflow-hidden whitespace-nowrap ${
+          className={`flex flex-col -mr-80 mb-20 mw-md:hidden text-ellipsis overflow-hidden whitespace-nowrap ${
             productsList.length > 1 ? ' ' : 'justify-start mt-2 '
-          } items-center border border-gray-300 rounded-lg `}
+          } items-center border border-gray-300 `}
         >
           <SelectedProductsList />
         </div>

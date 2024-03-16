@@ -9,7 +9,7 @@ const StoreSearchBar = ({ setKeyword }) => {
   };
 
   return (
-    <div className="mx-14 mw-md:mx-10 mw-md:ml-24 mw-md:mt-0 flex justify-center items-center border border-transparent rounded-lg">
+    <div className="mb-3 mx-14 mw-md:mx-10 mw-md:ml-24 mw-md:mt-0 flex justify-center items-center border border-transparent rounded-lg">
       <div id="search-box" className="flex justify-center items-center mr-5 mw-md:h-1/2 mw-md:ml-3">
         <form method="get" className="flex justify-center" onSubmit={handleSubmit}>
           <input

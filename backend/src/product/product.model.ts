@@ -24,9 +24,13 @@ export class Product implements Prisma.ProductCreateInput {
   createdAt?: string | Date;
   updatedAt?: string | Date;
   reviewProduct?: Prisma.ReviewProductCreateNestedManyWithoutProductInput;
+  discountPrice?: number;
+  discountRatio?: number;
+  isDiscounting?: boolean;
+  viewed_count?: number;
 }
 
-export class ReviewedProduct implements Prisma.ReviewProductCreateInput{
+export class ReviewedProduct implements Prisma.ReviewProductCreateInput {
   product: Prisma.ProductCreateNestedOneWithoutReviewProductInput;
   review: Prisma.ReviewCreateNestedOneWithoutReviewProductInput;
 }

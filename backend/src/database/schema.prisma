@@ -104,6 +104,7 @@ model Product {
   description     String
   manufacturer    String
   category_name   String
+  isDiscounting Boolean?
   discountPrice Int?
   discountRatio Int?
   category        Category        @relation(fields: [categoryId], references: [id])

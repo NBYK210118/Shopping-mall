@@ -31,11 +31,14 @@ export const Watchlist = () => {
       );
     } else {
       const result = watchedProducts.map((val, idx) => (
-        <div className="flex flex-col items-center border rounded-[4px] mt-3" style={{ flex: '0 1 calc(20% - 16px);' }}>
+        <div
+          className="flex flex-col items-center border rounded-[4px] mt-3 shadow transition-all duration-150 hover:-translate-y-1 cursor-pointer"
+          style={{ flex: '0 1 calc(20% - 16px);' }}
+        >
           <img
             src={val.images[0].imgUrl}
             alt=""
-            className="h-[200px] mw-md:h-[100px] max-w-[150px] mw-md:max-w-[60px] object-cover transition-all duration-150 hover:-translate-y-1 cursor-pointer"
+            className="h-[200px] mw-md:h-[100px] max-w-[150px] mw-md:max-w-[60px] object-cover "
             onClick={() => navigate(`/products/${val.id}`)}
           />
           <span className="text-center my-3 font-bold mw-md:text-[0.7rem] mw-md:text-nowrap">{val.name}</span>
@@ -50,10 +53,7 @@ export const Watchlist = () => {
   };
 
   return (
-    <div
-      id="watchlist_container"
-      className="w-full h-full my-7 justify-center items-center mw-md:-ml-10 border border-gray-300 rounded-lg p-1"
-    >
+    <div id="watchlist_container" className="w-full h-full my-7 justify-center items-center mw-md:-ml-10 p-1">
       <h1 className="font-bold font-mono"></h1>
       <div className="grid grid-cols-4 mw-md:grid-cols-2 gap-4">
         <Items />

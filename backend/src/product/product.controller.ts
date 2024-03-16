@@ -5,6 +5,7 @@ import {
   Param,
   ParseIntPipe,
   Post,
+  Query,
   Req,
   Res,
   UseGuards,
@@ -22,8 +23,22 @@ export class ProductController {
   @UseGuards(AuthGuard())
   @Get(':id')
   async getProduct(@Param('id', ParseIntPipe) id: number): Promise<Product> {
-    console.log(id);
     return this.productService.getProduct(id);
+  }
+
+  @UseGuards(AuthGuard())
+  @Get('/my-store/everypage/')
+  async getProductsByPage(
+    @GetUser() user: User,
+    @Query('page') page: string,
+    @Query('limit') limit: string,
+  ) {
+    return this.productService.getProductsByPage(user, +page, +limit);
+  }
+
+  @Get('/all/discounting')
+  async getDiscountingProducts(): Promise<Product[]> {
+    return this.productService.getDiscountingProducts();
   }
 
   @UseGuards(AuthGuard())

@@ -22,6 +22,7 @@ export default function MainContent() {
   const [wishProducts, setWishProducts] = useState([]);
   const [watchedProducts, setWatchedProducts] = useState(null);
   const [mostViewedProducts, setMostViewedProducts] = useState(null);
+  const [discountingProducts, setDiscountingProducts] = useState(null);
 
   // 첫 로드 때 환영합니다 메시지 띄워주기
   // 사용자가 판매 중인 상품 로드해주기
@@ -72,6 +73,10 @@ export default function MainContent() {
         setMostViewedProducts(response.data);
       }
     };
+    const getDiscountingProducts = async () => {
+      const response = await ProductApi.getDiscountingProducts();
+      setDiscountingProducts(response.data);
+    };
 
     if (user) {
       setLoading(true);
@@ -83,6 +88,7 @@ export default function MainContent() {
 
     setLoading(true);
     getMostViewedProducts();
+    getDiscountingProducts();
     setLoading(false);
 
     return () => {
@@ -433,14 +439,45 @@ export default function MainContent() {
                 <h3 className="text-xl font-semibold mb-3 mw-md:text-nowrap text-center mw-md:text-lg">
                   할인 중인 상품
                 </h3>
-                <div className="grid grid-cols-2 gap-4 mw-md:grid-cols-2">
-                  {[...Array(4)].map((_, index) => (
-                    <div key={index} className="flex flex-col items-center">
-                      <img src="https://via.placeholder.com/150" alt={`Product ${index + 1}`} className="mb-2" />
-                      <p className="mw-md:text-sm">Product Name {index + 1}</p>
-                    </div>
-                  ))}
-                </div>
+                {loading ? (
+                  <div className="grid grid-cols-2 gap-4 mw-md:grid-cols-2">
+                    {Array(4).map((_, idx) => (
+                      <div className="flex flex-col items-center max-w-[200px]">
+                        <Skeleton height={180} className="mb-2" />
+                        <Skeleton count={5} />
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-2 gap-4 mw-md:grid-cols-2">
+                    {discountingProducts &&
+                      discountingProducts.map((val, index) => (
+                        <div
+                          key={index}
+                          className="flex flex-col items-center max-w-[200px] border border-solid border-sky-700 rounded transition-all duration-300 hover:-translate-y-1"
+                        >
+                          <img
+                            src={val.images[0].imgUrl}
+                            alt={`Product ${index + 1}`}
+                            className="object-cover w-[190px] h-[180px] mw-md:w-[150px] mw-md:h-[150px] mb-2 cursor-pointer"
+                            onClick={() => navigate(`/products/${val.id}`)}
+                          />
+                          <div className="flex items-center">
+                            <FontAwesomeIcon icon={faEye} className="text-gray-400 mr-1 mw-md:text-sm" />
+                            <p className="text-xs mw-md:text-sm text-gray-500">{val.viewed_count} views</p>
+                          </div>
+                          <p className="mw-md:text-sm font-bold">{val.name}</p>
+                          <div className="flex items-center">
+                            <p className="text-xs mw-md:text-[0.6rem] mw-md:text-nowrap text-red-500 mr-1 line-through">
+                              {val.price.toLocaleString('ko-kr')}원
+                            </p>
+                            <p className="mw-md:text-[0.68rem]">{val.discountPrice.toLocaleString('ko-kr')}원</p>
+                            <span className="text-red-500 font-bold opacity-80 ml-2">{val.discountRatio}%</span>
+                          </div>
+                        </div>
+                      ))}
+                  </div>
+                )}
               </div>
 
               {/* Advertising Space */}
@@ -562,17 +599,49 @@ export default function MainContent() {
                 </div>
               </div>
 
-              {/* Sales and Promotions */}
               <div className="mb-2 p-4">
-                <h3 className="text-xl font-semibold mb-3 mw-md:text-nowrap mw-md:text-lg">On Sale Now</h3>
-                <div className="grid grid-cols-3 gap-4 ">
-                  {[...Array(6)].map((_, index) => (
-                    <div key={index} className="flex flex-col items-center">
-                      <img src="https://via.placeholder.com/150" alt={`Product ${index + 1}`} className="mb-2" />
-                      <p className="mw-md:text-sm">Product Name {index + 1}</p>
-                    </div>
-                  ))}
-                </div>
+                <h3 className="text-xl font-semibold mb-3 mw-md:text-nowrap text-center mw-md:text-lg">
+                  할인 중인 상품
+                </h3>
+                {loading ? (
+                  <div className="grid grid-cols-2 gap-4 mw-md:grid-cols-2">
+                    {Array(4).map((_, idx) => (
+                      <div className="flex flex-col items-center max-w-[200px]">
+                        <Skeleton height={180} className="mb-2" />
+                        <Skeleton count={5} />
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-2 gap-4 mw-md:grid-cols-2">
+                    {discountingProducts &&
+                      discountingProducts.map((val, index) => (
+                        <div
+                          key={index}
+                          className="flex flex-col items-center max-w-[200px] border border-solid border-sky-700 rounded transition-all duration-300 hover:-translate-y-1"
+                        >
+                          <img
+                            src={val.images[0].imgUrl}
+                            alt={`Product ${index + 1}`}
+                            className="object-cover w-[190px] h-[180px] mw-md:w-[150px] mw-md:h-[150px] mb-2 cursor-pointer"
+                            onClick={() => navigate(`/products/${val.id}`)}
+                          />
+                          <div className="flex items-center">
+                            <FontAwesomeIcon icon={faEye} className="text-gray-400 mr-1 mw-md:text-sm" />
+                            <p className="text-xs mw-md:text-sm text-gray-500">{val.viewed_count} views</p>
+                          </div>
+                          <p className="mw-md:text-sm font-bold">{val.name}</p>
+                          <div className="flex items-center">
+                            <p className="text-xs mw-md:text-[0.6rem] mw-md:text-nowrap text-red-500 mr-1 line-through">
+                              {val.price.toLocaleString('ko-kr')}원
+                            </p>
+                            <p className="mw-md:text-[0.68rem]">{val.discountPrice.toLocaleString('ko-kr')}원</p>
+                            <span className="text-red-500 font-bold opacity-80 ml-2">{val.discountRatio}%</span>
+                          </div>
+                        </div>
+                      ))}
+                  </div>
+                )}
               </div>
 
               {/* Advertising Space */}

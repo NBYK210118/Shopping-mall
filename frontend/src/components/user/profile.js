@@ -74,7 +74,7 @@ export default function UserProfile() {
   return (
     <>
       <>
-        <div className="flex mw-md:flex-wrap justify-around mt-10 p-10 mw-md:p-0 mw-md:-ml-10 mw-md:mt-16 bg-gray-100 ">
+        <div className="flex mw-md:flex-wrap justify-around mt-5 p-10 mw-md:p-0 mw-md:-ml-10 mw-md:mt-5 bg-gray-100 ">
           {/* left Panel */}
           <div className="flex flex-col bg-white shadow-md rounded-lg overflow-hidden mw-md:-mt-14 mw-md:shadow-lg border border-gray-200">
             <div className="flex items-center justify-between p-10 border-b mb-5 mw-md:flex-wrap mw-md:-ml-6">

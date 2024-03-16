@@ -6,6 +6,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faComments,
   faEdit,
+  faGear,
   faHeart,
   faMoneyBillWave,
   faShoppingCart,
@@ -13,12 +14,11 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import { faStar as fablankStar } from '@fortawesome/free-regular-svg-icons';
 import { faHeart as faHeartRegular } from '@fortawesome/free-regular-svg-icons';
-import DataService from '../../data_services';
 
 export const ProductDetail = () => {
   const [currentProduct, setCurrentProduct] = useState(null);
   const [isCurrentUserProduct, setIsCurrentUsersProduct] = useState(null);
-  const { token, user, navigate, setLoading } = useAuth();
+  const { token, user, navigate, setLoading, setClickedSellingProduct } = useAuth();
   const [currentComment, setCurrentComment] = useState(null);
   const [currentStars, setCurrentStars] = useState(5);
   const [fetchStars, setFetchStars] = useState(null);
@@ -59,7 +59,6 @@ export const ProductDetail = () => {
           if (response.data.reviews.length > 0) {
             const review = response.data.reviews.filter((val) => val.userId === user.id);
             if (review[0]) {
-              console.log(review[0]);
               setCurrentUserReview(review[0]);
               setFetchStars(review[0].stars);
               setFetchComment(review[0].txt);
@@ -155,6 +154,12 @@ export const ProductDetail = () => {
     });
   };
 
+  // 설정 아이콘 클릭 -> 해당 상품 정보 수정을 위해 PersonalStore 로 이동
+  const handleClickGear = () => {
+    setClickedSellingProduct(Number(productId));
+    navigate(`/user/my-store`);
+  };
+
   // 별표 갯수가 확정되고 별점이 몇 점인지 state로 저장해주기
   useEffect(() => {
     console.log('cReviewStars: ', cReviewStars);
@@ -208,9 +213,16 @@ export const ProductDetail = () => {
               className="w-[30%] h-[420px] mw-md:w-[65%] mw-md:h-auto rounded"
             />
             <div className="w-1/2 mw-md:w-1/2 mw-md:h-auto flex flex-col justify-around p-4 bg-gray-200 rounded">
-              <span className="text-[0.8rem] mw-md:text-[0.7rem] mw-md:mb-4 mw-md:-ml-[1px] ml-1 text-blue-400 hover:underline hover:cursor-pointer">
-                {currentProduct.manufacturer ? `${currentProduct.manufacturer}` : 'Failed to load manufacturer'}
-              </span>
+              <div className="flex justify-between items-center">
+                <span className="text-[0.8rem] mw-md:text-[0.7rem] mw-md:mb-4 mw-md:-ml-[1px] ml-1 text-blue-500 hover:underline hover:cursor-pointer">
+                  {currentProduct.manufacturer ? `${currentProduct.manufacturer}` : 'Failed to load manufacturer'}
+                </span>
+                {isCurrentUserProduct && (
+                  <span className="mw-md:text-xs mw-md:mb-5 cursor-pointer" onClick={() => handleClickGear()}>
+                    <FontAwesomeIcon icon={faGear} />
+                  </span>
+                )}
+              </div>
               <div className="flex items-center -mt-5 mw-md:flex-wrap mw-md:flex-col mw-md:items-start">
                 <span className="font-bold miw-lg:text-[1.6rem] mw-md:text-[0.9rem]">
                   {currentProduct && currentProduct.name}
@@ -328,7 +340,7 @@ export const ProductDetail = () => {
     <>
       <div
         id={`product_detail_container_${productId}`}
-        className="w-[90%] mw-md:w-full h-full mt-10 border border-gray-300 mw-md:ml-0 mw-md:border-none"
+        className="w-[90%] mw-md:w-full h-full mt-10 border border-gray-300 mw-md:ml-0 mw-md:border-none mw-md:mb-20"
       >
         <ItemInfo />
         <div id="product_reviews" className="w-3/5 h-2/5 mw-md:w-[85%] mw-md:ml-9  flex flex-col mt-10 mx-auto">

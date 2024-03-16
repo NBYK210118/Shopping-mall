@@ -1,6 +1,5 @@
 import { Injectable } from '@nestjs/common';
 import { Product, User, ViewedProduct } from '@prisma/client';
-import { NotFoundError } from 'rxjs';
 import { PrismaService } from 'src/database/prisma.service';
 
 @Injectable()
@@ -134,5 +133,33 @@ export class ProductService {
   async deleteProduct(id: number): Promise<Product> {
     const result = await this.prisma.product.delete({ where: { id } });
     return result;
+  }
+
+  async getDiscountingProducts(): Promise<Product[]> {
+    const discounting_products = await this.prisma.product.findMany({
+      where: { isDiscounting: { equals: true } },
+      take: 4,
+      include: { images: true },
+    });
+
+    return discounting_products;
+  }
+
+  async getProductsByPage(
+    user: User,
+    page: number,
+    limit: number,
+  ): Promise<Product[]> {
+    const skip = (page - 1) * limit;
+
+    const products = await this.prisma.product.findMany({
+      take: limit,
+      skip,
+      orderBy: {
+        id: 'asc',
+      },
+    });
+
+    return products;
   }
 }

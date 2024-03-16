@@ -1,17 +1,11 @@
-import {
-  Injectable,
-  UnauthorizedException,
-  UploadedFile,
-} from '@nestjs/common';
-import { Image, Product, Profile, Store, User, WishList } from '@prisma/client';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Product, Profile, User } from '@prisma/client';
 import { PrismaService } from 'src/database/prisma.service';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 import { signInDto, signUpDto } from './dto/sign.dto';
 import { UserProfileDto } from './dto/user.dto';
-import AddProductDto from './dto/addProduct.dto';
-import { Category } from 'src/product/product.model';
-import { ProfileDto } from './dto/profile.dto';
+import ProductDetailDto from './dto/addProduct.dto';
 
 @Injectable()
 export class UserService {
@@ -20,6 +14,7 @@ export class UserService {
     private jwtService: JwtService,
   ) {}
 
+  // 토큰 유효성 검증
   async verifyToken(token: string, secretKey: string) {
     try {
       const decodedToken = await this.jwtService.verify(token, {
@@ -31,6 +26,7 @@ export class UserService {
     }
   }
 
+  // 토큰 기한이 만료되었는지
   async isTokenExpired(token: string) {
     const decodedToken = await this.jwtService.decode(token);
     const expirationTime = new Date(decodedToken.exp * 1000);
@@ -39,6 +35,7 @@ export class UserService {
     return expirationTime < currentTime;
   }
 
+  // 이메일로 유저 정보 가져오기
   async emailUser(email: string): Promise<User> {
     const user = await this.prisma.user.findFirst({
       where: { email },
@@ -55,6 +52,9 @@ export class UserService {
                 images: true,
                 manufacturer: true,
                 description: true,
+                isDiscounting: true,
+                discountPrice: true,
+                discountRatio: true,
               },
             },
             store: true,
@@ -72,6 +72,7 @@ export class UserService {
     return user;
   }
 
+  // 토큰값으로 유저 정보 가져오기
   async getTokenUser(token: string): Promise<User> {
     const decodedToken = await this.jwtService.verify(token, {
       secret: 'Secret1234',
@@ -84,6 +85,7 @@ export class UserService {
     return user;
   }
 
+  // 토큰 최종 유효성 검증
   async checkingToken(token: string, secretKey: string) {
     try {
       // JWT 토큰을 검증하고 디코딩합니다
@@ -102,6 +104,7 @@ export class UserService {
     }
   }
 
+  // 회원가입
   async signUp(data: signUpDto): Promise<User> {
     const { email, password, firstName, lastName } = data;
     const hash = await bcrypt.hash(password, 10);
@@ -126,6 +129,7 @@ export class UserService {
     return signup_result;
   }
 
+  // 로그인
   async signIn(signInDto: signInDto): Promise<{ access_token: string }> {
     const { email, password } = signInDto;
     const user = await this.emailUser(email);
@@ -143,24 +147,29 @@ export class UserService {
     }
   }
 
+  // 유저 생성 id 값으로 유저 정보 가져오기
   async getUser(id: number): Promise<User> {
     return this.prisma.user.findUnique({
       where: { id },
     });
   }
 
+  // 모든 유저 정보 가져오기(관리자 권한)
   async getAllUsers(): Promise<User[]> {
     return this.prisma.user.findMany();
   }
 
+  // 유저 정보 삭제하기(회원탈퇴)
   async deleteUser(id: number): Promise<User> {
     return this.prisma.user.delete({ where: { id: Number(id) } });
   }
 
+  // 유저 정보 모두 삭제하기
   async deleteAllUsers() {
     return this.prisma.user.deleteMany();
   }
 
+  // 닉네임 변경
   async updateNickname(user: User, nickname: string): Promise<User> {
     await this.prisma.profile.update({
       where: { userId: user.id },
@@ -171,6 +180,7 @@ export class UserService {
     return userinfo;
   }
 
+  // 프로필 정보 수정
   async updateProfile(user: User, data: UserProfileDto) {
     const { firstName, lastName, email, address, store, phoneNumber } = data;
 
@@ -236,6 +246,7 @@ export class UserService {
     return result;
   }
 
+  // 프로필 이미지 업로드
   async uploadProfileImage(user: User, imgUrl: string, img_size: number) {
     const image = await this.prisma.image.create({
       data: { imgUrl, size: img_size },
@@ -250,19 +261,23 @@ export class UserService {
     return result;
   }
 
+  // 프로필 가져오기
   async getProfile(user: User): Promise<Profile> {
     return this.prisma.profile.findUnique({ where: { userId: user.id } });
   }
 
+  // 모든 프로필 정보 가져오기
   async getAllProfile(): Promise<Profile[]> {
     return this.prisma.profile.findMany();
   }
 
+  // 프로필 삭제하기
   async deleteProfile(id: number): Promise<Profile> {
     return this.prisma.profile.delete({ where: { id: id } });
   }
 
-  async addProduct(user: User, addProductDto: AddProductDto) {
+  // 판매 상품 등록하기
+  async addProduct(user: User, productDetailDto: ProductDetailDto) {
     const {
       image,
       image_size,
@@ -273,10 +288,14 @@ export class UserService {
       category,
       inventory,
       status,
-    } = addProductDto;
+      discountPrice,
+      discountRatio,
+      isDiscounting,
+    } = productDetailDto;
     const detail2 = detail.trim();
     const priceWithoutComma = price.replace(/,/g, '');
     const parsedIntPrice = parseInt(priceWithoutComma, 10);
+    const parsedDiscountPrice = parseInt(discountPrice.replace(/,/g, ''));
     let product_category = null;
     let onsales = null;
 
@@ -303,6 +322,9 @@ export class UserService {
         price: Number(parsedIntPrice),
         manufacturer,
         status,
+        discountPrice: parsedDiscountPrice,
+        isDiscounting: Boolean(isDiscounting),
+        discountRatio: Number(discountRatio),
         category_name: category,
         inventory: Number(inventory),
         category: { connect: { id: product_category.id } },
@@ -355,10 +377,11 @@ export class UserService {
     return onUser;
   }
 
+  // 판매 중인 물품 정보 수정하기
   async updateProduct(
     user: User,
     id: number,
-    updateProductDto: AddProductDto,
+    updateProductDto: ProductDetailDto,
   ): Promise<User> {
     const {
       name,
@@ -370,15 +393,17 @@ export class UserService {
       inventory,
       manufacturer,
       status,
+      isDiscounting,
+      discountPrice,
+      discountRatio,
     } = updateProductDto;
     const priceWithoutComma = price.replace(/,/g, '');
+    const parsedDiscountPrice = parseInt(discountPrice.replace(/,/g, ''));
     const parsedIntPrice = parseInt(priceWithoutComma, 10);
-    console.log('category: ', category);
     const product_image = await this.prisma.productImage.findFirst({
       where: { productId: Number(id) },
     });
 
-    // console.log('found product: ', await this.prisma.product.findFirst({where:{id:Number(id)}}));
     await this.prisma.product.update({
       where: { id: Number(id) },
       data: {
@@ -389,6 +414,9 @@ export class UserService {
         category_name: category,
         inventory: Number(inventory),
         manufacturer,
+        discountPrice: parsedDiscountPrice,
+        discountRatio: Number(discountRatio),
+        isDiscounting: Boolean(isDiscounting),
         images: {
           update: {
             where: { id: product_image.imageId },
@@ -402,6 +430,7 @@ export class UserService {
     return onUser;
   }
 
+  // 업데이트 버튼 클릭 시 체크된 상품 정보들에 대한 레코드 불러오기
   async getProductsWhileUpdate(checklist: number[]): Promise<Product[]> {
     const products = await this.prisma.product.findMany({
       where: { id: { in: checklist } },
@@ -411,6 +440,7 @@ export class UserService {
     return products;
   }
 
+  // 선택된 상품 제거하기(판매 취소 버튼)
   async deleteProduct(user: User, checklist: string) {
     const parsedChecklist = checklist.split(',').map((val) => parseInt(val));
 

@@ -11,14 +11,13 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { UserService } from './user.service';
-import { Image, Product, Profile, User } from '@prisma/client';
+import { Profile, User } from '@prisma/client';
 import { signInDto, signUpDto } from './dto/sign.dto';
 import { AuthGuard } from '@nestjs/passport';
 import { Request, Response } from 'express';
 import { GetUser } from './get-user.decorator';
-import { ProfileDto } from './dto/profile.dto';
-import AddProductDto from './dto/addProduct.dto';
 import { UserProfileDto } from './dto/user.dto';
+import ProductDetailDto from './dto/addProduct.dto';
 
 @Controller('user')
 export class UserController {
@@ -127,10 +126,10 @@ export class UserController {
   }
 
   @UseGuards(AuthGuard())
-  @Post('/my-store/add-product')
+  @Post('/my-store/add/product')
   async addProduct(
     @GetUser() user: User,
-    @Body() addProductDto: AddProductDto,
+    @Body() addProductDto: ProductDetailDto,
   ) {
     return this.userService.addProduct(user, addProductDto);
   }
@@ -140,7 +139,7 @@ export class UserController {
   async updateProduct(
     @GetUser() user: User,
     @Param('id') id: number,
-    @Body() updateProduct: AddProductDto,
+    @Body() updateProduct: ProductDetailDto,
   ): Promise<User> {
     return this.userService.updateProduct(user, id, updateProduct);
   }
