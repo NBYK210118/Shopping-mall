@@ -3,9 +3,10 @@ import { Route, Routes, useLocation, useNavigate, useSearchParams } from 'react-
 import UserProfile from './profile';
 import PersonalStore from './personal_store';
 import UserWishlist from './user_wishlist';
-import { faClock, faHeart, faList, faStore, faUser } from '@fortawesome/free-solid-svg-icons';
+import { faBasketShopping, faClock, faHeart, faList, faStore, faUser } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Watchlist } from './watchlist';
+import ShoppingBasket from './ShoppingBasket';
 
 const Mypage = () => {
   const navigate = useNavigate();
@@ -30,6 +31,7 @@ const Mypage = () => {
     { txt: 'WishList', to: 'wishlist', icon: faHeart },
     { txt: 'WatchList', to: 'watchlist', icon: faClock },
     { txt: 'My Orders', to: 'my-orders', icon: faList },
+    { txt: 'My Basket', to: 'my-basket', icon: faBasketShopping },
   ];
 
   // url 에 맞는 사이드바 상태 표시
@@ -80,8 +82,10 @@ const Mypage = () => {
     <div className="w-[75%] h-full flex justify-center">
       <div className="w-[95%] h-[70%] flex justify-center items-center">
         <div id="mypage_content" className="w-[90%] h-full flex">
-          <div className="group bg-blue-400 rounded-r-xl hover:bg-white h-[50%] mw-md:h-[10%] mt-10 p-1 fixed left-0 mw-md:left-0 top-20 mw-md:top-8 mw-md:flex-row flex flex-col justify-evenly items-center transition-all duration-300 ">
-            <span className="font-bold text-white group-hover:hidden mw-md:text-[0.7rem]">Menu</span>
+          <div className="group bg-blue-600 rounded-r-xl hover:bg-white h-[50%] mw-md:h-[10%] mt-10 p-1 fixed left-0 mw-md:left-0 top-20 z-10 mw-md:top-8 mw-md:flex-row flex flex-col justify-evenly items-center transition-all duration-300 ">
+            <span className="font-bold text-white group-hover:hidden mw-md:text-[0.85rem] text-xl px-3 mw-md:px-[1px]">
+              Menu
+            </span>
             <SideBar />
           </div>
           <div className="w-full h-full mw-md:h-1/2 flex justify-center mt-20 ml-10">
@@ -90,6 +94,7 @@ const Mypage = () => {
               <Route path="my-store" element={<PersonalStore />}></Route>
               <Route path="wishlist" element={<UserWishlist />}></Route>
               <Route path="watchlist" element={<Watchlist />}></Route>
+              <Route path="my-basket" element={<ShoppingBasket />}></Route>
             </Routes>
           </div>
         </div>

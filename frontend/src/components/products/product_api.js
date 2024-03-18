@@ -336,6 +336,99 @@ const getProductsBypage = async (token, currentPage, itemsPage, navigate) => {
   }
 };
 
+// 검색한 단어로 상품을 찾아내기
+const getProductsBySearchKeyword = async (keyword, navigate) => {
+  try {
+    const data = await http.get(`/product/?search_keyword=${keyword}`);
+    return data;
+  } catch (error) {
+    if (error.response.status === 400) {
+      alert('잘못된 요청');
+      localStorage.clear();
+      navigate('');
+    } else if (error.response.status === 500) {
+      alert('서버 에러!');
+      localStorage.clear();
+      navigate('');
+    }
+  }
+};
+
+// 내 장바구니 불러오기
+const getMyBasket = async (token, navigate) => {
+  try {
+    const data = await http.get('/shoppingbasket', {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    return data;
+  } catch (error) {
+    if (error.response.status === 401) {
+      localStorage.clear();
+      navigate('/signin');
+    } else if (error.response.status === 400) {
+      alert('잘못된 요청');
+      localStorage.clear();
+      navigate('');
+    } else if (error.response.status === 500) {
+      alert('서버 에러!');
+      localStorage.clear();
+      navigate('');
+    }
+  }
+};
+
+// 장바구니 담기 버튼 클릭
+const addProductMyBasket = async (token, productId, navigate) => {
+  try {
+    const data = await http.post(
+      `/shoppingbasket/add/?product_id=${productId}`,
+      {},
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    );
+    return data;
+  } catch (error) {
+    if (error.response.status === 401) {
+      localStorage.clear();
+      navigate('/signin');
+    } else if (error.response.status === 400) {
+      alert('잘못된 요청');
+      localStorage.clear();
+      navigate('');
+    } else if (error.response.status === 500) {
+      alert('서버 에러!');
+      localStorage.clear();
+      navigate('');
+    }
+  }
+};
+
+// 장바구니에서 제거하기
+const removeProductBasket = async (token, productId, navigate) => {
+  try {
+    const data = await http.post(
+      `/shoppingbasket/remove/?product_id=${productId}`,
+      {},
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+    return data;
+  } catch (error) {
+    if (error.response.status === 401) {
+      localStorage.clear();
+      navigate('/signin');
+    } else if (error.response.status === 400) {
+      alert('잘못된 요청');
+      localStorage.clear();
+      navigate('');
+    } else if (error.response.status === 500) {
+      alert('서버 에러!');
+      localStorage.clear();
+      navigate('');
+    }
+  }
+};
+
 const ProductApi = {
   findProduct,
   categoriesItem,
@@ -352,6 +445,10 @@ const ProductApi = {
   getMostInterested,
   getDiscountingProducts,
   getProductsBypage,
+  getProductsBySearchKeyword,
+  getMyBasket,
+  addProductMyBasket,
+  removeProductBasket,
 };
 
 export default ProductApi;

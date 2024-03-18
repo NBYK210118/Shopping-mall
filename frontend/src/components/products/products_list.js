@@ -8,11 +8,25 @@ import { Link, useSearchParams } from 'react-router-dom';
 import Skeleton from 'react-loading-skeleton';
 
 export function Products() {
-  const { token, user, setUser, category, setCategory, loading, setLoading, navigate } = useAuth();
+  const {
+    token,
+    user,
+    setUser,
+    category,
+    setCategory,
+    loading,
+    setLoading,
+    navigate,
+    searchResult,
+    showMessage,
+    setShowMessage,
+  } = useAuth();
   const [currentProducts, setCurrentProducts] = useState([]);
   const [manageProductsLikes, setManageProductsLikes] = useState({});
-  let [searchParams, setSearchParams] = useSearchParams();
-  let param = searchParams.get('category');
+  let [categoryParams, setCategoryParams] = useSearchParams();
+  let [searchKeywordParams, setSearchKeywordParams] = useSearchParams();
+  let category_query = categoryParams.get('category');
+  let search_keyword = searchKeywordParams.get('search_keyword');
 
   const checkUserLikedProduct = (product, user) => {
     return product.likedBy.some((like) => like.userId === user.id);
@@ -31,11 +45,25 @@ export function Products() {
     }
   };
 
+  const handleBasketClick = (productId) => {
+    ProductApi.addProductMyBasket(token, productId, navigate).then((response) => {
+      if (response && response.data) {
+        console.log('success to add product in your Basket: ', response.data);
+        setShowMessage(true);
+        setTimeout(() => {
+          setShowMessage(false);
+        }, 2500);
+      } else {
+        console.log('Failed to add product');
+      }
+    });
+  };
+
   useEffect(() => {
     const waitForProducts = async () => {
       try {
         setLoading(true);
-        const response = await ProductApi.getAllProducts(param, navigate);
+        const response = await ProductApi.getAllProducts(category_query, navigate);
         if (response && response.data) {
           setCurrentProducts(response.data);
           console.log('response.data: ', response.data);
@@ -48,14 +76,21 @@ export function Products() {
       }
     };
 
+    if (searchResult) {
+      console.log(searchResult);
+    }
+
     setLoading(true);
     waitForProducts();
     setLoading(true);
   }, []);
 
   useEffect(() => {
+    console.log('search-keyword: ', search_keyword);
+  }, [search_keyword]);
+
+  useEffect(() => {
     if (token) {
-      console.log(currentProducts);
       setManageProductsLikes(
         currentProducts.reduce((acc, product) => {
           acc[product.id] = checkUserLikedProduct(product, user);
@@ -78,7 +113,7 @@ export function Products() {
   }, [manageProductsLikes]);
 
   const Items = () => {
-    if (currentProducts !== undefined && currentProducts.length > 0) {
+    if (currentProducts !== null && currentProducts !== undefined && currentProducts.length > 0) {
       return currentProducts.map((val, idx) => (
         <div
           id="product_item"
@@ -106,10 +141,13 @@ export function Products() {
               >
                 구매
               </Link>
-              <Link className="font-semibold text-nowrap mw-md:text-[0.5rem] flex justify-around items-center text-xs py-1 px-2 bg-green-500 text-white rounded hover:bg-green-600 transition-all duration-150">
+              <span
+                className="font-semibold text-nowrap mw-md:text-[0.5rem] flex justify-around items-center text-xs py-1 px-2 bg-green-500 text-white rounded hover:bg-green-600 transition-all duration-150"
+                onClick={() => handleBasketClick(val.id)}
+              >
                 <FontAwesomeIcon icon={faShoppingCart} />
                 장바구니 담기
-              </Link>
+              </span>
             </div>
           </div>
         </div>
@@ -119,12 +157,69 @@ export function Products() {
     }
   };
 
+  const handleGuestClick = () => {
+    alert('로그인이 필요합니다!');
+    navigate('/signin');
+  };
+
+  const SearchResult = () => {
+    if (searchResult !== null && searchResult !== undefined && searchResult.length > 0) {
+      return searchResult.map((val, idx) => (
+        <div className="flex flex-col min-h-60 min-w-36 max-h-[390px] mw-md:max-w-[100px] mw-md:max-h-[150px] cursor-pointer p-3 mx-5 my-2 border boder-solid border-gray-300 hover:-translate-y-1 transition-all duration-150">
+          <Link to={`/products/${val.id}`} key={val.id}>
+            <img
+              src={val.images[0].imgUrl}
+              alt=""
+              className="w-full max-w-[250px] miw-md:min-h-72 max-h-[290px] mw-md:max-w-[210px] mw-md:min-h-36 mw-md:max-h-[140px] object-cover hover:scale-[1.04] transition-all duration-300"
+            />
+          </Link>
+          <span className="font-bold text-md mw-md:text-sm mb-1">{val.name}</span>
+          <span className="text-sm mw-md:text-xs mb-2">
+            {val.isDiscounting ? val.discountPrice.toLocaleString('ko-kr') : val.price.toLocaleString('ko-kr')}원
+          </span>
+          <div className="w-full mw-md:w-auto mw-md:space-x-0 flex justfiy-between items-center">
+            <FontAwesomeIcon
+              icon={faHeartRegular} // isFilledHeart 상태에 따라 아이콘을 변경하는 로직 추가 필요
+              className=" text-red-500 text-2xl mw-md:text-sm mw-md:-ml-1 cursor-pointer hover:scale-[1.1] transition-all duration-300"
+              onClick={() => handleGuestClick()}
+            />
+            <div className="flex justify-end ml-20">
+              <span
+                className="font-semibold text-nowrap text-xs mw-md:text-[0.5rem] mx-1 py-1 px-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-all duration-150"
+                onClick={() => handleGuestClick()}
+              >
+                구매
+              </span>
+              <Link
+                className="font-semibold text-nowrap mw-md:text-[0.5rem] flex justify-around items-center text-xs py-1 px-2 bg-green-500 text-white rounded hover:bg-green-600 transition-all duration-150"
+                onClick={() => handleGuestClick()}
+              >
+                <FontAwesomeIcon icon={faShoppingCart} />
+                장바구니 담기
+              </Link>
+            </div>
+          </div>
+        </div>
+      ));
+    }
+  };
+
   return (
     <div id="products_main" className="w-full h-full flex justify-center mt-10 mw-md:mb-20">
       <div id="products_container" className="w-full h-full">
         <div className="mx-auto px-4">
           <div className="flex flex-wrap items-end mw-md:grid mw-md:grid-cols-2">
-            {loading ? (
+            {search_keyword ? (
+              <div className="flex flex-col justify-center">
+                <span className="ml-5 mw-md:text-sm text-nowrap">
+                  <b>{searchResult !== undefined && searchResult.length > 0 ? searchResult.length : 0}</b>건의
+                  검색결과를 찾았습니다
+                </span>
+                <div className="flex items-center">
+                  <SearchResult />
+                </div>
+              </div>
+            ) : loading ? (
               <div>
                 <Skeleton height={170} />
                 <Skeleton count={5} />

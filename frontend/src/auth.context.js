@@ -14,6 +14,8 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
   const [category, setCategory] = useState(localStorage.getItem('category'));
   const [clickedSellingProduct, setClickedSellingProduct] = useState(null);
+  const [searchResult, setSearchResult] = useState([]);
+  const [showMessage, setShowMessage] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -57,6 +59,10 @@ export const AuthProvider = ({ children }) => {
         setCategory,
         clickedSellingProduct,
         setClickedSellingProduct,
+        searchResult,
+        setSearchResult,
+        showMessage,
+        setShowMessage,
         navigate,
       }}
     >

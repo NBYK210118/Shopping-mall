@@ -14,11 +14,12 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import { faStar as fablankStar } from '@fortawesome/free-regular-svg-icons';
 import { faHeart as faHeartRegular } from '@fortawesome/free-regular-svg-icons';
+import Message from '../message';
 
 export const ProductDetail = () => {
   const [currentProduct, setCurrentProduct] = useState(null);
   const [isCurrentUserProduct, setIsCurrentUsersProduct] = useState(null);
-  const { token, user, navigate, setLoading, setClickedSellingProduct } = useAuth();
+  const { token, user, navigate, setLoading, setClickedSellingProduct, setShowMessage, showMessage } = useAuth();
   const [currentComment, setCurrentComment] = useState(null);
   const [currentStars, setCurrentStars] = useState(5);
   const [fetchStars, setFetchStars] = useState(null);
@@ -198,6 +199,20 @@ export const ProductDetail = () => {
     );
   };
 
+  const handleBasketClick = (productId) => {
+    ProductApi.addProductMyBasket(token, productId, navigate).then((response) => {
+      if (response && response.data) {
+        console.log('success to add product in your Basket: ', response.data);
+        setShowMessage(true);
+        setTimeout(() => {
+          setShowMessage(false);
+        }, 2500);
+      } else {
+        console.log('Failed to add product');
+      }
+    });
+  };
+
   const ItemInfo = () => {
     if (currentProduct) {
       return (
@@ -234,12 +249,12 @@ export const ProductDetail = () => {
               <span className="font-semibold miw-lg:text-[1.2rem]">
                 {currentProduct.price ? currentProduct.price.toLocaleString('ko-kr') : 'Failed to load price'}원
               </span>
-              <span className="mb-10 mw-md:mb-0 mw-md:text-[0.7rem]">
+              <span className="mb-10 text-sm mw-md:mb-0 mw-md:text-[0.7rem]">
                 {currentProduct.description || currentProduct.description === ''
-                  ? `상세정보: ${currentProduct.description}`
+                  ? `상품정보:\n${currentProduct.description}`
                   : 'Failed to load description'}
               </span>
-              <span className="mw-md:text-[0.7rem]">
+              <span className="text-xs mw-md:text-[0.7rem]">
                 <b>판매자:</b> {user ? user.profile.nickname : "Failed to load seller's name"}
               </span>
               <div className="flex justify-end mt-3 mw-md:flex-col mw-md:text-nowrap mw-md:mt-2">
@@ -253,11 +268,17 @@ export const ProductDetail = () => {
                   />
                   <b className="text-white mw-md:text-[0.6rem]">{currentLikesCount} 좋아요</b>
                 </span>
-                <span className="text-center text-nowrap miw-lg:px-2 miw-lg:text-[0.7rem] py-2 mx-2 mw-md:mb-2 bg-black hover:bg-black/70 trasition-all duration-150 text-white font-bold rounded cursor-pointer mw-md:text-[0.6rem] ">
+                <span
+                  className="text-center text-nowrap miw-lg:px-2 miw-lg:text-[0.7rem] py-2 mx-2 mw-md:mb-2 bg-black hover:bg-black/70 trasition-all duration-150 text-white font-bold rounded cursor-pointer mw-md:text-[0.6rem]"
+                  onClick={() => navigate(`/products/${currentProduct.id}/buy`)}
+                >
                   <FontAwesomeIcon icon={faMoneyBillWave} className="mr-1" />
                   <b className="mw-md:text-[0.6rem]">구매하기</b>
                 </span>
-                <span className="text-center text-nowrap miw-lg:px-2 miw-lg:text-[0.7rem] mw-md:w-20 py-2 mx-2 mw-md:mb-2 mw-md:flex mw-md:justify-center mw-md:items-center bg-green-600 hover:bg-green-700 trasition-all duration-150 rounded cursor-pointer mw-md:text-[0.6rem]">
+                <span
+                  className="text-center text-nowrap miw-lg:px-2 miw-lg:text-[0.7rem] mw-md:w-20 py-2 mx-2 mw-md:mb-2 mw-md:flex mw-md:justify-center mw-md:items-center bg-green-600 hover:bg-green-700 trasition-all duration-150 rounded cursor-pointer mw-md:text-[0.6rem]"
+                  onClick={() => handleBasketClick(currentProduct.id)}
+                >
                   <FontAwesomeIcon icon={faShoppingCart} className="text-white mr-1" />
                   <b className="text-white">장바구니</b>
                 </span>
@@ -338,6 +359,7 @@ export const ProductDetail = () => {
 
   return (
     <>
+      {showMessage && <Message />}
       <div
         id={`product_detail_container_${productId}`}
         className="w-[90%] mw-md:w-full h-full mt-10 border border-gray-300 mw-md:ml-0 mw-md:border-none mw-md:mb-20"

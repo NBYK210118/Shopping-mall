@@ -34,10 +34,22 @@ export default function PersonalStore() {
   const [keyword, setKeyword] = useState('');
   const [searchingResult, setSearchingResult] = useState(null);
   const [isDiscounting, setIsDiscountingPar] = useState(false);
-  const [sellinglist, setSellinglist] = useState(null);
+  const [sellinglist, setSellinglist] = useState([]);
   const [selection, setSelection] = useState('10개 정렬');
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPage, setTotalPage] = useState(null);
+
+  const handleClickPageOrPerItems = () => {
+    // 초기 정렬 갯수 숫자만 추출해서 보내기
+    let result = selection.replace(/개 정렬/, '');
+    ProductApi.getProductsBypage(token, currentPage, result, navigate).then((response) => {
+      if (response && response.data) {
+        console.log(response.data.products);
+        setSellinglist(response.data.products);
+        setTotalPage(response.data.totalPages);
+      }
+    });
+  };
 
   useEffect(() => {
     if (!token) {
@@ -45,16 +57,12 @@ export default function PersonalStore() {
       alert('로그인이 필요합니다!');
     }
 
-    // 초기 정렬 갯수 숫자만 추출해서 보내기
-    let result = selection.replace(/개 정렬/, '');
-
-    DataService.getSellinglist(token, result, navigate).then((response) => {
-      if (response && response.data) {
-        setSellinglist(response.data.sellinglist);
-        setTotalPage(response.data.totalPages);
-      }
-    });
+    handleClickPageOrPerItems();
   }, []);
+
+  useEffect(() => {
+    handleClickPageOrPerItems();
+  }, [currentPage, selection]);
 
   // MainContent 에서 내가 판매 중인 상품을 클릭했을 때 my-store로 이동해오면서 선택되었던 상품 ID가 useContext를 통해 PersonalStore로 전파된다
   useEffect(() => {
@@ -66,6 +74,22 @@ export default function PersonalStore() {
     }
   }, [clickedSellingProduct]);
 
+  // 선택된 상품 리스트에 대한 콘솔 출력
+  useEffect(() => {
+    console.log(selectedList);
+  }, [selectedList]);
+
+  // ActiveOption이 상품 수정 일 때, 우측에 있는 상품 리스트들 중 한 가지를 선택한다면 currentProduct 가 바뀌게 됨 -> 이 때, currentProduct 로 input 태그의 value들을 채워줌
+  useEffect(() => {
+    if (currentProduct) {
+      if (currentProduct['images'] && currentProduct['name']) {
+        setImageUrl(currentProduct['images'][0]['imgUrl']);
+      }
+    } else {
+      setImageUrl('');
+    }
+  }, [currentProduct]);
+
   // 이전 버튼 클릭 시 activeOption 비워주기
   const handleBeforeButton = () => {
     setActiveOption(null);
@@ -73,34 +97,6 @@ export default function PersonalStore() {
     setSellistIndex(null);
     setCurrentProduct(null);
     window.location.reload();
-  };
-
-  // 판매 리스트 정렬 메뉴 변경이나 현재 페이지가 바뀔 때
-  // useEffect(() => {
-  //   // 정렬 갯수 숫자만 추출해서 보내기
-  //   let result = selection.replace(/개 정렬/, '');
-  //   ProductApi.getProductsBypage(token, currentPage, result, navigate).then((response) => {
-  //     console.log('다음 페이지: ', response.data);
-  //     setSellinglist(response.data);
-  //   });
-  // }, [currentPage, selection]);
-
-  // 페이지네이션 컨트롤 렌더링
-  const Pages = () => {
-    let controls = [];
-    for (let i = 1; i <= totalPage; i++) {
-      controls.push(
-        <button
-          key={i}
-          onClick={() => setCurrentPage(i)}
-          disabled={currentPage === i}
-          className={`mt-2 text-sm cursor-pointer hover:underline bg-gray-100 px-2 py-1 rounded-full mr-2`}
-        >
-          {i}
-        </button>
-      );
-    }
-    return <div className="flex ">{controls}</div>;
   };
 
   // 상품 목록에서 특정 상품을 선택했을 때 선택된 상품 리스트들을 state에 저장해주고, If, 선택된 상품들에 대한 번호가 리스트에 있다면 background color 지정해주기
@@ -119,21 +115,23 @@ export default function PersonalStore() {
     }
   };
 
-  // 선택된 상품 리스트에 대한 콘솔 출력
-  useEffect(() => {
-    console.log(selectedList);
-  }, [selectedList]);
+  const Pages = () => {
+    let controls = [];
 
-  // ActiveOption이 상품 수정 일 때, 우측에 있는 상품 리스트들 중 한 가지를 선택한다면 currentProduct 가 바뀌게 됨 -> 이 때, currentProduct 로 input 태그의 value들을 채워줌
-  useEffect(() => {
-    if (currentProduct) {
-      if (currentProduct['images'] && currentProduct['name']) {
-        setImageUrl(currentProduct['images'][0]['imgUrl']);
-      }
-    } else {
-      setImageUrl('');
+    for (let i = 1; i <= totalPage; i++) {
+      controls.push(
+        <button
+          key={i}
+          onClick={() => setCurrentPage(i)}
+          disabled={currentPage === i}
+          className={`appearance-none mt-2 text-sm cursor-pointer hover:underline border border-solid border-gray-300 px-2 py-1 mr-2 mw-md:text-[0.67rem] mw-md:px-[3px] mw-md:py-[1px]`}
+        >
+          {i}
+        </button>
+      );
     }
-  }, [currentProduct]);
+    return <div className="flex ">{controls}</div>;
+  };
 
   // 상품 수정 버튼 기능
   const handleUpdatebtn = async (e) => {
@@ -339,7 +337,7 @@ export default function PersonalStore() {
   };
 
   const UsersOnSale = () => {
-    if (sellinglist) {
+    if (sellinglist.length > 0) {
       if (searchingResult && searchingResult.length > 0) {
         return searchingResult.map((val, idx) => (
           <div
@@ -383,7 +381,7 @@ export default function PersonalStore() {
           </div>
         ));
       } else {
-        return sellinglist.products.map((val, idx) => (
+        return sellinglist?.map((val, idx) => (
           <div
             className={`w-full grid grid-cols-8 mw-md:gap-3 p-4 justify-center items-center border border-solid border-gray-300
            hover:bg-gray-200 transition-all duration-150 hover:cursor-pointer
@@ -704,7 +702,23 @@ export default function PersonalStore() {
                           <DropDown selection={selection} setSelection={setSelection} />
                         </div>
                         <SampleTable />
-                        {clickedCategory ? loading ? <LoadingSkeleton /> : <CategoriesOnSale /> : <UsersOnSale />}
+                        {clickedCategory ? (
+                          loading ? (
+                            <div>
+                              {' '}
+                              {Array(5).map((_, idx) => (
+                                <>
+                                  <Skeleton height={50} />
+                                  <Skeleton count={5} />
+                                </>
+                              ))}
+                            </div>
+                          ) : (
+                            <CategoriesOnSale />
+                          )
+                        ) : (
+                          <UsersOnSale />
+                        )}
                         <Pages />
                       </>
                     ) : (

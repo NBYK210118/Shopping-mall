@@ -90,6 +90,7 @@ export default function MainContent() {
     getMostViewedProducts();
     getDiscountingProducts();
     setLoading(false);
+    window.scroll(0, 0);
 
     return () => {
       clearTimeout(slideUpTimeout);
@@ -361,19 +362,6 @@ export default function MainContent() {
     );
   };
 
-  const LoadingSkeleton = () => {
-    return (
-      <div className="max-w-[800px] mw-md:max-w-[200px] mw-md:max-h-[200px] flex flex-wrap justify-center items-center gap-4 p-4">
-        {Array(5).map((_, index) => (
-          <div key={index} className="p-2 flex flex-col justify-between w-full">
-            <Skeleton height={170} className="mb-2" />
-            <Skeleton count={5} />
-          </div>
-        ))}
-      </div>
-    );
-  };
-
   return (
     <>
       {token ? (
@@ -525,7 +513,16 @@ export default function MainContent() {
                   <FontAwesomeIcon icon={faHandSparkles} />
                   마이 스토어
                 </h1>
-                {loading ? <LoadingSkeleton /> : <Sales />}
+                {loading ? (
+                  Array(4).map((_, idx) => (
+                    <div className="flex flex-col items-center max-w-[200px]">
+                      <Skeleton height={170} className="mb-2" />
+                      <Skeleton count={5} />
+                    </div>
+                  ))
+                ) : (
+                  <Sales />
+                )}
               </div>
               {/* Favorites */}
               <div className="mw-md:hidden flex flex-col justify-around items-center max-w-[1024px] mt-10 mx-auto border border-solid border-gray-300 p-2 rounded shadow">
@@ -533,7 +530,16 @@ export default function MainContent() {
                   {' '}
                   <FontAwesomeIcon icon={faHeart} className="text-red-500" /> 좋아요 리스트
                 </h1>
-                {loading ? <LoadingSkeleton /> : <LikedProducts />}
+                {loading ? (
+                  Array(4).map((_, idx) => (
+                    <div className="flex flex-col items-center max-w-[200px]">
+                      <Skeleton height={170} className="mb-2" />
+                      <Skeleton count={5} />
+                    </div>
+                  ))
+                ) : (
+                  <LikedProducts />
+                )}
               </div>
               {/* WatchList */}
               <div className="mw-md:hidden flex flex-col justify-around items-center max-w-[1024px] mt-10 mx-auto border border-solid border-gray-300 p-2 rounded shadow">
@@ -541,7 +547,16 @@ export default function MainContent() {
                   {' '}
                   <FontAwesomeIcon icon={faEye} /> 최근 본 상품들
                 </h1>
-                {loading ? <LoadingSkeleton /> : <WatchList />}
+                {loading ? (
+                  Array(4).map((_, idx) => (
+                    <div className="flex flex-col items-center max-w-[200px]">
+                      <Skeleton height={170} className="mb-2" />
+                      <Skeleton count={5} />
+                    </div>
+                  ))
+                ) : (
+                  <WatchList />
+                )}
               </div>
             </div>
           </div>

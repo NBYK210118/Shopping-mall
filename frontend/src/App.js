@@ -24,8 +24,11 @@ import {
   faList,
   faMoneyBill1Wave,
   faShirt,
+  faShoppingBasket,
 } from '@fortawesome/free-solid-svg-icons';
 import Categories from './components/categories';
+import ProductApi from './components/products/product_api';
+import { Message } from './components/message';
 
 function BottomBar() {
   const { setCategory, navigate, setLoading } = useAuth();
@@ -102,7 +105,7 @@ function BottomBar() {
 
       <div className="flex flex-col" ref={menuRef} onClick={() => toggleMenu()}>
         <BottomCategories />
-        <FontAwesomeIcon icon={faList} className="p-1 text-black/50" />
+        <FontAwesomeIcon icon={faList} className="p-1 text-gray-400" />
         <span className="mw-md:text-[0.6rem] text-center font-bold text-white">카테고리</span>
       </div>
 
@@ -112,14 +115,18 @@ function BottomBar() {
       </div>
 
       <div className="flex flex-col">
-        <FontAwesomeIcon icon={faEye} className="p-1 text-slate-400" onClick={() => navigate('/user/watchlist')} />
-        <span className="mw-md:text-[0.6rem] text-center font-bold text-white">조회목록</span>
+        <FontAwesomeIcon
+          icon={faShoppingBasket}
+          className="p-1 text-white"
+          onClick={() => navigate('/user/my-basket')}
+        />
+        <span className="mw-md:text-[0.6rem] text-center font-bold text-white">장바구니</span>
       </div>
 
       <div className="flex flex-col">
         <FontAwesomeIcon
           icon={faMoneyBill1Wave}
-          className="p-1 text-green-500"
+          className="p-1 text-white"
           onClick={() => navigate('/user/my-store')}
         />
         <span className="mw-md:text-[0.6rem] font-bold text-white">판매목록</span>
@@ -130,10 +137,11 @@ function BottomBar() {
 
 function MainHeader() {
   const [isMenuOpen, setMenuOpen] = useState(false);
-  const { token, category, setLoading, setCategory } = useAuth();
+  const { token, setLoading, setCategory, setSearchResult } = useAuth();
   const navigate = useNavigate();
   const [openSearchBox, setOpenSearchBox] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  const [searchKeyword, setSearchKeyword] = useState('');
 
   const handleCategoryClick = (category) => {
     setLoading(true);
@@ -203,24 +211,18 @@ function MainHeader() {
     return links;
   };
 
-  useEffect(() => {
-    const handleScroll = () => {
-      if (window.scrollY > 70) {
-        setIsScrolled(true);
-      } else {
-        setIsScrolled(false);
-      }
-    };
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
+  const handleSearchClick = () => {
+    ProductApi.getProductsBySearchKeyword(searchKeyword, navigate).then((response) => {
+      console.log(response.data);
+      setSearchResult(response.data);
+      navigate(`/products/?search_keyword=${searchKeyword}`);
+    });
+  };
 
   return (
     <div
       id="main_header"
-      className={`w-full h-[70px] fixed top-0 z-10 flex justify-between items-center bg-gradient-to-r from-sky-500 to-indigo-500 transition-all duration-300 ${
-        isScrolled ? 'bg-opacity-50' : 'bg-opacity-100'
-      }`}
+      className={`w-full h-[70px] fixed top-0 z-10 flex justify-between items-center bg-gradient-to-r from-sky-500 to-indigo-500`}
     >
       {/*헤더 메뉴 버튼*/}
       <div id="main_header_menus" className="mw-md:ml-5 relative miw-md:w-[150px] h-full flex justify-between">
@@ -310,11 +312,19 @@ function MainHeader() {
             type="text"
             placeholder="Enter keywords"
             className="w-1/2 mw-md:w-4/5 mw-md:focus:w-full h-[40px] rounded-l-md pl-2 focus:w-[70%] focus:outline-none placeholder:pl-1 transition-all duration-500"
+            value={searchKeyword}
+            onChange={(e) => setSearchKeyword(e.target.value)}
           />
-          <span className="w-[10%] miw-md:flex miw-md:items-center miw-md:justify-center mw-md:hidden bg-gradient-to-r from-blue-600 text-white rounded-r-lg border border-solid hover:bg-blue-600 hover:cursor-pointer">
+          <span
+            className="w-[10%] miw-md:flex miw-md:items-center miw-md:justify-center mw-md:hidden bg-gradient-to-r from-blue-600 text-white rounded-r-lg border border-solid hover:bg-blue-600 hover:cursor-pointer"
+            onClick={() => handleSearchClick()}
+          >
             Search
           </span>
-          <span className="hidden rounded-r-lg mw-md:flex mw-md:bg-gray-400 mw-md:items-center hover:cursor-pointer">
+          <span
+            className="hidden rounded-r-lg mw-md:flex mw-md:bg-gray-400 mw-md:items-center hover:cursor-pointer"
+            onClick={() => handleSearchClick()}
+          >
             &#128269;
           </span>
         </div>
@@ -337,10 +347,18 @@ function MainHeader() {
 }
 
 function App() {
+  const { showMessage, setShowMessage } = useAuth();
+
+  useEffect(() => {
+    window.onbeforeunload = function pushRefresh() {
+      window.scrollTo(0, 0);
+    };
+  }, []);
   return (
     <div className={`w-full h-full overflow-hidden`} id="main">
       <MainHeader />
       <div className="w-full h-full flex justify-center items-center mt-12">
+        {showMessage && <Message />}
         <Routes>
           <Route exact path="/" element={<MainContent />}></Route>
           <Route exact path="/home" element={<MainContent />}></Route>

@@ -145,21 +145,41 @@ export class ProductService {
     return discounting_products;
   }
 
-  async getProductsByPage(
-    user: User,
-    page: number,
-    limit: number,
-  ): Promise<Product[]> {
+  async getProductsByPage(user: User, page: number, limit: number) {
+    const sellinglist = await this.prisma.sellingList.findUnique({
+      where: { userId: user.id },
+      include: { products: true },
+    });
+
+    const totalPages = Math.ceil(sellinglist.products.length / limit);
     const skip = (page - 1) * limit;
 
     const products = await this.prisma.product.findMany({
+      where: { SellingList: { userId: user.id } },
       take: limit,
       skip,
       orderBy: {
         id: 'asc',
       },
+      include: { images: true },
     });
 
-    return products;
+    const data = {
+      totalPages,
+      products,
+    };
+
+    return data;
+  }
+
+  async getProductsBySearchKeyword(
+    keyword: string,
+  ): Promise<Product | Product[]> {
+    const results = await this.prisma.product.findMany({
+      where: { name: { contains: keyword } },
+      include: { images: true, likedBy: true },
+    });
+
+    return results;
   }
 }

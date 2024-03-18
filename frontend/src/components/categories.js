@@ -42,7 +42,7 @@ export const Categories = ({ onCategory }) => {
       className={`group border border-transparent rounded-lg p-3 hover:bg-sky-300 hover:cursor-pointer transition-all duration-300`}
     >
       <span className="text-nowrap text-base text-white mw-md:text-black font-semibold">Categories</span>
-      <ul className={`absolute hidden top-11 text-gray-700 pt-1 group-hover:block`}>{result}</ul>
+      <ul className={`absolute hidden top-[3.5rem] left-[170px] text-gray-700 pt-1 group-hover:block`}>{result}</ul>
     </div>
   );
 };

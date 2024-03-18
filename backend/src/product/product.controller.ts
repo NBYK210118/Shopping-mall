@@ -36,6 +36,13 @@ export class ProductController {
     return this.productService.getProductsByPage(user, +page, +limit);
   }
 
+  @Get('')
+  async getProductsBySearchKeyword(
+    @Query('search_keyword') search_keyword: string,
+  ) {
+    return this.productService.getProductsBySearchKeyword(search_keyword);
+  }
+
   @Get('/all/discounting')
   async getDiscountingProducts(): Promise<Product[]> {
     return this.productService.getDiscountingProducts();
