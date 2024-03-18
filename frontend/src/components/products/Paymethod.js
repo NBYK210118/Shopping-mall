@@ -17,11 +17,13 @@ export const PayMethod = ({ currentBasket }) => {
   const [finalPayPrice, setFinalPayPrice] = useState(0);
 
   const fetchSummary = () => {
+    setLoading(true);
     ProductApi.getMyBasket(token, navigate).then((response) => {
       setTotalPrice(response.data.summary.totalPrice);
       setFinalPayPrice(response.data.summary.finalPay);
       setTotalDiscount(response.data.summary.totalDiscount);
     });
+    setLoading(false);
   };
 
   useEffect(() => {
@@ -116,7 +118,7 @@ export const PayMethod = ({ currentBasket }) => {
             <div className="flex flex-col">
               <div className="flex mw-md:flex-col">
                 {paymentMethods.map((val) => (
-                  <label className="flex items-center ml-2 text-nowrap">
+                  <label className="flex items-center ml-2 text-nowrap mw-md:p-2">
                     {val.txt === 'account_transfer' ? (
                       <input
                         type="radio"
