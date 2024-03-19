@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import ProductApi from './product_api';
 import { useAuth } from '../../auth.context';
 
-export const PayMethod = ({ currentBasket }) => {
+export const PayMethod = ({ currentBasket, quantityState }) => {
   const [paymentState, setPaymentState] = useState({
     account_transfer: true,
     cave_money: false,
@@ -33,6 +33,29 @@ export const PayMethod = ({ currentBasket }) => {
   useEffect(() => {
     fetchSummary();
   }, [currentBasket]);
+
+  useEffect(() => {
+    if (currentBasket) {
+      const effectivePrice = currentBasket.map(
+        (val, idx) =>
+          (val.product.isDiscounting ? val.product.discountPrice : val.product.price) * quantityState[val.product.id]
+      );
+      const originTotal = currentBasket
+        .map((val) => val.product.price * quantityState[val.product.id])
+        .reduce((acc, val) => acc + val, 0);
+      const discountTotal = currentBasket
+        .map(
+          (val) =>
+            (val.product.isDiscounting ? val.product.price - val.product.discountPrice : 0) *
+            quantityState[val.product.id]
+        )
+        .reduce((acc, val) => acc + val, 0);
+      const finalPay = effectivePrice.reduce((acc, val) => acc + val, 0);
+      setTotalPrice(originTotal);
+      setTotalDiscount(discountTotal);
+      setFinalPayPrice(finalPay);
+    }
+  }, [quantityState]);
 
   const paymentMethods = [
     { txt: '계좌이체', value: 'account_transfer' },
@@ -82,7 +105,7 @@ export const PayMethod = ({ currentBasket }) => {
         </div>
         <div className="w-full flex flex-col">
           <div id="product_price" className="w-full border-b border-gray-200 p-2 py-[9px]">
-            <span className="mw-md:text-[0.6rem] text-[0.73rem]">
+            <span className="mw-md:text-[0.7rem] mw-md:pb-[1px] text-[0.73rem]">
               {totalPrice ? totalPrice.toLocaleString('ko-kr') : 0}원
             </span>
           </div>

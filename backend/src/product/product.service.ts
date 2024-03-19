@@ -34,10 +34,7 @@ export class ProductService {
     return result;
   }
 
-  async getCategoryItems(
-    user: User,
-    category: string,
-  ): Promise<Product | Product[]> {
+  async getCategoryItems(user: User, category: string, limit: number) {
     const result = await this.prisma.product.findMany({
       where: {
         sellingListId: user.sellinglistId,
@@ -45,7 +42,15 @@ export class ProductService {
       },
       include: { images: true },
     });
-    return result;
+
+    const totalPages = Math.ceil(result.length / limit);
+
+    const data = {
+      result,
+      totalPages,
+    };
+
+    return data;
   }
 
   async getAllProducts(category: string): Promise<Product[]> {

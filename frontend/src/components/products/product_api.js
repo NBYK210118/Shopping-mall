@@ -73,9 +73,9 @@ const getAllCategories = async (token, navigate) => {
 };
 
 // PersonalStore 에서 선택한 카테고리의 상품들만 불러오기
-const categoriesItem = async (token, category, navigate) => {
+const categoriesItem = async (token, category, selection, navigate) => {
   try {
-    const data = await http.get(`/product/my-store/${category}`, {
+    const data = await http.get(`/product/my-store/${category}?limit=${selection}`, {
       headers: { Authorization: `Bearer ${token}` },
     });
     return data;

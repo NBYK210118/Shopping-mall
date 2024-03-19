@@ -1,9 +1,9 @@
 import { useRef, useState } from 'react';
 import { Images } from '../../images_list';
 import { useAuth } from '../../auth.context';
-import DataService from '../../data_services';
 import { useNavigate } from 'react-router-dom';
 import ProfileInput from './profileInput';
+import DataService from '../../user_api';
 
 export default function UserProfile() {
   const { token, user, setUser, setLoading } = useAuth();
@@ -11,8 +11,6 @@ export default function UserProfile() {
   const [nickname, setNickname] = useState(`${user['profile'] ? user['profile']['nickname'] : 'Not yet'}`);
   const [email, setEmail] = useState(user['email']);
   const [nickChange, setNickChange] = useState(false);
-  const [currentProfileImg, setCurrentProfileImg] = useState(null);
-  const [profileImgSize, setProfileImgSize] = useState(0);
   const [imageUrl, setImageUrl] = useState(user['profile']['imageUrl']);
 
   const navigate = useNavigate();
@@ -27,15 +25,12 @@ export default function UserProfile() {
     e.preventDefault();
     const file = e.target.files[0];
 
-    setCurrentProfileImg(file);
-    setProfileImgSize(file.size);
-
     const reader = new FileReader();
     reader.onload = async () => {
       setImageUrl(reader.result);
       const formData = new FormData();
       formData.append('imageUrl', reader.result);
-      formData.append('image_size', profileImgSize);
+      formData.append('image_size', file.size);
       const response = await DataService.uploadProfileImg(token, formData);
       if (localStorage.getItem('user')) {
         localStorage.removeItem('user');

@@ -1,11 +1,11 @@
 import { useContext, useState } from 'react';
 import { Images } from '../images_list';
 import { useNavigate } from 'react-router-dom';
-import DataService from '../data_services';
 import { useAuth } from '../auth.context';
 import Loading from '../loading';
 import { faXmark } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import DataService from '../user_api';
 
 const SignIn = () => {
   const [isOpenModal, setIsOpenModal] = useState(true);
@@ -72,7 +72,7 @@ const SignIn = () => {
 
             <form onSubmit={handleSubmit} className="flex flex-col justify-around ml-2 -mt-3">
               <div className="mb-2 ">
-                <label htmlFor="email" className="pb-2 mw-md:text-[0.8rem]">
+                <label htmlFor="email" className="pb-2 font-bold mw-md:text-[0.8rem]">
                   Email
                 </label>
                 <input
@@ -84,7 +84,7 @@ const SignIn = () => {
                 />
               </div>
               <div className="mw-md:mb-5">
-                <label htmlFor="password" className="pb-2 mw-md:text-[0.8rem]">
+                <label htmlFor="password" className="pb-2 font-bold mw-md:text-[0.8rem]">
                   Password
                 </label>
                 <input

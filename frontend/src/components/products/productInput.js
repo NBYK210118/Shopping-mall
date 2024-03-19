@@ -14,7 +14,7 @@ export const ProductInput = ({
   const [productName, setProductName] = useState('');
   const [productDetail, setProductDetail] = useState('');
   const [productMaker, setProductMaker] = useState('');
-  const [categoryInput, setCategoryInput] = useState('');
+  const [categoryInput, setCategoryInput] = useState('카테고리 선택');
   const [inventory, setInventory] = useState('');
   const [statusInput, setStatusInput] = useState('판매중');
   const [productPrice, setProductPrice] = useState('');
@@ -193,7 +193,7 @@ export const ProductInput = ({
   return (
     <div className="max-w-4xl py-14 mw-md:max-w-xl mw-md:mx-0">
       <div className="bg-white w-[550px] rounded mb-4 -mt-10 mw-md:-mt-20">
-        <div className="mb-2">
+        <div className="mb-1">
           <label
             className="block text-gray-700 text-sm font-bold mb-2 mw-md:text-[0.7rem] mw-md:text-nowrap"
             for="product_name"
@@ -201,7 +201,7 @@ export const ProductInput = ({
             상품명
           </label>
           <input
-            className="shadow appearance-none border rounded mw-md:w-auto py-2 px-3 mw-md:text-[0.5rem] text-gray-700 leading-tight focus:outline-none focus:shadow-outline border-gray-400 hover:border-gray-500"
+            className="shadow appearance-none border rounded mw-md:w-auto py-2 px-3 text-sm mw-md:text-[0.5rem] text-gray-700 leading-tight focus:outline-none focus:shadow-outline border-gray-400 hover:border-gray-500"
             id="product_name"
             type="text"
             placeholder="Enter your product name"
@@ -209,7 +209,7 @@ export const ProductInput = ({
             onChange={(e) => setProductName(e.currentTarget.value)}
           />
         </div>
-        <div className="mb-2">
+        <div className="mb-1">
           <label
             className="block text-gray-700 text-sm font-bold mb-2 mw-md:text-[0.7rem] mw-md:text-nowrap"
             for="product_detail"
@@ -217,14 +217,14 @@ export const ProductInput = ({
             상세설명
           </label>
           <textarea
-            className="shadow appearance-none border rounded w-full mw-md:w-auto mw-md:text-[0.5rem] py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline border-gray-400 hover:border-gray-500"
+            className="shadow appearance-none border rounded w-full mw-md:w-auto text-sm mw-md:text-[0.5rem] py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline border-gray-400 hover:border-gray-500"
             id="product_detail"
             placeholder="Enter the detail of the product"
             value={productDetail}
             onChange={(e) => setProductDetail(e.currentTarget.value)}
           ></textarea>
         </div>
-        <div className="mb-2">
+        <div className="mb-1">
           <label
             className="block text-gray-700 text-sm font-bold mb-2 mw-md:text-[0.7rem] mw-md:text-nowrap"
             for="product_price"
@@ -233,7 +233,7 @@ export const ProductInput = ({
           </label>
           <div className="flex items-center mb-0">
             <input
-              className="shadow appearance-none border rounded w-[200px] text-right mw-md:w-auto mw-md:text-[0.5rem] py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline border-gray-400 hover:border-gray-500"
+              className="shadow appearance-none border rounded w-[200px] text-sm text-right mw-md:w-auto mw-md:text-[0.5rem] py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline border-gray-400 hover:border-gray-500"
               id="product_price"
               type="text"
               placeholder="Enter the price"
@@ -243,7 +243,7 @@ export const ProductInput = ({
             <span className="ml-1 text-gray-700 text-sm font-bold">원</span>
           </div>
         </div>
-        <div className="mb-2">
+        <div className="mb-1">
           <div className="flex">
             <label
               className="block text-gray-700 text-sm font-bold mr-1 mw-md:text-[0.7rem] mw-md:text-nowrap"
@@ -252,7 +252,7 @@ export const ProductInput = ({
               할인 적용
             </label>
             <input
-              className="shadow mw-md:w-auto text-gray-700 focus:outline-none focus:shadow-outline"
+              className="shadow mw-md:w-auto text-gray-700 text-sm focus:outline-none focus:shadow-outline"
               id="isDiscounting"
               type="checkbox"
               checked={isDiscounting}
@@ -262,7 +262,7 @@ export const ProductInput = ({
         </div>
         {isDiscounting && (
           <>
-            <div className="mb-2">
+            <div className="mb-1">
               <label
                 className="block text-gray-700 text-sm font-bold mb-2 mw-md:text-[0.7rem] mw-md:text-nowrap"
                 for="add_label_discount_ratio"
@@ -271,7 +271,7 @@ export const ProductInput = ({
               </label>
               <div className="flex items-center">
                 <input
-                  className="shadow appearance-none border rounded w-[200px] text-right mw-md:w-auto mw-md:text-[0.5rem] py-2 px-1 text-gray-700 leading-tight focus:outline-none focus:shadow-outline border-gray-400 hover:border-gray-500"
+                  className="shadow appearance-none border rounded w-[200px] text-sm text-right mw-md:w-auto mw-md:text-[0.5rem] py-2 px-1 text-gray-700 leading-tight focus:outline-none focus:shadow-outline border-gray-400 hover:border-gray-500"
                   id="add_discount_ratio"
                   type="number"
                   value={discountRatio}
@@ -280,7 +280,7 @@ export const ProductInput = ({
                 <span className="ml-1 text-gray-700 text-sm font-bold">%</span>
               </div>
             </div>
-            <div className="mb-2">
+            <div className="mb-1">
               <label
                 className="block text-gray-700 text-sm font-bold mb-2 mw-md:text-[0.7rem] mw-md:text-nowrap"
                 for="product_price"
@@ -289,7 +289,7 @@ export const ProductInput = ({
               </label>
               <div className="flex items-center">
                 <input
-                  className="shadow appearance-none border rounded w-[200px] text-right mw-md:w-auto mw-md:text-[0.5rem] py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline border-gray-400 hover:border-gray-500"
+                  className="shadow appearance-none border rounded w-[200px] text-sm text-right mw-md:w-auto mw-md:text-[0.5rem] py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline border-gray-400 hover:border-gray-500"
                   id="add_discount_price"
                   type="text"
                   ref={discountPriceInputRef}
@@ -300,7 +300,7 @@ export const ProductInput = ({
             </div>
           </>
         )}
-        <div className="mb-2">
+        <div className="mb-1">
           <label
             className="block text-gray-700 text-sm font-bold mb-2 mw-md:text-[0.7rem] mw-md:text-nowrap"
             for="product_maker"
@@ -308,7 +308,7 @@ export const ProductInput = ({
             제조사/원산지
           </label>
           <input
-            className="shadow appearance-none border rounded w-full mw-md:w-auto mw-md:text-[0.5rem] py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline border-gray-400 hover:border-gray-500"
+            className="shadow appearance-none border rounded w-full text-sm mw-md:w-auto mw-md:text-[0.5rem] py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline border-gray-400 hover:border-gray-500"
             id="product_maker"
             type="text"
             placeholder="Enter the manufacturer"
@@ -316,7 +316,7 @@ export const ProductInput = ({
             onChange={(e) => setProductMaker(e.currentTarget.value)}
           />
         </div>
-        <div className="mb-2">
+        <div className="mb-1">
           <label
             className="block text-gray-700 text-sm font-bold mb-2 mw-md:text-[0.7rem] mw-md:text-nowrap"
             for="categories"
@@ -324,11 +324,12 @@ export const ProductInput = ({
             카테고리
           </label>
           <select
-            class="block appearance-none w-full mw-md:w-auto mw-md:text-[0.55rem] bg-white border border-gray-400 hover:border-gray-500 px-4 py-2 pr-8 rounded shadow leading-tight focus:outline-none focus:shadow-outline"
+            class="block appearance-none w-full mw-md:w-auto text-sm mw-md:text-[0.55rem] bg-white border border-gray-400 hover:border-gray-500 px-4 py-2 pr-8 rounded shadow leading-tight focus:outline-none focus:shadow-outline"
             id="categories"
             value={categoryInput}
             onChange={(e) => setCategoryInput(e.currentTarget.value)}
           >
+            <option value="카테고리 선택">카테고리를 선택해주세요</option>
             <option value="의류">의류</option>
             <option value="가구">가구</option>
             <option value="식품">식품</option>
@@ -339,7 +340,7 @@ export const ProductInput = ({
             <option value="장난감">장난감</option>
           </select>
         </div>
-        <div className="mb-2">
+        <div className="mb-1">
           <label
             className="block text-gray-700 text-sm font-bold mb-2 mw-md:text-[0.7rem] mw-md:text-nowrap"
             for="inventory"
@@ -347,7 +348,7 @@ export const ProductInput = ({
             재고 수량
           </label>
           <input
-            className="shadow appearance-none border rounded w-[200px] mw-md:w-auto mw-md:text-[0.5rem] py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline border-gray-400 hover:border-gray-500"
+            className="shadow appearance-none border rounded w-[200px] text-sm mw-md:w-auto mw-md:text-[0.5rem] py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline border-gray-400 hover:border-gray-500"
             id="inventory"
             type="text"
             placeholder="Enter the inventory quantity"
@@ -355,7 +356,7 @@ export const ProductInput = ({
             onChange={(e) => setInventory(e.currentTarget.value)}
           />
         </div>
-        <div className="mb-2">
+        <div className="mb-1">
           <label
             className="block text-gray-700 text-sm font-bold mb-2 mw-md:text-[0.7rem] mw-md:text-nowrap"
             for="status"
@@ -363,7 +364,7 @@ export const ProductInput = ({
             판매 여부
           </label>
           <select
-            className="block appearance-none w-full mw-md:w-auto mw-md:text-[0.5rem] bg-white border border-gray-400 hover:border-gray-700 hover:bg-gray-200 cursor-pointer px-4 py-2 pr-8 rounded shadow leading-tight focus:outline-none focus:shadow-outline"
+            className="block appearance-none w-full mw-md:w-auto text-sm mw-md:text-[0.5rem] bg-white border border-gray-400 hover:border-gray-700 hover:bg-gray-200 cursor-pointer px-4 py-2 pr-8 rounded shadow leading-tight focus:outline-none focus:shadow-outline"
             id="status"
             value={statusInput}
             onChange={(e) => setStatusInput(e.currentTarget.value)}
@@ -372,7 +373,7 @@ export const ProductInput = ({
             <option value="보류">보류</option>
           </select>
         </div>
-        <div className="flex items-center justify-center mw-md:-ml-14">
+        <div className="flex items-center justify-center mw-md:-ml-96">
           <button
             className="bg-blue-500 hover:bg-blue-700 mt-3 text-white font-bold py-2 px-10 mw-md:py-1 rounded focus:outline-none focus:shadow-outline transition-all duration-300"
             type="button"

@@ -9,6 +9,7 @@ export const ShoppingBasket = () => {
   const { token, loading, setLoading, navigate, user } = useAuth();
   const [currentBasket, setCurrentBasket] = useState([]);
   const [basketSummary, setBasketSummary] = useState();
+  const [quantityState, setQuantityState] = useState({});
 
   useEffect(() => {
     setLoading(true);
@@ -16,12 +17,23 @@ export const ShoppingBasket = () => {
       if (response && response.data) {
         setCurrentBasket(response.data.products);
         setBasketSummary(response.data.summary);
+
+        const initialQuantities = response.data.products.reduce((acc, product) => {
+          acc[product.productId] = product.quantity;
+          return acc;
+        }, {});
+        setQuantityState(initialQuantities);
       }
     });
     setLoading(false);
   }, []);
 
-  console.log(currentBasket);
+  const updateQuantity = (productId, newQuantity) => {
+    setQuantityState((prevState) => ({
+      ...prevState,
+      [productId]: Number(newQuantity),
+    }));
+  };
 
   const handleXClick = (productId) => {
     const answer = window.confirm('장바구니에서 제거하시겠습니까?');
@@ -45,17 +57,18 @@ export const ShoppingBasket = () => {
               <img
                 src={val.product.images[0].imgUrl}
                 alt="상품이미지"
-                className="my-1 w-[100px] h-[100px] max-h-[120px] object-fill"
+                className="w-[100px] h-[100px] max-h-[120px] object-cover cursor-pointer mw-md:h-full"
+                onClick={() => navigate(`/products/${val.product.id}`)}
               />
 
               <div className="flex flex-col justify-center ml-2">
-                <span className="text-lg">
+                <span className="text-lg mw-md:text-sm">
                   <b>{val.product.name}</b>
                 </span>
 
-                <div className="flex mw-md:flex-col items-center mw-md:items-start my-1">
+                <div className="flex mw-md:flex-col items-center mw-md:items-start my-1 mw-md:my-0">
                   <span
-                    className={`text-sm mr-2 ${
+                    className={`text-sm mw-md:text-[0.7rem] mr-2 ${
                       val.product.isDiscounting ? 'text-red-500 line-through' : 'text-blue-500'
                     } font-bold`}
                   >
@@ -63,15 +76,32 @@ export const ShoppingBasket = () => {
                   </span>
 
                   {val.product.isDiscounting && (
-                    <>
-                      <span className="text-xs text-red-500 mr-3">
+                    <div className="flex flex-col mw-md:flex-row mw-md:items-center">
+                      <span className="text-xs text-red-500 mr-3 mw-md:text-[0.65rem]">
                         -{(val.product.price - val.product.discountPrice).toLocaleString('ko-kr')}원
                       </span>
-                      <span className="text-sm mr-10 text-blue-500 font-bold">
+                      <span className="text-sm mr-10 mw-md:mr-0 text-blue-500 font-bold mw-md:text-[0.75rem]">
                         {val.product.discountPrice.toLocaleString('ko-kr')}원
                       </span>
-                    </>
+                    </div>
                   )}
+                  <div className="flex items-center space-y-1">
+                    <label
+                      htmlFor="quantity-input"
+                      className="text-sm mw-md:text-[0.68rem] font-bold text-gray-700 mr-1"
+                    >
+                      담은 상품 수:
+                    </label>
+                    <input
+                      type="number"
+                      id="quantity-input"
+                      name="quantity"
+                      value={quantityState[val.product.id] || 0}
+                      className="w-[60px] h-[30px] mw-md:w-[9vw] mw-md:h-[4vh] mw-md:text-[0.68rem] focus:outline-none text-center border-2 border-gray-300 rounded-md shadow-sm hover:border-blue-500 focus:border-blue-500 transition-colors"
+                      onChange={(e) => updateQuantity(val.product.id, e.target.value)}
+                      min="0"
+                    />
+                  </div>
                 </div>
 
                 <span className="text-sm mw-md:text-[0.6rem]">{val.product.description}</span>
@@ -106,7 +136,7 @@ export const ShoppingBasket = () => {
         <Items />
       </div>
 
-      <PayMethod basketSummary={basketSummary} currentBasket={currentBasket} />
+      <PayMethod basketSummary={basketSummary} currentBasket={currentBasket} quantityState={quantityState} />
       <div className="w-full flex justify-center cursor-pointer mt-10">
         <span
           id="pay_button"

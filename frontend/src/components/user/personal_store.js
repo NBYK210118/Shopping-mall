@@ -2,7 +2,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../auth.context';
 import { Images } from '../../images_list';
 import React, { useEffect, useRef, useState } from 'react';
-import DataService from '../../data_services';
+import DataService from '../../user_api';
 import ProductApi from '../products/product_api';
 import { Navigation } from 'swiper/modules';
 import { Swiper, SwiperSlide } from 'swiper/react';
@@ -44,7 +44,6 @@ export default function PersonalStore() {
     let result = selection.replace(/개 정렬/, '');
     ProductApi.getProductsBypage(token, currentPage, result, navigate).then((response) => {
       if (response && response.data) {
-        console.log(response.data.products);
         setSellinglist(response.data.products);
         setTotalPage(response.data.totalPages);
       }
@@ -172,6 +171,7 @@ export default function PersonalStore() {
     setClickedCategory('');
     setSearchingResult(null);
     setKeyword(null);
+    handleClickPageOrPerItems();
   };
 
   // 상품 추가하기 버튼 기능
@@ -238,6 +238,10 @@ export default function PersonalStore() {
       { image: Images.watermelon, txt: '식품' },
       { image: Images.macbook, txt: '전자제품' },
       { image: Images.Bluejean, txt: '의류' },
+      { image: Images.Sports, txt: '스포츠' },
+      { image: Images.Game, txt: '게임' },
+      { image: Images.Book, txt: '도서' },
+      { image: Images.Toy, txt: '장난감' },
     ];
 
     return (
@@ -328,10 +332,13 @@ export default function PersonalStore() {
   //슬라이드 쇼의 카테고리를 클릭하면 해당 유저의 판매 물품들 중 클릭한 카테고리에 해당하는 상품들만 출력돼야함
   const handleCategoryClick = (category) => {
     setLoading(true);
-    ProductApi.categoriesItem(token, category, navigate).then((response) => {
-      console.log('클릭한 카테고리에 해당하는 상품들: ', response.data);
-      setCategoryItems(response.data);
-      setClickedCategory(category);
+    ProductApi.categoriesItem(token, category, selection, navigate).then((response) => {
+      if (response && response.data) {
+        console.log('클릭한 카테고리에 해당하는 상품들: ', response.data);
+        setCategoryItems(response.data.result);
+        setTotalPage(response.data.totalPages);
+        setClickedCategory(category);
+      }
     });
     setLoading(false);
   };
@@ -434,8 +441,12 @@ export default function PersonalStore() {
       return sortedProducts.map((val, idx) => (
         <div
           className={`w-full grid grid-cols-8 mw-md:gap-3 p-4 justify-center items-center border border-solid border-gray-300
-            rounded-lg hover:bg-gray-200 transition-all duration-150 hover:cursor-pointer
-          ${selectedList.includes(val.id) ? ' bg-gradient-to-bl from-cyan-400 to-blue-600 font-bold text-white' : ''}`}
+        hover:bg-gray-200 transition-all duration-150 hover:cursor-pointer
+       ${
+         selectedList && selectedList.includes(val.id)
+           ? ' bg-gradient-to-bl from-cyan-400 to-blue-600 font-bold text-white'
+           : ''
+       }`}
           onClick={() => handleSellingListClick(val.id)}
           key={val.id}
         >
@@ -478,27 +489,27 @@ export default function PersonalStore() {
     const result = productsList.map((val, idx) => (
       <div
         id="selected_items"
-        className={`mb-8 flex flex-col justify-center border rounded-lg 
+        className={`w-[200px] mw-md:w-[120px] mb-8 flex flex-col justify-center border rounded-lg 
         hover:cursor-pointer hover:-translate-y-1 transition-all duration-300
         ${currentProduct?.name === val.name ? ' bg-gray-300' : ''}`}
         onClick={() => setCurrentProduct(val)}
       >
-        <div id="selected_item_1" className="w-[200px] flex justify-center items-center">
+        <div id="selected_item_1" className="flex justify-center items-center">
           <div className="flex items-center mb-2">
             <img
               src={val.images[0].imgUrl}
               alt="product_img"
-              className="max-w-[80px] max-h-[80px] ml-1 mt-1 object-cover mw-md:h-[50px]"
+              className="max-w-[80px] max-h-[80px] ml-1 mt-1 object-cover mw-md:ml-2 mw-md:h-[50px]"
               onChange={(e) => setImageUrl(e.target.value)}
             />
           </div>
-          <div className="ml-3 flex flex-col justify-around items-center">
-            <div id="product_name" className="text-sm text-blue-500 hover:underline">
+          <div className="ml-3 mw-md:ml-0 flex flex-col justify-around items-center">
+            <div id="product_name" className="text-sm text-blue-500 hover:underline mw-md:text-nowrap mw-md:text-xs">
               <span className="font-semibold">{val.name ? val.name : 'None'}</span>
             </div>
             <div
               id="product_description"
-              className="p-3 text-sm text-ellipsis overflow-hidden whitespace-nowrap text-blue-500 hover:underline"
+              className="p-3 text-sm mw-md:text-nowrap mw-md:text-xs text-ellipsis overflow-hidden whitespace-nowrap text-blue-500 hover:underline"
             >
               <span className="">{val.description ? val.description : 'None'}</span>
             </div>
@@ -524,42 +535,24 @@ export default function PersonalStore() {
     }
   };
 
-  const LoadingSkeleton = () => {
-    return (
-      <div
-        className="w-full p-4 border border-solid border-gray-300 flex flex-col
-      rounded-lg"
-      >
-        {Array(5).map((_, index) => (
-          <div key={index} className="p-2 flex flex-col justify-between w-full">
-            <Skeleton height={170} className="mb-2" />
-            <Skeleton count={2} />
-          </div>
-        ))}
-      </div>
-    );
-  };
-
   return (
     <>
       <div
         className={`h-full p-10 mw-md:px-12 mw-md:mb-10 flex ${!activeOption ? 'mw-md:mt-0 mw-md:ml-56' : ''} ${
-          activeOption === '상품 수정' ? '-mt-10 mw-md:ml-20' : ''
-        } ${
-          activeOption === '상품 추가' ? 'mw-md:mt-5 mw-md:ml-10' : ''
-        } mr-4 justify-center items-center mw-md:border-none`}
+          activeOption === '상품 수정' ? '-mt-10 mw-md:-mt-20 mw-md:ml-80' : ''
+        } ${activeOption === '상품 추가' ? 'mw-md:mt-5' : ''} mr-4 justify-center items-center mw-md:border-none`}
       >
         <div
           className={`mw-md:-ml-72 mw-md:-mt-9 flex items-center ${
-            activeOption === '상품 추가' ? 'mw-md:p-3 justify-around' : ''
-          } ${activeOption === '상품 수정' ? 'p-5 justify-center' : ''}`}
+            activeOption === '상품 추가' ? 'mw-md:ml-32 mw-md:p-3 justify-around' : ''
+          } ${activeOption === '상품 수정' ? 'p-5 justify-center mw-md:-ml-64' : ''}`}
         >
           <div
             id="mystore_left_content"
             className={`mr-3 flex flex-col justify-center items-center ${isDiscounting ? '-mt-40' : ''} ${
               activeOption ? '' : ' hidden'
             } ${activeOption === '상품 수정' ? 'mw-md:ml-56' : ''} ${
-              activeOption === '상품 추가' ? '-mt-20 mw-md:ml-20 mw-md:mr-32' : ''
+              activeOption === '상품 추가' ? '-mt-20 mw-md:ml-20 mw-md:mr-20' : ''
             }
             `}
           >
@@ -620,7 +613,7 @@ export default function PersonalStore() {
                 <div className="flex justify-around items-center mw-md:mb-10">
                   <div className="flex items-center mr-5">
                     <span
-                      className="flex items-center justify-center p-3 cursor-pointer text-white bg-blue-500 rounded-xl hover:bg-blue-600 focus:outline-none transition-all duration-300"
+                      className="flex items-center justify-center p-3 mw-md:p-2 cursor-pointer text-white bg-blue-500 rounded-xl hover:bg-blue-600 focus:outline-none transition-all duration-300"
                       onClick={() => fileInputRef.current.click()}
                     >
                       <span className="font-bold text-xl mw-md:text-[0.65rem]">Upload</span>
@@ -629,7 +622,7 @@ export default function PersonalStore() {
                   </div>
                   <div className="flex items-center">
                     <span
-                      className="flex items-center justify-center p-3 cursor-pointer text-white bg-yellow-500 rounded-xl hover:bg-yellow-600 focus:outline-none transition-all duration-300"
+                      className="flex items-center justify-center p-3 mw-md:p-2 cursor-pointer text-white bg-yellow-500 rounded-xl hover:bg-yellow-600 focus:outline-none transition-all duration-300"
                       onClick={handleBeforeButton}
                     >
                       <span className="font-bold text-xl mw-md:text-[0.65rem]">Before</span>
@@ -650,8 +643,10 @@ export default function PersonalStore() {
           </div>
           <div
             id="mystore_right_content_or_maincontent"
-            className={`p-5 mx-auto flex flex-col -mt-10 ${activeOption === '상품 수정' ? 'mw-md:ml-0' : ''}
-            ${activeOption === '상품 추가' ? '-mt-20 mw-md:p-0 mw-md:-ml-32 mw-md:mr-20' : ''}`}
+            className={`p-5 mx-auto flex flex-col -mt-10 ${
+              activeOption === '상품 수정' ? 'mw-md:-mt-32 mw-md:ml-0' : ''
+            }
+            ${activeOption === '상품 추가' ? 'mw-md:p-0 mw-md:-ml-20 mw-md:mr-20' : ''}`}
           >
             {activeOption === '상품 추가' && (
               <ProductInput
@@ -708,7 +703,7 @@ export default function PersonalStore() {
                               {' '}
                               {Array(5).map((_, idx) => (
                                 <>
-                                  <Skeleton height={50} />
+                                  <Skeleton width={300} />
                                   <Skeleton count={5} />
                                 </>
                               ))}

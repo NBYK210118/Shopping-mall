@@ -11,14 +11,7 @@ export class WishlistService {
       where: { userId },
       include: {
         products: {
-          select: {
-            description: true,
-            id: true,
-            price: true,
-            name: true,
-            images: true,
-            likedBy: true,
-          },
+          include: { images: true, likedBy: true },
         },
       },
     });

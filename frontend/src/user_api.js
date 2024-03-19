@@ -202,6 +202,57 @@ const deleteProduct = async (token, form) => {
   }
 };
 
+// 문의사항 등록
+const addQuestion = async (token, formdata, navigate) => {
+  try {
+    const data = await http.post('/question/add', formdata, { headers: { Authorization: `Bearer ${token}` } });
+    return data;
+  } catch (error) {
+    if (error.response.status === 401) {
+      alert('Unauthorized!');
+      navigate('/signin');
+    } else if (error.response.status === 400) {
+      alert('잘못된 요청');
+    } else if (error.response.status === 500) {
+      alert('서버 에러');
+      window.location.reload();
+    }
+  }
+};
+
+// 유저가 문의했던 질문들 불러오기
+const getUserQuestions = async (token, navigate) => {
+  try {
+    const data = await http.get('/question/user', { headers: { Authorization: `Bearer ${token}` } });
+    return data;
+  } catch (error) {
+    if (error.response.status === 401) {
+      alert('Unauthorized!');
+      navigate('/signin');
+    } else if (error.response.status === 400) {
+      alert('잘못된 요청');
+    } else if (error.response.status === 500) {
+      alert('서버 에러');
+      window.location.reload();
+    }
+  }
+};
+
+// 최근 문의된 질문들 불러오기
+const getRecentQuestions = async (navigate) => {
+  try {
+    const data = await http.get('/question');
+    return data;
+  } catch (error) {
+    if (error.response.status === 400) {
+      alert('잘못된 요청');
+    } else if (error.response.status === 500) {
+      alert('서버 에러');
+      window.location.reload();
+    }
+  }
+};
+
 const DataService = {
   signIn,
   signUp,
@@ -217,6 +268,9 @@ const DataService = {
   deleteProduct,
   getProductsWhileUpdate,
   getSellinglist,
+  addQuestion,
+  getUserQuestions,
+  getRecentQuestions,
 };
 
 export default DataService;

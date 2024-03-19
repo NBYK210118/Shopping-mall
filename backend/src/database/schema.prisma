@@ -15,6 +15,11 @@ enum OrderType {
   Sell
 }
 
+enum UserRole{
+  ADMIN
+  USER
+}
+
 enum StoreRoles {
   Admin
   inventory
@@ -31,6 +36,15 @@ model Image {
   Profile      Profile[]
   products     Product[]
   ProductImage ProductImage[]
+}
+
+model Question {
+  id Int @id @default(autoincrement())
+  imgUrl String?
+  content String
+  user User @relation(fields: [userId],references: [id])
+  userId Int
+  answer String?
 }
 
 model Profile {
@@ -76,6 +90,8 @@ model User {
   lastName       String
   email          String          @unique
   password       String
+  role UserRole @default(USER)
+  questions Question[]
   orders         Order[]
   profile        Profile?
   wishlist       WishList?

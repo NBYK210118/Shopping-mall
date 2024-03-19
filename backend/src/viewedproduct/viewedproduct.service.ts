@@ -11,13 +11,7 @@ export class ViewedproductService {
       where: { userId: user.id },
       include: {
         products: {
-          select: {
-            id: true,
-            images: true,
-            price: true,
-            name: true,
-            description: true,
-          },
+          include: { images: true, likedBy: true },
         },
       },
     });

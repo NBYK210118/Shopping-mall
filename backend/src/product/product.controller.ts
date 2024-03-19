@@ -53,8 +53,9 @@ export class ProductController {
   async getCategoryItems(
     @GetUser() user: User,
     @Param('category') category: string,
+    @Query('limit') limit: string,
   ) {
-    return this.productService.getCategoryItems(user, category);
+    return this.productService.getCategoryItems(user, category, +limit);
   }
 
   @UseGuards(AuthGuard())

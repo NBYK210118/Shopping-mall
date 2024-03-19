@@ -30,7 +30,10 @@ export const Categories = ({ onCategory }) => {
   const result = categories.map((val) => (
     <>
       <li className="text-nowrap">
-        <span className="rounded-t bg-gray-200 hover:bg-gray-400 py-2 px-4 block" onClick={() => handleClick(val.txt)}>
+        <span
+          className="text-white rounded-t bg-sky-400 hover:bg-sky-500 py-2 px-4 block transition-all duration-150"
+          onClick={() => handleClick(val.txt)}
+        >
           <FontAwesomeIcon icon={val.icon} className="mr-2" />
           {val.txt}
         </span>

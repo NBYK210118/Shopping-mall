@@ -29,9 +29,10 @@ import {
 import Categories from './components/categories';
 import ProductApi from './components/products/product_api';
 import { Message } from './components/message';
+import Support from './components/support';
 
 function BottomBar() {
-  const { setCategory, navigate, setLoading } = useAuth();
+  const { setCategory, navigate, setLoading, token } = useAuth();
   const menuRef = useRef(null);
   const [isVisible, setIsVisible] = useState(false);
 
@@ -75,6 +76,30 @@ function BottomBar() {
     setIsVisible(!isVisible);
   };
 
+  const handleHeartClick = () => {
+    if (token) {
+      navigate('/user/wishlist');
+    } else {
+      navigate('/signin');
+    }
+  };
+
+  const handleMoveToBasket = () => {
+    if (token) {
+      navigate('/user/my-basket');
+    } else {
+      navigate('/signin');
+    }
+  };
+
+  const handleMoveToMyStore = () => {
+    if (token) {
+      navigate('/user/my-store');
+    } else {
+      navigate('/signin');
+    }
+  };
+
   const BottomCategories = () => {
     const result = categories.map((val) => (
       <>
@@ -109,26 +134,18 @@ function BottomBar() {
         <span className="mw-md:text-[0.6rem] text-center font-bold text-white">카테고리</span>
       </div>
 
-      <div className="flex flex-col" onClick={() => navigate('/user/wishlist')}>
+      <div className="flex flex-col" onClick={() => handleHeartClick()}>
         <FontAwesomeIcon icon={faHeart} className="p-1 text-red-500" />
         <span className="mw-md:text-[0.6rem] text-center font-bold text-white">좋아요</span>
       </div>
 
       <div className="flex flex-col">
-        <FontAwesomeIcon
-          icon={faShoppingBasket}
-          className="p-1 text-white"
-          onClick={() => navigate('/user/my-basket')}
-        />
+        <FontAwesomeIcon icon={faShoppingBasket} className="p-1 text-white" onClick={() => handleMoveToBasket()} />
         <span className="mw-md:text-[0.6rem] text-center font-bold text-white">장바구니</span>
       </div>
 
       <div className="flex flex-col">
-        <FontAwesomeIcon
-          icon={faMoneyBill1Wave}
-          className="p-1 text-white"
-          onClick={() => navigate('/user/my-store')}
-        />
+        <FontAwesomeIcon icon={faMoneyBill1Wave} className="p-1 text-white" onClick={() => handleMoveToMyStore()} />
         <span className="mw-md:text-[0.6rem] font-bold text-white">판매목록</span>
       </div>
     </div>
@@ -362,6 +379,7 @@ function App() {
         <Routes>
           <Route exact path="/" element={<MainContent />}></Route>
           <Route exact path="/home" element={<MainContent />}></Route>
+          <Route exact path="/support" element={<Support />}></Route>
           <Route exact path="/user/*" element={<Mypage />}></Route>
           <Route exact path="/signin" element={<SignIn />}></Route>
           <Route exact path="/signup" element={<SignUp />}></Route>
