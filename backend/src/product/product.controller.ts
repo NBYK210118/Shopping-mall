@@ -14,16 +14,14 @@ import { ProductService } from './product.service';
 import { AuthGuard } from '@nestjs/passport';
 import { Product, User, ViewedProduct } from '@prisma/client';
 import { GetUser } from 'src/user/get-user.decorator';
-import { Request, Response } from 'express';
 
 @Controller('product')
 export class ProductController {
   constructor(private productService: ProductService) {}
 
-  @UseGuards(AuthGuard())
-  @Get(':id')
-  async getProduct(@Param('id', ParseIntPipe) id: number): Promise<Product> {
-    return this.productService.getProduct(id);
+  @Get('')
+  async getProduct(@Query('product_id') product_id: string): Promise<Product> {
+    return this.productService.getProduct(+product_id);
   }
 
   @UseGuards(AuthGuard())

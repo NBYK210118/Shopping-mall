@@ -1,5 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react';
 import ProductApi from './product_api';
+import { useAuth } from '../../auth.context';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faFile } from '@fortawesome/free-solid-svg-icons';
 
 export const ProductInput = ({
   onAdd,
@@ -21,12 +24,15 @@ export const ProductInput = ({
   const [discountRatio, setDiscountRatio] = useState('');
   const [discountPrice, setDiscountPrice] = useState('');
   const [isDiscounting, setIsDiscounting] = useState('');
+  const [productDetailFile, setProductDetailFile] = useState([]);
   const priceInputRef = useRef();
   const discountPriceInputRef = useRef();
+  const productDetailRef = useRef();
+  const { user } = useAuth();
 
   useEffect(() => {
     if (activeOption === '상품 수정') {
-      ProductApi.findProduct(token, sellistIndex, navigate).then((response) => {
+      ProductApi.findProduct(sellistIndex, navigate).then((response) => {
         localStorage.setItem('product', JSON.stringify(response.data));
         setProductName(response.data?.name);
         setProductDetail(response.data?.description);
@@ -34,7 +40,7 @@ export const ProductInput = ({
         setDiscountPrice(response.data?.discountPrice);
         setDiscountRatio(response.data?.discountRatio);
         setProductPrice(response.data?.price);
-        priceInputRef.current.value = response.data.price.toLocaleString('ko-kr');
+        priceInputRef.current.value = response.data?.price?.toLocaleString('ko-kr');
         setProductMaker(response.data?.manufacturer);
         setCategoryInput(response.data?.category_name);
         setStatusInput(response.data?.status);
@@ -89,13 +95,34 @@ export const ProductInput = ({
     return price;
   };
 
+  const handleProductDetailUpload = () => {
+    productDetailRef.current.click();
+  };
+
+  const handleProductDetailFile = (e) => {
+    const files = e.target.files;
+
+    Array.from(files).forEach((val) => {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        setProductDetailFile((prevState) => [...prevState, e.target.result]);
+      };
+      reader.readAsDataURL(val);
+    });
+  };
+
+  useEffect(() => {
+    console.log('productDetailFile: ', productDetailFile);
+  }, [productDetailFile]);
+
   const handleAddBtn = (e) => {
     e.preventDefault();
-    console.log('product add 호출');
     const formData = new FormData();
     formData.append('name', productName);
     formData.append('detail', `${productDetail}`);
+    formData.append('detail_files', productDetailFile);
     formData.append('price', productPrice);
+    formData.append('seller', user.profile.nickname);
     formData.append('isDiscounting', isDiscounting);
     formData.append('discountPrice', discountPrice);
     formData.append('discountRatio', discountRatio);
@@ -109,10 +136,10 @@ export const ProductInput = ({
 
   const handleUpdateBtn = (e) => {
     e.preventDefault();
-    console.log('product update 호출');
     const formData = new FormData();
     formData.append('name', productName);
     formData.append('detail', `${productDetail}`);
+    formData.append('detail_files', productDetailFile);
     formData.append('price', productPrice);
     formData.append('isDiscounting', isDiscounting);
     formData.append('discountPrice', discountPrice);
@@ -210,12 +237,28 @@ export const ProductInput = ({
           />
         </div>
         <div className="mb-1">
-          <label
-            className="block text-gray-700 text-sm font-bold mb-2 mw-md:text-[0.7rem] mw-md:text-nowrap"
-            for="product_detail"
-          >
-            상세설명
-          </label>
+          <div className="flex items-center">
+            <label
+              className="block text-gray-700 text-nowrap text-sm font-bold mb-2 mw-md:text-[0.7rem]"
+              for="product_detail"
+            >
+              상세설명
+            </label>
+            <input
+              type="file"
+              id="product_detail_file"
+              multiple
+              className="hidden"
+              ref={productDetailRef}
+              onChange={(e) => handleProductDetailFile(e)}
+            />
+            <span
+              className="cursor-pointer ml-2 mb-2 px-1 text-white bg-blue-500 rounded text-nowrap text-sm font-bold mw-md:text-[0.6rem]"
+              onClick={() => handleProductDetailUpload()}
+            >
+              <FontAwesomeIcon icon={faFile} className="text-sm"></FontAwesomeIcon>
+            </span>
+          </div>
           <textarea
             className="shadow appearance-none border rounded w-full mw-md:w-auto text-sm mw-md:text-[0.5rem] py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline border-gray-400 hover:border-gray-500"
             id="product_detail"
@@ -373,9 +416,9 @@ export const ProductInput = ({
             <option value="보류">보류</option>
           </select>
         </div>
-        <div className="flex items-center justify-center mw-md:-ml-96">
+        <div className="flex items-center justify-center mw-md:-ml-40">
           <button
-            className="bg-blue-500 hover:bg-blue-700 mt-3 text-white font-bold py-2 px-10 mw-md:py-1 rounded focus:outline-none focus:shadow-outline transition-all duration-300"
+            className="flex items-center bg-blue-500 hover:bg-blue-700 mt-3 text-white font-bold py-2 px-10 mw-md:py-1 rounded focus:outline-none focus:shadow-outline transition-all duration-300 mw-md:-ml-72"
             type="button"
             onClick={(e) => (activeOption === '상품 추가' ? handleAddBtn(e) : handleUpdateBtn(e))}
           >

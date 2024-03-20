@@ -19,9 +19,11 @@ export const PayMethod = ({ currentBasket, quantityState }) => {
   const fetchSummary = () => {
     setLoading(true);
     ProductApi.getMyBasket(token, navigate).then((response) => {
-      setTotalPrice(response.data.summary.totalPrice);
-      setFinalPayPrice(response.data.summary.finalPay);
-      setTotalDiscount(response.data.summary.totalDiscount);
+      if (response && response.data) {
+        setTotalPrice(response.data.summary.totalPrice);
+        setFinalPayPrice(response.data.summary.finalPay);
+        setTotalDiscount(response.data.summary.totalDiscount);
+      }
     });
     setLoading(false);
   };
@@ -117,7 +119,7 @@ export const PayMethod = ({ currentBasket, quantityState }) => {
           </div>
 
           <div id="coupon" className="w-full flex items-center border-b border-gray-200 py-3">
-            <span className="ml-3 text-[0.71rem] text-red-500 mr-4">-12,000원</span>
+            <span className="ml-3 text-[0.71rem] text-red-500 mr-4">0원</span>
             <button className="ml-7 px-2 shadow text-[0.65rem] border border-gray-200 bg-white">할인쿠폰선택</button>
           </div>
 

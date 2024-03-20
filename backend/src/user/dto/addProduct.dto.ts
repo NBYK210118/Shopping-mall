@@ -5,6 +5,7 @@ export default class ProductDetailDto {
   detail: string;
   price: string;
   status: string;
+  seller: string;
   manufacturer: string;
   isDiscounting: boolean;
   discountPrice: string;

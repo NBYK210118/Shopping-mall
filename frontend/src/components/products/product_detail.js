@@ -29,6 +29,12 @@ export const ProductDetail = () => {
   const [currentLikesCount, setCurrentLikesCount] = useState(0);
   // createOrEdit 리뷰 제출했을 때 사용할 state 변수 true 이면 edit 상태, false 이면 create 상태
   const [createOrEdit, setCreateOrEdit] = useState(true);
+  const [activeDetailMenu, setActiveDetailMenu] = useState('후기');
+  const [detailMenuStates, setDetailMenuStates] = useState({
+    후기: true,
+    상세정보: false,
+    상품문의: false,
+  });
   const [cReviewStars, setCReviewStars] = useState({
     first: false,
     second: false,
@@ -36,16 +42,18 @@ export const ProductDetail = () => {
     fourth: false,
     fifth: false,
   });
+  const [productReviews, setProductReviews] = useState([]);
   let { productId } = useParams();
 
   // 상품 리스트에서 상품을 클릭했을 때 로드됨
   useEffect(() => {
     setLoading(true);
-    console.log(productId);
-    ProductApi.findProduct(token, productId, navigate).then((response) => {
+    ProductApi.findProduct(productId, navigate).then((response) => {
       if (response && response.data) {
         setCurrentProduct(response.data);
-        setUserLiked(response.data.likedBy.some((val) => val.userId === user.id));
+        if (user) {
+          setUserLiked(response.data.likedBy.some((val) => val.userId === user.id));
+        }
         setCurrentLikesCount(response.data.likedBy.length);
 
         // 회원이 상품을 봤을 때와 게스트가 상품을 봤을 때
@@ -68,11 +76,19 @@ export const ProductDetail = () => {
         } else {
           const formData = new FormData();
           formData.append('productId', productId);
+          setLoading(true);
           ProductApi.guestViewed(formData, navigate).then((response) => {
             if (response && response.data) {
               console.log('guest watched Product result: ', response.data);
             }
           });
+          ProductApi.getAllReviewsByProduct(productId, navigate).then((response) => {
+            if (response && response.data) {
+              console.log(response.data);
+              setProductReviews(response.data);
+            }
+          });
+          setLoading(false);
         }
       }
     });
@@ -80,9 +96,11 @@ export const ProductDetail = () => {
   }, [productId]);
 
   useEffect(() => {
-    ProductApi.isUsersProduct(token, productId, navigate).then((response) => {
-      setIsCurrentUsersProduct(response.data);
-    });
+    if (token) {
+      ProductApi.isUsersProduct(token, productId, navigate).then((response) => {
+        setIsCurrentUsersProduct(response.data);
+      });
+    }
   }, [currentUserReview]);
 
   // 리뷰 제출 버튼 클릭시 실행
@@ -242,7 +260,7 @@ export const ProductDetail = () => {
                 <span className="font-bold miw-lg:text-[1.6rem] mw-md:text-[0.9rem]">
                   {currentProduct && currentProduct.name}
                 </span>
-                <div className="hidden mw-md:flex mw-md:-ml-1">
+                <div className="mw-md:flex mw-md:-ml-1">
                   <ProductStars />
                 </div>
               </div>
@@ -255,7 +273,7 @@ export const ProductDetail = () => {
                   : 'Failed to load description'}
               </span>
               <span className="text-xs mw-md:text-[0.7rem]">
-                <b>판매자:</b> {user ? user.profile.nickname : "Failed to load seller's name"}
+                <b>판매자:</b> {currentProduct ? currentProduct.seller : "Failed to load seller's name"}
               </span>
               <div className="flex justify-end mt-3 mw-md:flex-col mw-md:text-nowrap mw-md:mt-2">
                 <span
@@ -293,22 +311,34 @@ export const ProductDetail = () => {
   };
 
   const Reviews = () => {
-    return (
-      <div id="review_1_wrapper" className="p-5 mb-5 bg-white shadow border border-gray-300 rounded">
-        <div id="reviewed_user_info_1" className="flex -mt-2 mw-md:-ml-4">
-          <span className="material-symbols-outlined text-7xl mw-md:text-6xl -mt-2">account_circle</span>
-          <div className="flex flex-col">
-            <span className="ml-1 miw-lg:text-lg font-bold">User Name</span>
-            <div className="flex">
-              <ReviewStars />
+    if (productReviews && productReviews.length > 0) {
+      return productReviews.map((val, idx) => (
+        <div id="review_1_wrapper" className="p-5 mb-5 bg-white shadow border border-gray-300 rounded">
+          <div id="reviewed_user_info_1" className="flex -mt-2 mw-md:-ml-4">
+            {val.user.profile.imageUrl ? (
+              <img src={val.user.profile.imageUrl} alt="profile_img" className="w-[60px] h-[60px] rounded-full" />
+            ) : (
+              <span className="material-symbols-outlined text-7xl mw-md:text-6xl -mt-2">account_circle</span>
+            )}
+            <div className="flex flex-col ml-1">
+              <span className="ml-1 miw-lg:text-lg font-bold">{val.user.profile.nickname}</span>
+              <div className="flex">
+                <ReviewStars product_stars={val.stars} />
+              </div>
             </div>
           </div>
+          <div id="user_comment_1" className="flex items-center p-2 ml-2 mw-md:-ml-4 mw-md:pb-1">
+            <span className="">상품의 상태가 매우 좋습니다.</span>
+          </div>
         </div>
-        <div id="user_comment_1" className="flex items-center p-2 ml-2 mw-md:-ml-4 mw-md:pb-1">
-          <span className="">상품의 상태가 매우 좋습니다.</span>
+      ));
+    } else {
+      return (
+        <div id="review_1_wrapper" className="p-5 mb-5 bg-white shadow border border-gray-300">
+          <span className="font-bold">아직 작성된 리뷰가 없습니다</span>
         </div>
-      </div>
-    );
+      );
+    }
   };
 
   const UserAlreadyReviewed = () => {
@@ -357,6 +387,13 @@ export const ProductDetail = () => {
     }
   };
 
+  const handleProductHelp = (value) => {
+    setActiveDetailMenu(value);
+    setDetailMenuStates((prevState) => ({
+      ...Object.fromEntries(Object.keys(prevState).map((key) => [key, false])),
+      [value]: true,
+    }));
+  };
   return (
     <>
       {showMessage && <Message />}
@@ -444,10 +481,34 @@ export const ProductDetail = () => {
           ) : (
             ''
           )}
-
-          <Reviews />
+          <div className="grid grid-cols-3 border-x border-t border-solid border-gray-300 transition-all duration-300">
+            {[`후기`, '상세정보', '상품문의'].map((val) => (
+              <span
+                className={`cursor-pointer text-center text-lg font-semibold border-b-2 border-transparent  text-blue-500 p-5 transition-all duration-300 ${
+                  detailMenuStates[val] ? 'bg-gray-200 border-blue-500' : 'hover:border-blue-300'
+                }`}
+                onClick={() => handleProductHelp(val)}
+              >
+                {val} {val === '후기' && `(${productReviews.length})`}
+              </span>
+            ))}
+          </div>
+          {activeDetailMenu === '후기' && <Reviews />}
+          {activeDetailMenu === '상세정보' && (
+            <div className="flex flex-col items-center justify-center p-5 mb-5 bg-white shadow border border-gray-300 rounded">
+              {Array(currentProduct.images.length).fill(
+                <img src={currentProduct.images[0].imgUrl} alt="" className="mx-auto" />
+              )}
+              <span>상세정보</span>
+            </div>
+          )}
+          {activeDetailMenu === '상품문의' && (
+            <div className="p-5 mb-5 bg-white shadow border border-gray-300 rounded">
+              <span>상품문의</span>
+            </div>
+          )}
           <div
-            id="review_1_wrapper"
+            id="ad_banner_1"
             className="h-60 p-5 mb-5 flex items-center bg-white shadow border border-gray-300 rounded"
           >
             <img src="https://via.placeholder.com/1024x192" alt="" className="h-full" />

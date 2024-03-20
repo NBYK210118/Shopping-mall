@@ -8,19 +8,7 @@ import { Link, useSearchParams } from 'react-router-dom';
 import Skeleton from 'react-loading-skeleton';
 
 export function Products() {
-  const {
-    token,
-    user,
-    setUser,
-    category,
-    setCategory,
-    loading,
-    setLoading,
-    navigate,
-    searchResult,
-    showMessage,
-    setShowMessage,
-  } = useAuth();
+  const { token, user, category, loading, setLoading, navigate, searchResult, setShowMessage } = useAuth();
   const [currentProducts, setCurrentProducts] = useState([]);
   const [manageProductsLikes, setManageProductsLikes] = useState({});
   let [categoryParams, setCategoryParams] = useSearchParams();
@@ -164,43 +152,51 @@ export function Products() {
 
   const SearchResult = () => {
     if (searchResult !== null && searchResult !== undefined && searchResult.length > 0) {
-      return searchResult.map((val, idx) => (
-        <div className="flex flex-col min-h-60 min-w-36 max-h-[390px] mw-md:max-w-[100px] mw-md:max-h-[150px] cursor-pointer p-3 mx-5 my-2 border boder-solid border-gray-300 hover:-translate-y-1 transition-all duration-150">
-          <Link to={`/products/${val.id}`} key={val.id}>
-            <img
-              src={val.images[0].imgUrl}
-              alt=""
-              className="w-full max-w-[250px] miw-md:min-h-72 max-h-[290px] mw-md:max-w-[210px] mw-md:min-h-36 mw-md:max-h-[140px] object-cover hover:scale-[1.04] transition-all duration-300"
-            />
-          </Link>
-          <span className="font-bold text-md mw-md:text-sm mb-1">{val.name}</span>
-          <span className="text-sm mw-md:text-xs mb-2">
-            {val.isDiscounting ? val.discountPrice.toLocaleString('ko-kr') : val.price.toLocaleString('ko-kr')}원
-          </span>
-          <div className="w-full mw-md:w-auto mw-md:space-x-0 flex justfiy-between items-center">
-            <FontAwesomeIcon
-              icon={faHeartRegular} // isFilledHeart 상태에 따라 아이콘을 변경하는 로직 추가 필요
-              className=" text-red-500 text-2xl mw-md:text-sm mw-md:-ml-1 cursor-pointer hover:scale-[1.1] transition-all duration-300"
-              onClick={() => handleGuestClick()}
-            />
-            <div className="flex justify-end ml-20">
-              <span
-                className="font-semibold text-nowrap text-xs mw-md:text-[0.5rem] mx-1 py-1 px-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-all duration-150"
+      return loading ? (
+        <div className="flex justify-around">
+          {Array(5).fill(
+            <Skeleton count={5} className="min-h-60 min-w-36 max-h-[390px] mw-md:max-w-[100px] mw-md:max-h-[150px]" />
+          )}
+        </div>
+      ) : (
+        searchResult.map((val, idx) => (
+          <div className="flex flex-col min-h-60 min-w-36 max-h-[390px] mw-md:max-w-[100px] mw-md:max-h-[150px] cursor-pointer p-3 mx-5 my-2 border boder-solid border-gray-300 hover:-translate-y-1 transition-all duration-150">
+            <Link to={`/products/${val.id}`} key={val.id}>
+              <img
+                src={val.images[0].imgUrl}
+                alt=""
+                className="w-full max-w-[250px] miw-md:min-h-72 max-h-[290px] mw-md:max-w-[210px] mw-md:min-h-36 mw-md:max-h-[140px] object-cover hover:scale-[1.04] transition-all duration-300"
+              />
+            </Link>
+            <span className="font-bold text-md mw-md:text-sm mb-1">{val.name}</span>
+            <span className="text-sm mw-md:text-xs mb-2">
+              {val.isDiscounting ? val.discountPrice.toLocaleString('ko-kr') : val.price.toLocaleString('ko-kr')}원
+            </span>
+            <div className="w-full mw-md:w-auto mw-md:space-x-0 flex justfiy-between items-center">
+              <FontAwesomeIcon
+                icon={faHeartRegular} // isFilledHeart 상태에 따라 아이콘을 변경하는 로직 추가 필요
+                className=" text-red-500 text-2xl mw-md:text-sm mw-md:-ml-1 cursor-pointer hover:scale-[1.1] transition-all duration-300"
                 onClick={() => handleGuestClick()}
-              >
-                구매
-              </span>
-              <Link
-                className="font-semibold text-nowrap mw-md:text-[0.5rem] flex justify-around items-center text-xs py-1 px-2 bg-green-500 text-white rounded hover:bg-green-600 transition-all duration-150"
-                onClick={() => handleGuestClick()}
-              >
-                <FontAwesomeIcon icon={faShoppingCart} />
-                장바구니 담기
-              </Link>
+              />
+              <div className="flex justify-end ml-20">
+                <span
+                  className="font-semibold text-nowrap text-xs mw-md:text-[0.5rem] mx-1 py-1 px-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-all duration-150"
+                  onClick={() => handleGuestClick()}
+                >
+                  구매
+                </span>
+                <Link
+                  className="font-semibold text-nowrap mw-md:text-[0.5rem] flex justify-around items-center text-xs py-1 px-2 bg-green-500 text-white rounded hover:bg-green-600 transition-all duration-150"
+                  onClick={() => handleGuestClick()}
+                >
+                  <FontAwesomeIcon icon={faShoppingCart} />
+                  장바구니 담기
+                </Link>
+              </div>
             </div>
           </div>
-        </div>
-      ));
+        ))
+      );
     }
   };
 

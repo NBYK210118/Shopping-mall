@@ -1,13 +1,9 @@
 import { http } from '../../http-common';
 
 // PersonalStore 에서 선택된 상품의 정보 불러오기 -> PersonalStore 에선 getProductsWhileUpdate 와 같이 사용됨
-const findProduct = async (token, id, navigate) => {
+const findProduct = async (id, navigate) => {
   try {
-    const data = await http.get(`/product/${id}`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
+    const data = await http.get(`/product/?product_id=${id}`);
 
     return data;
   } catch (error) {
@@ -429,6 +425,24 @@ const removeProductBasket = async (token, productId, navigate) => {
   }
 };
 
+// 리뷰 모두 불러오기
+const getAllReviewsByProduct = async (productId, navigate) => {
+  try {
+    const data = http.get(`/review/all/?product_id=${productId}`);
+    return data;
+  } catch (error) {
+    if (error.response.status === 400) {
+      alert('잘못된 요청');
+      localStorage.clear();
+      navigate('');
+    } else if (error.response.status === 500) {
+      alert('서버 에러!');
+      localStorage.clear();
+      navigate('');
+    }
+  }
+};
+
 const ProductApi = {
   findProduct,
   categoriesItem,
@@ -449,6 +463,7 @@ const ProductApi = {
   getMyBasket,
   addProductMyBasket,
   removeProductBasket,
+  getAllReviewsByProduct,
 };
 
 export default ProductApi;

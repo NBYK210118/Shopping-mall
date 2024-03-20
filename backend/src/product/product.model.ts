@@ -25,6 +25,9 @@ export class Product implements Prisma.ProductCreateInput {
   updatedAt?: string | Date;
   reviewProduct?: Prisma.ReviewProductCreateNestedManyWithoutProductInput;
   discountPrice?: number;
+  ShoppingBasket?: Prisma.ShoppingBasketCreateNestedManyWithoutProductInput;
+  basketCount?: number;
+  seller: string;
   discountRatio?: number;
   isDiscounting?: boolean;
   viewed_count?: number;

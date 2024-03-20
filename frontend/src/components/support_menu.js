@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 
-export const Menus = () => {
-  const [activeSupport, setActiveSupport] = useState('자주 찾는 FAQ');
+export const Menus = ({ activeSupport, setActiveSupport }) => {
   const [supportMenus, setSupportMenus] = useState({
     '자주 찾는 FAQ': true,
     '서비스 이용 관련': false,

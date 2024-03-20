@@ -7,6 +7,15 @@ import { Review, User } from '@prisma/client';
 export class ReviewService {
   constructor(private prisma: PrismaService) {}
 
+  // 특정 상품에 대한 리뷰 모두 불러오기
+  async getAllReviewsByProduct(product_id: number): Promise<Review[]> {
+    const result = await this.prisma.review.findMany({
+      where: { productId: product_id },
+      include: { user: { include: { profile: true } } },
+    });
+    return result;
+  }
+
   // 상품 상세정보 페이지에서 사용자가 작성한 리뷰 업데이트
   async reviewUpdate(user: User, data: ReviewDto): Promise<Review> {
     const { productId, review, stars } = data;

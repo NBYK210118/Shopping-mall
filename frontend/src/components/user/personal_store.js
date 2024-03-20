@@ -42,12 +42,14 @@ export default function PersonalStore() {
   const handleClickPageOrPerItems = () => {
     // 초기 정렬 갯수 숫자만 추출해서 보내기
     let result = selection.replace(/개 정렬/, '');
+    setLoading(true);
     ProductApi.getProductsBypage(token, currentPage, result, navigate).then((response) => {
       if (response && response.data) {
         setSellinglist(response.data.products);
         setTotalPage(response.data.totalPages);
       }
     });
+    setLoading(false);
   };
 
   useEffect(() => {
@@ -137,12 +139,15 @@ export default function PersonalStore() {
     // 선택한 상품에 대해서 업데이트 페이지로 넘어가면서 input 태그들에 해당 상품 정보 입력해놓기
     if (sellistIndex) {
       setActiveOption(e.currentTarget.firstChild.textContent);
-      const response = await ProductApi.findProduct(token, sellistIndex, navigate);
-      localStorage.setItem('product', JSON.stringify(response.data));
-      setImageUrl(response.data['images'][0]['imgUrl']);
-      setIsDiscountingPar(response.data.isDiscounting);
-      setCurrentProduct(response.data);
-      getProductsWhileUpdate();
+      const response = await ProductApi.findProduct(sellistIndex, navigate);
+      if (response && response.data) {
+        console.log(response.data);
+        localStorage.setItem('product', JSON.stringify(response.data));
+        // setImageUrl(response.data['images'][0]['imgUrl']);
+        setIsDiscountingPar(response.data.isDiscounting);
+        setCurrentProduct(response.data);
+        getProductsWhileUpdate();
+      }
     } else {
       alert('상품을 선택해주세요');
     }
@@ -596,7 +601,7 @@ export default function PersonalStore() {
               </div>
             )}
             {activeOption === '상품 수정' && (
-              <div className="p-5 ml-10 mw-md:mb-40 flex flex-col">
+              <div className="p-5 ml-10 mw-md:ml-20 mw-md:mb-40 flex flex-col">
                 <div className="h-[400px] mw-md:w-[140px] mw-md:h-[200px] mb-5 border border-gray-300 rounded-xl overflow-hidden">
                   {imageUrl ? (
                     <img src={imageUrl} alt="preview" className="w-full h-full" />
@@ -700,17 +705,25 @@ export default function PersonalStore() {
                         {clickedCategory ? (
                           loading ? (
                             <div>
-                              {' '}
-                              {Array(5).map((_, idx) => (
-                                <>
+                              {Array(5).fill(
+                                <div>
                                   <Skeleton width={300} />
                                   <Skeleton count={5} />
-                                </>
-                              ))}
+                                </div>
+                              )}
                             </div>
                           ) : (
                             <CategoriesOnSale />
                           )
+                        ) : loading ? (
+                          <div>
+                            {Array(5).fill(
+                              <div>
+                                <Skeleton width={300} />
+                                <Skeleton count={5} />
+                              </div>
+                            )}
+                          </div>
                         ) : (
                           <UsersOnSale />
                         )}

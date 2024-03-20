@@ -4,6 +4,7 @@ import { AuthGuard } from '@nestjs/passport';
 import { QuestionDto } from './dto/question.dto';
 import { GetUser } from 'src/user/get-user.decorator';
 import { Question, User } from '@prisma/client';
+import { AnswerDto } from './dto/answer.dto';
 
 @Controller('question')
 export class QuestionController {
@@ -28,5 +29,11 @@ export class QuestionController {
   ): Promise<Question> {
     console.log(data);
     return this.question.addQuestion(user, data);
+  }
+
+  @UseGuards(AuthGuard())
+  @Post('/admin-answered')
+  async adminAnswered(@Body() data: AnswerDto) {
+    return this.question.adminAnswered(data);
   }
 }
