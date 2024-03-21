@@ -105,7 +105,7 @@ export function Products() {
       return currentProducts.map((val, idx) => (
         <div
           id="product_item"
-          className="min-h-60 min-w-36 max-h-[390px] mw-md:max-w-[100px] mw-md:max-h-[150px] cursor-pointer p-3 mx-5 my-2 border boder-solid border-gray-300"
+          className="max-w-[250px] min-h-60 min-w-36 max-h-[390px] mw-md:max-w-[100px] mw-md:max-h-[150px] cursor-pointer p-3 mx-5 my-2 border boder-solid border-gray-300"
         >
           <Link to={`/products/${val.id}`} key={val.id}>
             <img

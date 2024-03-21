@@ -40,13 +40,26 @@ model Image {
 
 model Question {
   id Int @id @default(autoincrement())
-  imgUrl String?
+  imgUrl String[]
   content String
   user User @relation(fields: [userId],references: [id])
   userId Int
-  answer String?
-  createdAt DateTime @default(now())
+  answer Answer?
+  createdAt DateTime? @default(now())
+  updatedAt DateTime? @updatedAt
   isAnswered Boolean? @default(false)
+}
+
+model Answer {
+  id Int @id @default(autoincrement())
+  content String
+  imgUrl String[]
+  user User @relation(fields: [userId],references: [id])
+  userId Int
+  createdAt DateTime? @default(now())
+  updatedAt DateTime? @updatedAt
+  question Question @relation(fields: [questionId], references: [id])
+  questionId Int @unique
 }
 
 model Profile {
@@ -94,6 +107,7 @@ model User {
   password       String
   role UserRole @default(USER)
   questions Question[]
+  answers Answer[]
   orders         Order[]
   profile        Profile?
   wishlist       WishList?

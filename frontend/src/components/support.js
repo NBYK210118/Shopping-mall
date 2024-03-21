@@ -1,4 +1,11 @@
-import { faArrowRight, faArrowRightLong, faQuestion, faReply, faTurnDown } from '@fortawesome/free-solid-svg-icons';
+import {
+  faArrowRight,
+  faArrowRightLong,
+  faFile,
+  faQuestion,
+  faReply,
+  faTurnDown,
+} from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useEffect, useRef, useState } from 'react';
 import { AskInfo } from './askinfo';
@@ -6,6 +13,8 @@ import DataService from '../user_api';
 import { useAuth } from '../auth.context';
 import Skeleton from 'react-loading-skeleton';
 import { Menus } from './support_menu';
+import SupportApi from './SupportApi';
+import RecentQuestions from './RecentQuestions';
 
 export const Support = () => {
   const { token, user, navigate, setLoading, loading } = useAuth();
@@ -17,14 +26,14 @@ export const Support = () => {
   useEffect(() => {
     if (token) {
       setLoading(true);
-      DataService.getUserQuestions(token, navigate).then((response) => {
+      SupportApi.getUserQuestions(token, navigate).then((response) => {
         console.log('users questions: ', response.data);
         setMyQuestions(response.data);
       });
       setLoading(false);
     }
     setLoading(true);
-    DataService.getRecentQuestions(navigate).then((response) => {
+    SupportApi.getRecentQuestions(navigate).then((response) => {
       console.log('recent questions: ', response.data);
       setRecentQuestions(response.data);
     });
@@ -41,18 +50,26 @@ export const Support = () => {
     );
   }, [recentQuestions]);
 
-  console.log(recentReplyStatus);
-
   const handleReply = (question_id) => {
     setRecentReplyStatus({
       ...recentReplyStatus,
-      [question_id]: !recentReplyStatus[question_id],
+      [question_id]: true,
+    });
+  };
+
+  const handleReplySubmit = (question_id, formdata) => {
+    SupportApi.addAnswer(token, question_id, formdata, navigate).then((response) => {
+      console.log('Success to upload your answer!', response.data);
+    });
+    setRecentReplyStatus({
+      ...recentReplyStatus,
+      [question_id]: false,
     });
   };
 
   const postQuestion = (formdata) => {
     setLoading(true);
-    DataService.addQuestion(token, formdata, navigate).then((response) => {
+    SupportApi.addQuestion(token, formdata, navigate).then((response) => {
       console.log(response.data);
       setMyQuestions(response.data);
     });
@@ -78,7 +95,7 @@ export const Support = () => {
 
               <div className="flex flex-col ml-2">
                 <span className="p-1 font-bold">{user.profile.nickname}</span>
-                <span className="ml-1 my-4 text-sm">{val.content}</span>
+                <span className="ml-1 my-4 text-sm mw-md:text-xs">{val.content}</span>
               </div>
             </div>
             {val.answer && (
@@ -90,91 +107,15 @@ export const Support = () => {
 
                 <div className="flex flex-col ml-5">
                   <span className="p-1">관리자</span>
-                  <span className="ml-1 my-4 text-sm">Ipsum enim pariatur qui voluptate eu sit sit laboris.</span>
+                  <span className="ml-1 my-4 text-sm mw-md:text-xs">
+                    Ipsum enim pariatur qui voluptate eu sit sit laboris.
+                  </span>
                 </div>
               </div>
             )}
           </div>
         </div>
       ));
-    }
-  };
-
-  const RecentQuestions = () => {
-    if (recentQuestions && recentQuestions.length > 0) {
-      return recentQuestions.map((val) => (
-        <div className="flex flex-col relative">
-          <div className="flex border p-3 my-3">
-            <div className="p-3">
-              {val.user && val.user.profile.imageUrl ? (
-                <img src={val.user.profile.imageUrl} alt="profile" className="w-[60px] rounded-full" />
-              ) : (
-                <span className="material-symbols-outlined w-[60px] rounded-full">account_circle</span>
-              )}
-            </div>
-
-            <div className="flex flex-col ml-2">
-              <span className="p-1 font-bold">{val.user.profile.nickname}</span>
-              <span className="ml-1 my-4 text-sm">{val.content}</span>
-            </div>
-            {user && user.role === 'ADMIN' && (
-              <div
-                className={`absolute right-1 text-white text-sm cursor-pointer p-2 border rounded bg-blue-500 ${
-                  recentReplyStatus[val.id] ? 'hidden' : ''
-                }`}
-                onClick={() => handleReply(val.id)}
-              >
-                <span className="font-bold mr-1">답변</span>
-                <FontAwesomeIcon icon={faReply} />
-              </div>
-            )}
-          </div>
-          {val.answer && (
-            <div className="flex border p-3 -mt-3">
-              <FontAwesomeIcon icon={faTurnDown} className="text-3xl" />
-              <div className="p-3">
-                <img src="" alt="profile" className="rounded-full w-full" />
-              </div>
-
-              <div className="flex flex-col ml-5">
-                <span className="p-1">관리자</span>
-                <span className="ml-1 my-4 text-sm">Ipsum enim pariatur qui voluptate eu sit sit laboris.</span>
-              </div>
-            </div>
-          )}
-          {recentReplyStatus[val.id] && (
-            <div className="flex border p-3 -mt-3">
-              <FontAwesomeIcon icon={faTurnDown} className="text-3xl" />
-              <div className="p-3">
-                <img src="" alt="profile" className="rounded-full w-full" />
-              </div>
-
-              <div className="flex flex-col w-[80%] mw-md:w-[65%] ml-5">
-                <span className="p-1">관리자</span>
-                <input
-                  className="w-full p-2 ml-1 my-4 text-sm border border-gray-300"
-                  placeholder="답변을 입력해주세요"
-                />
-              </div>
-
-              <div className="absolute right-1 bottom-9 cursor-pointer">
-                <span
-                  className="border border-transparent rounded-lg bg-blue-500 text-white text-sm font-bold p-2"
-                  onClick={() => handleReply(val.id)}
-                >
-                  제출
-                </span>
-              </div>
-            </div>
-          )}
-        </div>
-      ));
-    } else {
-      return (
-        <div className="flex flex-col">
-          <span>최근 문의된 사항이 없습니다</span>
-        </div>
-      );
     }
   };
 
@@ -265,6 +206,7 @@ export const Support = () => {
       );
     }
   };
+
   return (
     <div className="w-[1024px] mw-md:w-[350px] flex flex-col mw-md:flex-wrap justify-around px-10 pb-10 mb-10 mt-10 mw-md:p-0 mw-md:mb-24 mw-md:mt-5 border border-gray-300">
       <div className="mb-4 border-b">
@@ -273,7 +215,7 @@ export const Support = () => {
         </div>
         <ShowByActiveSupport />
       </div>
-      {token && <AskInfo onAdd={postQuestion} />}
+      {token && user.role !== 'ADMIN' && <AskInfo onAdd={postQuestion} />}
       {loading ? (
         <div>
           <Skeleton width={500} />
@@ -282,7 +224,13 @@ export const Support = () => {
       ) : (
         <div className="mt-2 pb-3 border-b mw-md:ml-2">
           <h1 className="text-xl font-bold underline">최근 FAQ</h1>
-          <RecentQuestions />
+          <RecentQuestions
+            recentQuestions={recentQuestions}
+            recentReplyStatus={recentReplyStatus}
+            user={user}
+            handleReply={handleReply}
+            handleReplySubmit={handleReplySubmit}
+          />
         </div>
       )}
       {loading ? (

@@ -1,5 +1,5 @@
 export class QuestionDto {
-  imgUrl?: string;
+  imgUrl?: string[];
   content: string;
   img_size: number;
 }

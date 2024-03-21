@@ -10,7 +10,7 @@ export class QuestionService {
 
   async getQuestions(): Promise<Question[]> {
     const result = await this.prisma.question.findMany({
-      include: { user: { include: { profile: true } } },
+      include: { user: { include: { profile: true } }, answer: true },
     });
 
     return result;
@@ -25,19 +25,36 @@ export class QuestionService {
   }
 
   async addQuestion(user: User, data: QuestionDto): Promise<Question> {
-    const { content, imgUrl, img_size } = data;
+    const { content, imgUrl } = data;
+
     const result = await this.prisma.question.create({
       data: { content, imgUrl, user: { connect: { id: user.id } } },
+      include: { answer: true },
     });
 
     return result;
   }
-  async adminAnswered(data: AnswerDto) {
-    const { content, imgUrl, img_size, question_id } = data;
 
-    // 질문 찾고 답변 질문 레코드에 저장해주기 -> isAnswered 업데이트, answer 업데이트 -> 답변을 저장해주려는 질문이 없을 시 에러 발생시켜주기
-    await this.prisma.question.findUnique({
-      where: { id: Number(question_id) },
+  async updateQuestion(
+    user: User,
+    data: QuestionDto,
+    question_id: number,
+  ): Promise<Question> {
+    const { content, imgUrl } = data;
+    const question = await this.prisma.question.findUnique({
+      where: { id: question_id, userId: user.id },
     });
+
+    if (!question) {
+      throw new Error('Question Not found Error');
+    }
+
+    const result = await this.prisma.question.update({
+      where: { id: question_id, userId: user.id },
+      data: { content, imgUrl },
+      include: { answer: true },
+    });
+
+    return result;
   }
 }
