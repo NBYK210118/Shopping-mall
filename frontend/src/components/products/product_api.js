@@ -186,6 +186,24 @@ const updateReview = async (token, formData, navigate) => {
   }
 };
 
+// 특정 상품에 대한 리뷰들 전부 불러오기
+const getAllReviewsByProduct = async (productId, navigate) => {
+  try {
+    const data = await http.get(`/review/all?product_id=${productId}`);
+    return data;
+  } catch (error) {
+    if (error.response.status === 400) {
+      alert('잘못된 요청');
+      localStorage.clear();
+      navigate('');
+    } else if (error.response.status === 500) {
+      alert('서버 에러!');
+      localStorage.clear();
+      navigate('');
+    }
+  }
+};
+
 // 현재 상품 상세정보 페이지의 상품이 현재 사용자가 판매 등록한 상품인지 체크
 const isUsersProduct = async (token, productId, navigate) => {
   try {
@@ -433,6 +451,7 @@ const ProductApi = {
   updatelikeProduct,
   fetchUserWishList,
   updateReview,
+  getAllReviewsByProduct,
   isUsersProduct,
   guestViewed,
   userViewed,

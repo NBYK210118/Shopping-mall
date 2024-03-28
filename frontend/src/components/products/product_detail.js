@@ -74,6 +74,7 @@ export const ProductDetail = () => {
             }
           }
         } else {
+          console.log(ProductApi);
           const formData = new FormData();
           formData.append('productId', productId);
           setLoading(true);
@@ -484,7 +485,7 @@ export const ProductDetail = () => {
           <div className="grid grid-cols-3 border-x border-t border-solid border-gray-300 transition-all duration-300">
             {[`후기`, '상세정보', '상품문의'].map((val) => (
               <span
-                className={`cursor-pointer text-center text-lg font-semibold border-b-2 border-transparent  text-blue-500 p-5 transition-all duration-300 ${
+                className={`cursor-pointer text-center text-lg mw-md:text-xs font-semibold border-b-2 border-transparent  text-blue-500 p-5 transition-all duration-300 ${
                   detailMenuStates[val] ? 'bg-gray-200 border-blue-500' : 'hover:border-blue-300'
                 }`}
                 onClick={() => handleProductHelp(val)}

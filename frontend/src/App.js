@@ -30,6 +30,7 @@ import Categories from './components/categories';
 import ProductApi from './components/products/product_api';
 import { Message } from './components/message';
 import Support from './components/support';
+import Loading from './loading';
 
 function BottomBar() {
   const { setCategory, navigate, setLoading, token } = useAuth();
@@ -218,8 +219,12 @@ function MainHeader() {
     ];
 
     const links = result.map((val, idx) => (
-      <div key={idx} className="cursor-pointer rounded-lg block p-3 hover:bg-sky-300 transition-all duration-300">
-        <NavLink to={val.to} onClick={closeMenu} className="text-base font-semibold text-white mw-md:text-black">
+      <div
+        key={idx}
+        className="cursor-pointer rounded-lg block p-3 hover:bg-sky-300 transition-all duration-300"
+        onClick={closeMenu}
+      >
+        <NavLink to={val.to} className="text-base font-semibold text-white mw-md:text-black">
           {val.text}
         </NavLink>
       </div>
@@ -364,7 +369,7 @@ function MainHeader() {
 }
 
 function App() {
-  const { showMessage, setShowMessage } = useAuth();
+  const { showMessage, setShowMessage, loading } = useAuth();
 
   useEffect(() => {
     window.onbeforeunload = function pushRefresh() {
@@ -376,6 +381,7 @@ function App() {
       <MainHeader />
       <div className="w-full h-full flex justify-center items-center mt-12">
         {showMessage && <Message />}
+        {loading && <Loading />}
         <Routes>
           <Route exact path="/" element={<MainContent />}></Route>
           <Route exact path="/home" element={<MainContent />}></Route>

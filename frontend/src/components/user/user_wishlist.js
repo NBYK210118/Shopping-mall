@@ -135,7 +135,7 @@ export default function UserWishlist() {
   return (
     <div
       id="wishlist_container"
-      className="w-full h-full mt-6 p-5 mw-md:p-0 mw-md:-ml-10 mw-md:-mt-4 justify-center items-center mw-md:border-none"
+      className="w-full h-full mt-6 p-5 mw-md:p-0 mw-md:-ml-10 mw-md:-mt-4 mw-md:mb-24 justify-center items-center mw-md:border-none"
     >
       <div className="flex mw-md:grid mw-md:grid-cols-2 mw-md:-ml-12 items-center gap-8 mw-md:gap-20">
         <Items />

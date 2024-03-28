@@ -21,6 +21,9 @@ export class ProductController {
 
   @Get('')
   async getProduct(@Query('product_id') product_id: string): Promise<Product> {
+    if (!product_id) {
+      return;
+    }
     return this.productService.getProduct(+product_id);
   }
 
