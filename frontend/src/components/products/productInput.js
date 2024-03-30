@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import ProductApi from './product_api';
-import { useAuth } from '../../auth.context';
+import { useAuth } from '../../context/auth.context';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFile } from '@fortawesome/free-solid-svg-icons';
 

@@ -1,14 +1,14 @@
 import { useEffect, useState } from 'react';
-import { useAuth } from '../auth.context';
+import { useAuth } from '../../auth.context';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import 'swiper/css/pagination';
 import 'swiper/css/navigation';
 import 'swiper/css';
 import { Navigation } from 'swiper/modules';
-import DataService from '../user_api';
+import DataService from '../../services/user_api';
 import Skeleton from 'react-loading-skeleton';
 import 'react-loading-skeleton/dist/skeleton.css';
-import ProductApi from './products/product_api';
+import ProductApi from '../products/product_api';
 import { Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEye, faHandSparkles, faHeart } from '@fortawesome/free-solid-svg-icons';

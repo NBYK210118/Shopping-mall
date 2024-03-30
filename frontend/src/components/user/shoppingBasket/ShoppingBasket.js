@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react';
-import ProductApi from '../products/product_api';
-import { useAuth } from '../../auth.context';
+import ProductApi from '../../products/product_api';
+import { useAuth } from '../../../context/auth.context';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBasketShopping, faX } from '@fortawesome/free-solid-svg-icons';
-import { PayMethod } from '../products/Paymethod';
+import { PayMethod } from '../../products/Paymethod';
 
 export const ShoppingBasket = () => {
   const { token, loading, setLoading, navigate, user } = useAuth();

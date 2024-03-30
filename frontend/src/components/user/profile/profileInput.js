@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useAuth } from '../../auth.context';
+import { useAuth } from '../../../context/auth.context';
 
 export const ProfileInput = ({ onProfile }) => {
   const { user } = useAuth();

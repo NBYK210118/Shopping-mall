@@ -1,15 +1,15 @@
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../../auth.context';
-import { Images } from '../../images_list';
+import { useAuth } from '../../../context/auth.context';
+import { Images } from '../../../images/images_list';
 import React, { useEffect, useRef, useState } from 'react';
-import DataService from '../../user_api';
-import ProductApi from '../products/product_api';
+import DataService from '../../../services/user_api';
+import ProductApi from '../../products/product_api';
 import { Navigation } from 'swiper/modules';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import Skeleton from 'react-loading-skeleton';
 import StoreSearchBar from './search_keyword';
 import { ProductManageBtns } from './product_manage_btns';
-import { ProductInput } from '../products/productInput';
+import { ProductInput } from '../../products/productInput';
 import { DropDown } from './sortDropdown';
 
 export default function PersonalStore() {

@@ -2,8 +2,8 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faHeart, faMoneyBillWave, faShoppingCart } from '@fortawesome/free-solid-svg-icons';
 import { faHeart as faHeartRegular } from '@fortawesome/free-regular-svg-icons';
 import { useEffect, useState } from 'react';
-import { useAuth } from '../../auth.context';
-import ProductApi from '../products/product_api';
+import { useAuth } from '../../../context/auth.context';
+import ProductApi from '../../products/product_api';
 
 export default function UserWishlist() {
   const { user, token, navigate, setLoading, setShowMessage } = useAuth();

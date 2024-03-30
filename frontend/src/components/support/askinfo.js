@@ -1,7 +1,7 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React, { useRef, useState } from 'react';
 import { faImage } from '@fortawesome/free-solid-svg-icons';
-import { useAuth } from '../auth.context';
+import { useAuth } from '../../context/auth.context';
 
 export const AskInfo = ({ onAdd }) => {
   const { user, navigate } = useAuth();

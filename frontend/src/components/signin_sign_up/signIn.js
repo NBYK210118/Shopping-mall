@@ -1,11 +1,11 @@
 import { useContext, useState } from 'react';
-import { Images } from '../images_list';
+import { Images } from '../../images/images_list';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../auth.context';
-import Loading from '../loading';
+import { useAuth } from '../../context/auth.context';
+import Loading from '../../loading/loading';
 import { faXmark } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import DataService from '../user_api';
+import DataService from '../../services/user_api';
 
 const SignIn = () => {
   const [isOpenModal, setIsOpenModal] = useState(true);

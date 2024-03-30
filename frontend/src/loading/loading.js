@@ -1,5 +1,5 @@
 import React from 'react';
-import { Images } from './images_list';
+import { Images } from '../images/images_list';
 
 const Loading = () => {
   return (

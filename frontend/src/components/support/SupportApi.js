@@ -1,4 +1,4 @@
-import { http } from '../http-common';
+import { http } from '../../http-common';
 
 // 사용자들의 문의사항 모두 불러오기
 const getAllReviewsByProduct = async (productId, navigate) => {
