@@ -1,12 +1,12 @@
 import { useState, useEffect } from 'react';
-import { Route, Routes, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
-import UserProfile from './profile';
-import PersonalStore from './personal_store';
-import UserWishlist from './user_wishlist';
-import { faBasketShopping, faClock, faHeart, faList, faStore, faUser } from '@fortawesome/free-solid-svg-icons';
+import { Route, Routes, useLocation, useNavigate } from 'react-router-dom';
+import { faBasketShopping, faClock, faHeart, faStore, faUser } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { Watchlist } from './watchlist';
-import ShoppingBasket from './ShoppingBasket';
+import ShoppingBasket from './shoppingBasket/ShoppingBasket';
+import UserProfile from './profile/profile';
+import PersonalStore from './mystore/personal_store';
+import UserWishlist from './wishlist/user_wishlist';
+import Watchlist from './watchlist/watchlist';
 
 const Mypage = () => {
   const navigate = useNavigate();

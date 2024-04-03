@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import ProductApi from './product_api';
+import ProductApi from '../../services/product_api';
 import { useAuth } from '../../context/auth.context';
 
 export const PayMethod = ({ currentBasket, quantityState }) => {

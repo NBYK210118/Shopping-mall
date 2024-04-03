@@ -1,9 +1,9 @@
 import { useRef, useState } from 'react';
-import { Images } from '../../../images/images_list';
-import { useAuth } from '../../../context/auth.context';
 import { useNavigate } from 'react-router-dom';
 import ProfileInput from './profileInput';
+import { useAuth } from '../../../context/auth.context';
 import DataService from '../../../services/user_api';
+import { Images } from '../../../images/images_list';
 
 export default function UserProfile() {
   const { token, user, setUser, setLoading } = useAuth();

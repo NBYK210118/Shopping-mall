@@ -5,7 +5,7 @@ import { useAuth } from '../../context/auth.context';
 import Loading from '../../loading/loading';
 import { faXmark } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import DataService from '../../services/user_api';
+import DataService from '../../servsices/user_api';
 
 const SignIn = () => {
   const [isOpenModal, setIsOpenModal] = useState(true);

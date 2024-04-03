@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
-import ProductApi from './product_api';
-import { useAuth } from '../../auth.context';
+import ProductApi from '../../services/product_api';
 import { useParams } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
@@ -14,7 +13,8 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import { faStar as fablankStar } from '@fortawesome/free-regular-svg-icons';
 import { faHeart as faHeartRegular } from '@fortawesome/free-regular-svg-icons';
-import Message from '../message';
+import { useAuth } from '../../context/auth.context';
+import Message from '../support/message';
 
 export const ProductDetail = () => {
   const [currentProduct, setCurrentProduct] = useState(null);

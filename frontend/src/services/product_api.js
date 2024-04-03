@@ -1,4 +1,4 @@
-import { http } from '../../services/http-common';
+import { http } from './http-common';
 
 // PersonalStore 에서 선택된 상품의 정보 불러오기 -> PersonalStore 에선 getProductsWhileUpdate 와 같이 사용됨
 const findProduct = async (id, navigate) => {

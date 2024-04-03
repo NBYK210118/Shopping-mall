@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react';
-import { useAuth } from '../../auth.context';
-import ProductApi from './product_api';
+
+import ProductApi from '../../services/product_api';
 import { useParams } from 'react-router-dom';
 import { PayMethod } from './Paymethod';
+import { useAuth } from '../../context/auth.context';
 
 export const BuyNow = () => {
   const { token, navigate, user, setLoading, loading } = useAuth();

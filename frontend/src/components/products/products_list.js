@@ -2,10 +2,11 @@ import { useEffect, useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faHeart, faShoppingCart } from '@fortawesome/free-solid-svg-icons';
 import { faHeart as faHeartRegular } from '@fortawesome/free-regular-svg-icons';
-import ProductApi from './product_api';
-import { useAuth } from '../../auth.context';
+import ProductApi from '../../services/product_api';
+
 import { Link, useSearchParams } from 'react-router-dom';
 import Skeleton from 'react-loading-skeleton';
+import { useAuth } from '../../context/auth.context';
 
 export function Products() {
   const { token, user, category, loading, setLoading, navigate, searchResult, setShowMessage } = useAuth();

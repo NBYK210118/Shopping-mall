@@ -3,7 +3,7 @@ import { useAuth } from '../../../context/auth.context';
 import { Images } from '../../../images/images_list';
 import React, { useEffect, useRef, useState } from 'react';
 import DataService from '../../../services/user_api';
-import ProductApi from '../../products/product_api';
+import ProductApi from '../../../services/product_api';
 import { Navigation } from 'swiper/modules';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import Skeleton from 'react-loading-skeleton';

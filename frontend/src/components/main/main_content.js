@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react';
-import { useAuth } from '../../auth.context';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import 'swiper/css/pagination';
 import 'swiper/css/navigation';
@@ -8,13 +7,14 @@ import { Navigation } from 'swiper/modules';
 import DataService from '../../services/user_api';
 import Skeleton from 'react-loading-skeleton';
 import 'react-loading-skeleton/dist/skeleton.css';
-import ProductApi from '../products/product_api';
+import ProductApi from '../../services/product_api';
 import { Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEye, faHandSparkles, faHeart } from '@fortawesome/free-solid-svg-icons';
+import { useAuth } from '../../context/auth.context';
 
 export default function MainContent() {
-  const { token, user, loading, setLoading, navigate, category, setCategory, setClickedSellingProduct } = useAuth();
+  const { token, user, loading, setLoading, navigate, setClickedSellingProduct } = useAuth();
   const [showMessage, setShowMessage] = useState(true);
   const [slideOut, setSlideOut] = useState(false);
   const [salesProducts, setSalesProducts] = useState(null);

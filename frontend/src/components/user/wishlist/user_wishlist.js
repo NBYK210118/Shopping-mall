@@ -3,7 +3,7 @@ import { faHeart, faMoneyBillWave, faShoppingCart } from '@fortawesome/free-soli
 import { faHeart as faHeartRegular } from '@fortawesome/free-regular-svg-icons';
 import { useEffect, useState } from 'react';
 import { useAuth } from '../../../context/auth.context';
-import ProductApi from '../../products/product_api';
+import ProductApi from '../../../services/product_api';
 
 export default function UserWishlist() {
   const { user, token, navigate, setLoading, setShowMessage } = useAuth();

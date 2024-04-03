@@ -1,12 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Images } from './images_list';
 import { NavLink, Route, Routes, useNavigate } from 'react-router-dom';
-import SignIn from './components/signIn';
-import MainContent from './components/main_content';
-import Mypage from './components/user/Mypage';
 import { Products } from './components/products/products_list';
-import SignUp from './components/user/signUp';
-import { useAuth } from './auth.context';
+import SignUp from './components/signin_sign_up/signUp';
 import ProductDetail from './components/products/product_detail';
 import BuyNow from './components/products/buy_now';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -26,11 +21,16 @@ import {
   faShirt,
   faShoppingBasket,
 } from '@fortawesome/free-solid-svg-icons';
-import Categories from './components/categories';
-import ProductApi from './components/products/product_api';
-import { Message } from './components/message';
-import Support from './components/support';
-import Loading from './loading';
+import ProductApi from './services/product_api';
+import { Images } from './images/images_list';
+import SignIn from './components/signin_sign_up/signIn';
+import MainContent from './components/main/main_content';
+import Mypage from './components/user/Mypage';
+import { useAuth } from './context/auth.context';
+import Categories from './components/main/categories';
+import Message from './components/support/message';
+import Loading from './loading/loading';
+import Support from './components/support/support';
 
 function BottomBar() {
   const { setCategory, navigate, setLoading, token } = useAuth();
@@ -370,12 +370,6 @@ function MainHeader() {
 
 function App() {
   const { showMessage, setShowMessage, loading } = useAuth();
-
-  useEffect(() => {
-    window.onbeforeunload = function pushRefresh() {
-      window.scrollTo(0, 0);
-    };
-  }, []);
   return (
     <div className={`w-full h-full overflow-hidden`} id="main">
       <MainHeader />

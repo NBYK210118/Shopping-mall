@@ -1,19 +1,19 @@
-import logo from './images/Original Logo.png';
-import menu from './images/menu_FILL0_wght400_GRAD0_opsz24.svg';
-import Profile from './images/account_circle_FILL0_wght400_GRAD0_opsz24.svg';
-import Edit from './images/edit_FILL0_wght400_GRAD0_opsz24.svg';
-import Bluejean from './images/blue_jean_1.jpeg';
-import watermelon from './images/watermelon.jpeg';
-import macbook from './images/MacBook Pro.jpeg';
-import chair from './images/furniture_1.jpeg';
-import Search from './images/manage_search_FILL0_wght400_GRAD0_opsz24.svg';
-import spinner from './images/Rainbow.gif';
-import heart from './images/favorite_FILL0_wght400_GRAD0_opsz24.svg';
-import filled_heart from './images/filled_heart.svg';
-import Game from './images/게임.jpg';
-import Book from './images/도서.webp';
-import Sports from './images/스포츠.jpg';
-import Toy from './images/장난감.jpeg';
+import logo from './Original Logo.png';
+import menu from './menu_FILL0_wght400_GRAD0_opsz24.svg';
+import Profile from './account_circle_FILL0_wght400_GRAD0_opsz24.svg';
+import Edit from './edit_FILL0_wght400_GRAD0_opsz24.svg';
+import Bluejean from './blue_jean_1.jpeg';
+import watermelon from './watermelon.jpeg';
+import macbook from './MacBook Pro.jpeg';
+import chair from './furniture_1.jpeg';
+import Search from './manage_search_FILL0_wght400_GRAD0_opsz24.svg';
+import spinner from './Rainbow.gif';
+import heart from './favorite_FILL0_wght400_GRAD0_opsz24.svg';
+import filled_heart from './filled_heart.svg';
+import Game from './게임.jpg';
+import Book from './도서.webp';
+import Sports from './스포츠.jpg';
+import Toy from './장난감.jpeg';
 
 export const Images = {
   logo,

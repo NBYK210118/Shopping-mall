@@ -9,12 +9,11 @@ import {
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useEffect, useRef, useState } from 'react';
 import { AskInfo } from './askinfo';
-import DataService from '../../user_api';
-import { useAuth } from '../../auth.context';
 import Skeleton from 'react-loading-skeleton';
 import { Menus } from './support_menu';
-import SupportApi from './SupportApi';
+import SupportApi from '../../services/SupportApi';
 import RecentQuestions from './RecentQuestions';
+import { useAuth } from '../../context/auth.context';
 
 export const Support = () => {
   const { token, user, navigate, setLoading, loading } = useAuth();

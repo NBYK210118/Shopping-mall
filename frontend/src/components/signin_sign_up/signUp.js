@@ -1,8 +1,8 @@
 import { useNavigate } from 'react-router-dom';
-import { Images } from '../../images_list';
 import { useState } from 'react';
-import Loading from '../../loading';
-import DataService from '../../user_api';
+import { Images } from '../../images/images_list';
+import Loading from '../../loading/loading';
+import DataService from '../../services/user_api';
 
 const SignUp = () => {
   const navigate = useNavigate();

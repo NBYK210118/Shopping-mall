@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useAuth } from '../../../context/auth.context';
-import ProductApi from '../../products/product_api';
-import { Images } from '../../../images_list';
+import ProductApi from '../../../services/product_api';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faHeart, faMoneyBillWave, faShoppingCart } from '@fortawesome/free-solid-svg-icons';
 import { faHeart as faHeartRegular } from '@fortawesome/free-regular-svg-icons';
@@ -158,3 +157,5 @@ export const Watchlist = () => {
     </div>
   );
 };
+
+export default Watchlist;
