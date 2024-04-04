@@ -121,7 +121,7 @@ export default function MainContent() {
     } else {
       const slidesPerViewSetting = Math.max(1, salesProducts.length) >= 4 ? 3 : Math.max(1, salesProducts.length);
       return loading
-        ? Array(4).map((_, idx) => (
+        ? [...Array(4)].map((_, idx) => (
             <div>
               <Skeleton height={120} count={5} />
             </div>
@@ -205,7 +205,7 @@ export default function MainContent() {
     } else {
       const slidesPerViewSetting = Math.max(1, likedProducts.length) >= 4 ? 3 : Math.max(1, likedProducts.length);
       return loading
-        ? Array(4).map((_, idx) => (
+        ? [...Array(4)].map((_, idx) => (
             <div>
               <Skeleton height={120} count={5} />
             </div>
@@ -286,7 +286,7 @@ export default function MainContent() {
       // 데이터가 있을 때의 렌더링 로직
       const slidesPerViewSetting = Math.max(1, watchedProducts.length) >= 4 ? 3 : Math.max(1, watchedProducts.length);
       return loading
-        ? Array(4).map((_, idx) => (
+        ? [...Array(4)].map((_, idx) => (
             <div>
               <Skeleton height={120} count={5} />
             </div>
@@ -369,7 +369,7 @@ export default function MainContent() {
         </h3>
         {loading ? (
           <div className="grid grid-cols-2 gap-4 mw-md:grid-cols-2">
-            {Array(4).map((_, idx) => (
+            {[...Array(4)].map((_, idx) => (
               <div className="flex flex-col items-center max-w-[200px]">
                 <Skeleton height={180} className="mb-2" />
                 <Skeleton count={5} />
@@ -421,7 +421,7 @@ export default function MainContent() {
         </h3>
         {loading ? (
           <div className="grid grid-cols-2 gap-4 mw-md:grid-cols-2">
-            {Array(4).map((_, idx) => (
+            {[...Array(4)].map((_, idx) => (
               <div className="flex flex-col items-center max-w-[200px]">
                 <Skeleton height={180} className="mb-2" />
                 <Skeleton count={5} />
@@ -556,7 +556,7 @@ export default function MainContent() {
                   마이 스토어
                 </h1>
                 {loading ? (
-                  Array(4).map((_, idx) => (
+                  [...Array(4)].map((_, idx) => (
                     <div className="flex flex-col items-center max-w-[200px]">
                       <Skeleton height={170} className="mb-2" />
                       <Skeleton count={5} />
@@ -573,7 +573,7 @@ export default function MainContent() {
                   <FontAwesomeIcon icon={faHeart} className="text-red-500" /> 좋아요 리스트
                 </h1>
                 {loading ? (
-                  Array(4).map((_, idx) => (
+                  [...Array(4)].map((_, idx) => (
                     <div className="flex flex-col items-center max-w-[200px]">
                       <Skeleton height={170} className="mb-2" />
                       <Skeleton count={5} />
@@ -590,7 +590,7 @@ export default function MainContent() {
                   <FontAwesomeIcon icon={faEye} /> 최근 본 상품들
                 </h1>
                 {loading ? (
-                  Array(4).map((_, idx) => (
+                  [...Array(4)].map((_, idx) => (
                     <div className="flex flex-col items-center max-w-[200px]">
                       <Skeleton height={170} className="mb-2" />
                       <Skeleton count={5} />
@@ -631,7 +631,7 @@ export default function MainContent() {
                 <div className="grid grid-cols-2 gap-4">
                   {[...Array(4)].map((_, index) => (
                     <div className="flex flex-col items-center">
-                      <img src="https://via.placeholder.com/150" alt="Ad" className="mb-2" />
+                      <img src="https://via.placeholder.com/150" alt="Ad" className="mb-2 object-cover" />
                       <p className="mw-md:hidden">Ad Description</p>
                     </div>
                   ))}

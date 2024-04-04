@@ -1,13 +1,6 @@
-import {
-  faArrowRight,
-  faArrowRightLong,
-  faFile,
-  faQuestion,
-  faReply,
-  faTurnDown,
-} from '@fortawesome/free-solid-svg-icons';
+import { faArrowRight, faQuestion, faTurnDown } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { AskInfo } from './askinfo';
 import Skeleton from 'react-loading-skeleton';
 import { Menus } from './support_menu';
